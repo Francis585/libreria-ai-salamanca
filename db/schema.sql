@@ -271,6 +271,20 @@ create table if not exists novedades_feed (
 
 create index if not exists novedades_feed_anio_idx on novedades_feed (anio desc);
 
+-- Búsqueda sin acentos: «garcia marquez» tiene que encontrar a «García Márquez».
+-- Se guarda una versión normalizada y se consulta contra ella.
+alter table novedades_feed
+  add column if not exists busqueda text
+  generated always as (
+    translate(
+      lower(coalesce(titulo, '') || ' ' || coalesce(autor, '') || ' ' || coalesce(editorial, '')),
+      'áéíóúüñÁÉÍÓÚÜÑ',
+      'aeiouunAEIOUUN'
+    )
+  ) stored;
+
+create index if not exists novedades_feed_busqueda_idx on novedades_feed (busqueda);
+
 
 -- Opiniones de lectores. `origen = 'casa'` son las reseñas que firma el equipo
 -- de la librería (no cuentan como opinión de un cliente); `'lector'` son las que

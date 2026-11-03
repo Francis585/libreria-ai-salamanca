@@ -439,19 +439,24 @@ async function handleEmailReenviar(req: any, res: any) {
 
 // Editoriales de referencia en castellano. Pedir por editorial es lo único que
 // devuelve novedades reales: el "sort=new" global está lleno de autoeditados.
+/**
+ * Editoriales españolas que se consultan en la fuente externa.
+ *
+ * El catálogo de la tienda es el fondo de la sala (46 obras con ficha propia);
+ * esto de detrás es todo lo demás que se publica en castellano y se puede
+ * encargar: novedades, fondo vivo y traducciones de autores extranjeros. La
+ * consulta filtra por `language:spa`, así que lo que entra es siempre la
+ * edición española, venga el original de donde venga.
+ */
 const EDITORIALES = [
-  'Anagrama',
-  'Tusquets',
-  'Seix Barral',
-  'Siruela',
-  'Alfaguara',
-  'Destino',
-  'Salamandra',
-  'Lumen',
-  'Ediciones B',
-  'Galaxia Gutenberg',
-  'Libros del Asteroide',
-  'Impedimenta'
+  'Anagrama', 'Tusquets', 'Seix Barral', 'Siruela', 'Alfaguara', 'Destino',
+  'Salamandra', 'Lumen', 'Ediciones B', 'Galaxia Gutenberg', 'Libros del Asteroide',
+  'Impedimenta', 'Planeta', 'Espasa', 'Booket', 'Austral', 'Alianza Editorial',
+  'Cátedra', 'Crítica', 'Paidós', 'Ariel', 'Debate', 'Random House', 'Plaza & Janés',
+  'Grijalbo', 'Bruguera', 'Reservoir Books', 'Blackie Books', 'Periférica', 'Nórdica Libros',
+  'Minúscula', 'Acantilado', 'Pre-Textos', 'Renacimiento', 'Valdemar', 'Páginas de Espuma',
+  'Candaya', 'Capitán Swing', 'Libros del K.O.', 'RBA', 'DeBolsillo', 'Suma de Letras',
+  'Crossbooks', 'Montena', 'Nube de Tinta', 'SM', 'Anaya', 'Edebé', 'Kalandraka', 'Nube de Tinta'
 ];
 
 /**
@@ -490,10 +495,10 @@ function esTituloEnEspanol(titulo: string): boolean {
   return !MARCAS_OTRO_IDIOMA.test(limpio);
 }
 
-const feedUrl = (editorial: string, desde: number, hasta: number) =>
+const feedUrl = (editorial: string, desde: number, hasta: number, limite: number, pagina = 1) =>
   `https://openlibrary.org/search.json?q=${encodeURIComponent(
     `publisher:"${editorial}" language:spa first_publish_year:[${desde} TO ${hasta}]`
-  )}&sort=new&limit=10&fields=key,title,author_name,first_publish_year,publisher,number_of_pages_median,cover_i,language`;
+  )}&sort=new&limit=${limite}&page=${pagina}&fields=key,title,author_name,first_publish_year,publisher,number_of_pages_median,cover_i,language`;
 
 type FeedRow = {
   id: string;
@@ -505,11 +510,17 @@ type FeedRow = {
   portada_url: string | null;
 };
 
-async function unaEditorial(editorial: string, desde: number, hasta: number): Promise<FeedRow[]> {
+async function unaEditorial(
+  editorial: string,
+  desde: number,
+  hasta: number,
+  limite: number,
+  pagina = 1
+): Promise<FeedRow[]> {
   try {
-    const response = await fetch(feedUrl(editorial, desde, hasta), {
+    const response = await fetch(feedUrl(editorial, desde, hasta, limite, pagina), {
       headers: { 'User-Agent': 'LibreriaAI-Salamanca/1.0 (demo)' },
-      signal: AbortSignal.timeout(7000)
+      signal: AbortSignal.timeout(15000)
     });
     if (!response.ok) return [];
     const data: any = await response.json();
@@ -519,7 +530,6 @@ async function unaEditorial(editorial: string, desde: number, hasta: number): Pr
       .filter(
         (doc) =>
           doc?.title &&
-          doc?.cover_i &&
           Array.isArray(doc.author_name) &&
           doc.author_name.length &&
           Array.isArray(doc.language) &&
@@ -532,7 +542,7 @@ async function unaEditorial(editorial: string, desde: number, hasta: number): Pr
         anio: Number.isInteger(doc.first_publish_year) ? doc.first_publish_year : null,
         editorial,
         paginas: Number.isInteger(doc.number_of_pages_median) ? doc.number_of_pages_median : null,
-        portada_url: `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+        portada_url: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null
       }))
       .filter((row) => row.id && row.titulo && esTituloEnEspanol(row.titulo));
   } catch {
@@ -540,21 +550,47 @@ async function unaEditorial(editorial: string, desde: number, hasta: number): Pr
   }
 }
 
-async function traerNovedades(): Promise<FeedRow[]> {
+/**
+ * Dos barridos sobre las mismas editoriales:
+ *
+ *  - `novedades`: lo de los dos últimos años, para la franja de la portada.
+ *  - `fondo`: veinticinco años hacia atrás y muchos más títulos por editorial.
+ *    Es lo que hace que el catálogo encargable no sean cuatro novedades: incluye
+ *    el fondo vivo y las traducciones que siguen en distribución.
+ *
+ * El segundo pide más a la fuente, así que se lanza desde el cron del mes, no
+ * en cada visita.
+ */
+async function traerNovedades(modo: 'novedades' | 'fondo' = 'novedades'): Promise<FeedRow[]> {
   const hasta = new Date().getFullYear();
-  const desde = hasta - 1;
+  const desde = modo === 'fondo' ? hasta - 40 : hasta - 1;
+  const limite = modo === 'fondo' ? 100 : 12;
+  // En el barrido de fondo se piden dos páginas por editorial: con una sola
+  // salían mil seiscientos títulos y el fondo de cada sello es mucho mayor.
+  const paginas = modo === 'fondo' ? [1, 2] : [1];
 
-  // En paralelo: doce peticiones de ~1 s caben en el límite de la función.
-  const tandas = await Promise.all(EDITORIALES.map((editorial) => unaEditorial(editorial, desde, hasta)));
-
+  // La fuente limita por IP: cincuenta peticiones a la vez la tumban. Se piden
+  // de seis en seis con una pausa corta, que cabe de sobra en el tiempo de la
+  // función y no provoca respuestas vacías.
+  const TANDA = 6;
   const porId = new Map<string, FeedRow>();
-  for (const fila of tandas.flat()) {
-    if (!porId.has(fila.id)) porId.set(fila.id, fila);
+
+  for (let i = 0; i < EDITORIALES.length; i += TANDA) {
+    const grupo = EDITORIALES.slice(i, i + TANDA);
+    const filas = await Promise.all(
+      grupo.flatMap((editorial) =>
+        paginas.map((pagina) => unaEditorial(editorial, desde, hasta, limite, pagina))
+      )
+    );
+    for (const fila of filas.flat()) {
+      if (!porId.has(fila.id)) porId.set(fila.id, fila);
+    }
+    if (i + TANDA < EDITORIALES.length) await new Promise((r) => setTimeout(r, 350));
   }
 
   return [...porId.values()]
     .filter((fila) => !/autoeditad|independently published|createspace|lulu/i.test(fila.editorial ?? ''))
-    .slice(0, 48);
+    .slice(0, modo === 'fondo' ? 1600 : 60);
 }
 
 async function handleNovedades(req: any, res: any) {
@@ -577,30 +613,101 @@ async function handleNovedades(req: any, res: any) {
 }
 
 async function handleNovedadesSync(req: any, res: any) {
+  const url = new URL(String(req.url ?? '/'), 'http://localhost');
+  const modo = url.searchParams.get('modo') === 'fondo' ? 'fondo' : 'novedades';
   const desdeCron = typeof req.headers?.['x-vercel-cron'] === 'string';
-  if (req.method !== 'POST' && !desdeCron) return methodNotAllowed(res, ['POST']);
+  if (req.method !== 'POST' && req.method !== 'GET') return methodNotAllowed(res, ['POST']);
   if (!desdeCron && !validAdminToken(req.headers?.authorization)) return json(res, 401, { error: 'no_autorizado' });
 
   try {
-    const novedades = await traerNovedades();
+    const novedades = await traerNovedades(modo);
     let nuevas = 0;
 
-    for (const libro of novedades) {
+    // Inserción por tandas: el barrido de fondo trae más de mil filas y una a
+    // una se comería el tiempo de la función.
+    const TANDA = 200;
+    for (let i = 0; i < novedades.length; i += TANDA) {
+      const trozo = novedades.slice(i, i + TANDA);
       const rows = await sql.query(
         `insert into novedades_feed (id, titulo, autor, anio, editorial, paginas, portada_url)
-         values ($1, $2, $3, $4, $5, $6, $7)
+         select * from unnest($1::text[], $2::text[], $3::text[], $4::int[], $5::text[], $6::int[], $7::text[])
          on conflict (id) do nothing
          returning id`,
-        [libro.id, libro.titulo, libro.autor, libro.anio, libro.editorial, libro.paginas, libro.portada_url]
+        [
+          trozo.map((f) => f.id),
+          trozo.map((f) => f.titulo),
+          trozo.map((f) => f.autor),
+          trozo.map((f) => f.anio),
+          trozo.map((f) => f.editorial),
+          trozo.map((f) => f.paginas),
+          trozo.map((f) => f.portada_url)
+        ]
       );
-      if (rows.length > 0) nuevas += 1;
+      nuevas += rows.length;
     }
 
     const total = (await sql.query(`select count(*)::int as n from novedades_feed where activo`, [])).at(0)?.n ?? 0;
-    return json(res, 200, { ok: true, recibidas: novedades.length, nuevas, total });
+    return json(res, 200, { ok: true, modo, recibidas: novedades.length, nuevas, total });
   } catch (error) {
     console.error('[novedades-sync]', error);
     return json(res, 502, { error: 'fuente_no_disponible', detalle: errorMessage(error).slice(0, 200) });
+  }
+}
+
+/**
+ * Catálogo encargable: todo lo que hay en la base procedente de las editoriales
+ * españolas, con buscador y paginación. Es lo que hace que la web no se quede
+ * en las 46 obras de la sala: aquí entra el fondo vivo y todo lo traducido.
+ */
+async function handleCatalogo(req: any, res: any) {
+  if (req.method !== 'GET') return methodNotAllowed(res, ['GET']);
+
+  const url = new URL(String(req.url ?? '/'), 'http://localhost');
+  const q = text(url.searchParams.get('q') ?? '', 80);
+  const pagina = Math.max(1, Number(url.searchParams.get('pagina') ?? 1) || 1);
+  const limite = Math.min(48, Math.max(6, Number(url.searchParams.get('limite') ?? 24) || 24));
+  const normaliza = (texto: string) =>
+  texto
+    .toLowerCase()
+    .replace(/[áàäâ]/g, 'a')
+    .replace(/[éèëê]/g, 'e')
+    .replace(/[íìïî]/g, 'i')
+    .replace(/[óòöô]/g, 'o')
+    .replace(/[úùüû]/g, 'u')
+    .replace(/ñ/g, 'n');
+const patron = `%${normaliza(q).replace(/[%_]/g, '')}%`;
+
+  try {
+    // `busqueda` es una columna generada sin acentos ni mayúsculas (ver schema.sql)
+    const filtro = `activo and ($1 = '' or busqueda like $2)`;
+
+    const [filas, cuenta, editoriales] = await Promise.all([
+      sql.query(
+        `select id, titulo, autor, anio, editorial, paginas, portada_url
+           from novedades_feed
+          where ${filtro}
+          order by anio desc nulls last, titulo asc
+          limit $3 offset $4`,
+        [q, patron, limite, (pagina - 1) * limite]
+      ),
+      sql.query(`select count(*)::int as n from novedades_feed where ${filtro}`, [q, patron]),
+      sql.query(`select count(distinct editorial)::int as n from novedades_feed where activo`, [])
+    ]);
+
+    const total = cuenta.at(0)?.n ?? 0;
+
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=120, stale-while-revalidate=600');
+    return json(res, 200, {
+      libros: filas,
+      total,
+      pagina,
+      paginas: Math.max(1, Math.ceil(total / limite)),
+      editoriales: editoriales.at(0)?.n ?? 0,
+      idioma: 'es'
+    });
+  } catch (error) {
+    console.error('[catalogo]', error);
+    return json(res, 500, { error: 'error_interno', libros: [], total: 0 });
   }
 }
 
@@ -1047,6 +1154,9 @@ export default async function handler(req: any, res: any) {
       return handleResenas(req, res);
     case 'novedades':
       return handleNovedades(req, res);
+    case 'catalogo':
+    case 'catálogo':
+      return handleCatalogo(req, res);
     case 'novedades-sync':
       return handleNovedadesSync(req, res);
     default:

@@ -88,7 +88,7 @@ export const Footer: React.FC = () => {
               {[
                 ['Fondo antiguo y facsímiles', '#catalogo'],
                 ['Búsqueda por entidades', '#laboratorio'],
-                ['Encargos y novedades', '#catalogo'],
+                ['Encargos y novedades', '#encargos'],
                 ['Club de lectura', '#tertulias'],
                 ['Visitas al archivo', '#tertulias']
               ].map(([label, href]) => (
