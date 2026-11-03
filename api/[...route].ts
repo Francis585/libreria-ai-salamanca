@@ -354,6 +354,32 @@ async function handleEmailsPrueba(req: any, res: any) {
   }
 }
 
+/** Reintenta la entrega de un correo ya compuesto (útil con proveedor recién configurado). */
+async function handleEmailReenviar(req: any, res: any) {
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (!validAdminToken(req.headers?.authorization)) return json(res, 401, { error: 'no_autorizado' });
+
+  const cuerpo = readBody(req);
+  const id = Number(cuerpo.id);
+  if (!Number.isInteger(id) || id <= 0) return json(res, 400, { error: 'id_invalido' });
+  if (!process.env.RESEND_API_KEY) {
+    return json(res, 409, {
+      error: 'sin_proveedor',
+      mensaje: 'No hay RESEND_API_KEY configurada: el correo se puede leer, pero no entregar.'
+    });
+  }
+
+  await deliverEmail(id);
+
+  const rows = await sql.query(
+    `select id, tipo, destinatario, asunto, estado, proveedor, error, creado_en, enviado_en
+       from outbox where id = $1`,
+    [id]
+  );
+  if (!rows[0]) return json(res, 404, { error: 'no_existe' });
+  return json(res, 200, { ok: true, correo: { ...rows[0], id: Number(rows[0].id) } });
+}
+
 /* ------------------------------------------------------------------ rutas */
 
 async function handleStock(req: any, res: any) {
@@ -697,6 +723,8 @@ export default async function handler(req: any, res: any) {
       return handleAdminEmails(req, res);
     case 'emails-prueba':
       return handleEmailsPrueba(req, res);
+    case 'emails-reenviar':
+      return handleEmailReenviar(req, res);
     default:
       return json(res, 404, { error: 'ruta_desconocida' });
   }
