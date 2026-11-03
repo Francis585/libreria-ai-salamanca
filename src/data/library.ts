@@ -510,3 +510,17 @@ export function getBook(id: string): Book | undefined {
 export function booksByIds(ids: string[]): Book[] {
   return ids.map((id) => BOOKS_BY_ID[id]).filter(Boolean);
 }
+
+/** Un color por materia: tiñe el punto de los filtros y la etiqueta de cada ficha. */
+export const CATEGORY_ACCENTS: Record<Category, string> = {
+  'Clásicos Salmantinos': '#8c6a3f',
+  'Humanismo & Ciencia': '#2f6b63',
+  'Narrativa Contemporánea': '#7b5c48',
+  'Ensayo & Pensamiento IA': '#4a4a6b',
+  Poesía: '#8a4b6b',
+  'Novela & Aventura': '#2f4858',
+  'Misterio & Policíaco': '#3b3340',
+  Teatro: '#a8442a',
+  Novedades: '#b08a3e',
+  'Infantil & Juvenil': '#4f7a52',
+};

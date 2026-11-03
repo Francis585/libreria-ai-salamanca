@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpDown, BookOpen, Search, ShoppingBag, SlidersHorizontal, Star, X } from 'lucide-react';
-import { BOOKS, CATEGORIES, type Book } from '../data/library';
+import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, type Book } from '../data/library';
 import { searchBooks } from '../lib/semantic';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
@@ -75,9 +75,9 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             El catálogo de la casa
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-warm">
-            Fondo histórico salmantino y una selección pequeña, deliberada, de narrativa,
-            poesía y ensayo contemporáneo. Cada ficha incluye la transcripción, las entidades
-            y las métricas que hemos extraído del ejemplar.
+            {BOOKS.length} títulos: el fondo histórico salmantino, clásicos del XIX, misterio,
+            aventuras, poesía, ensayo, novedades de 2025–2026 e infantil. Las fichas del fondo
+            antiguo llevan transcripción y entidades; las novedades, ficha comercial.
           </p>
         </div>
 
@@ -126,6 +126,17 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                     : 'border-line bg-transparent text-muted-warm hover:border-muted/40 hover:text-ink'
                 }`}
               >
+                {cat !== 'Todos' && (
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor:
+                        CATEGORY_ACCENTS[cat as keyof typeof CATEGORY_ACCENTS] ?? '#8c6a3f',
+                      opacity: active ? 1 : 0.55
+                    }}
+                  />
+                )}
                 {cat}
                 <span className={`font-mono text-[10px] tabular-nums ${active ? 'text-gold' : 'text-muted/80'}`}>
                   {countFor(cat)}
@@ -220,7 +231,10 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
 
               <div className="mt-4 flex flex-1 flex-col">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-clay">
+                  <span
+                    className="font-mono text-[9px] uppercase tracking-[0.14em]"
+                    style={{ color: CATEGORY_ACCENTS[book.category] ?? '#a8442a' }}
+                  >
                     {book.category}
                   </span>
                   <span className="flex items-center gap-1 font-mono text-[10px] text-muted">
