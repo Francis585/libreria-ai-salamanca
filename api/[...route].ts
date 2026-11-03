@@ -107,8 +107,10 @@ function errorMessage(error: unknown): string {
  *     igualmente en el admin, que es justo lo que hace falta en una demo.
  *
  * Proveedor: Resend por HTTP (sin dependencias). Variables:
- *   RESEND_API_KEY   · si falta, no se envía nada (estado 'simulado')
- *   EMAIL_FROM       · remitente verificado, por defecto el de pruebas de Resend
+ * Proveedores (el primero configurado gana):
+ *   RESEND_API_KEY  + EMAIL_FROM   · Resend por HTTP
+ *   GMAIL_USER      + GMAIL_APP_PASSWORD · Gmail por SMTP (contraseña de aplicación)
+ * Sin ninguno de los dos no se envía nada: el correo queda en estado 'simulado'.
  */
 
 const EMAIL_BRAND = {
@@ -245,17 +247,25 @@ async function queueEmail(draft: EmailDraft, destinatario: string): Promise<numb
   }
 }
 
+const proveedorCorreo = (): 'resend' | 'gmail' | null => {
+  if (process.env.RESEND_API_KEY) return 'resend';
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) return 'gmail';
+  return null;
+};
+
 async function deliverEmail(id: number): Promise<void> {
   if (!Number.isFinite(id)) return;
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || 'Librería AI Salamanca <onboarding@resend.dev>';
+  const resendKey = process.env.RESEND_API_KEY;
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  const gmailReady = Boolean(gmailUser && gmailPass);
 
-  if (!apiKey) {
+  if (!resendKey && !gmailReady) {
     await sql
       .query(`update outbox set estado = 'simulado', error = $2 where id = $1`, [
         id,
-        'Sin proveedor configurado (falta RESEND_API_KEY): el correo queda compuesto y visible en el admin.'
+        'Sin proveedor configurado (falta RESEND_API_KEY o GMAIL_USER + GMAIL_APP_PASSWORD): el correo queda compuesto y visible en el admin.'
       ])
       .catch(() => undefined);
     return;
@@ -266,30 +276,56 @@ async function deliverEmail(id: number): Promise<void> {
     const mail = rows[0];
     if (!mail) return;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from,
-        to: [mail.destinatario],
-        subject: mail.asunto,
-        html: mail.html,
-        text: mail.texto ?? undefined
-      }),
-      signal: AbortSignal.timeout(10000)
-    });
+    if (resendKey) {
+      const from = process.env.EMAIL_FROM || 'Librería AI Salamanca <onboarding@resend.dev>';
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from,
+          to: [mail.destinatario],
+          subject: mail.asunto,
+          html: mail.html,
+          text: mail.texto ?? undefined
+        }),
+        signal: AbortSignal.timeout(10000)
+      });
 
-    if (!response.ok) {
-      const detail = (await response.text()).slice(0, 300);
-      throw new Error(`resend_${response.status}: ${detail}`);
+      if (!response.ok) {
+        const detail = (await response.text()).slice(0, 300);
+        throw new Error(`resend_${response.status}: ${detail}`);
+      }
+
+      await sql.query(`update outbox set estado = 'enviado', proveedor = 'resend', enviado_en = now() where id = $1`, [id]);
+      return;
     }
 
-    await sql.query(`update outbox set estado = 'enviado', proveedor = 'resend', enviado_en = now() where id = $1`, [id]);
+    // Gmail por SMTP. Requiere contraseña de aplicación (no la del correo).
+    const { default: nodemailer } = await import('nodemailer');
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.SMTP_PORT || 465);
+    const transporte = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user: gmailUser as string, pass: gmailPass as string }
+    });
+
+    await transporte.sendMail({
+      from: `"Librería AI Salamanca" <${gmailUser}>`,
+      to: mail.destinatario,
+      subject: mail.asunto,
+      html: mail.html,
+      text: mail.texto ?? undefined
+    });
+
+    await sql.query(`update outbox set estado = 'enviado', proveedor = 'gmail', enviado_en = now() where id = $1`, [id]);
   } catch (error) {
     await sql
-      .query(`update outbox set estado = 'error', proveedor = 'resend', error = $2 where id = $1`, [
+      .query(`update outbox set estado = 'error', proveedor = $3, error = $2 where id = $1`, [
         id,
-        errorMessage(error).slice(0, 300)
+        errorMessage(error).slice(0, 300),
+        resendKey ? 'resend' : 'gmail'
       ])
       .catch(() => undefined);
   }
@@ -305,10 +341,14 @@ async function handleAdminEmails(req: any, res: any) {
          from outbox order by creado_en desc limit 40`,
       []
     );
-    const proveedor = process.env.RESEND_API_KEY ? 'resend' : null;
+    const proveedor = proveedorCorreo();
     return json(res, 200, {
       proveedor,
-      remitente: process.env.EMAIL_FROM || 'Librería AI Salamanca <onboarding@resend.dev>',
+      remitente:
+        process.env.EMAIL_FROM ||
+        (proveedor === 'gmail'
+          ? `Librería AI Salamanca <${process.env.GMAIL_USER}>`
+          : 'Librería AI Salamanca <onboarding@resend.dev>'),
       correos: rows.map((row: any) => ({ ...row, id: Number(row.id) }))
     });
   } catch (error) {
@@ -343,10 +383,10 @@ async function handleEmailsPrueba(req: any, res: any) {
     return json(res, 201, {
       ok: true,
       ids,
-      proveedor: process.env.RESEND_API_KEY ? 'resend' : null,
-      mensaje: process.env.RESEND_API_KEY
+      proveedor: proveedorCorreo(),
+      mensaje: proveedorCorreo()
         ? 'Tres correos compuestos y entregados al proveedor.'
-        : 'Tres correos compuestos y guardados. Sin RESEND_API_KEY quedan como «simulado» y se leen en esta misma pantalla.'
+        : 'Tres correos compuestos y guardados. Sin proveedor configurado quedan como «simulado» y se leen en esta misma pantalla.'
     });
   } catch (error) {
     console.error('[emails-prueba]', error);
@@ -362,10 +402,10 @@ async function handleEmailReenviar(req: any, res: any) {
   const cuerpo = readBody(req);
   const id = Number(cuerpo.id);
   if (!Number.isInteger(id) || id <= 0) return json(res, 400, { error: 'id_invalido' });
-  if (!process.env.RESEND_API_KEY) {
+  if (!proveedorCorreo()) {
     return json(res, 409, {
       error: 'sin_proveedor',
-      mensaje: 'No hay RESEND_API_KEY configurada: el correo se puede leer, pero no entregar.'
+      mensaje: 'No hay proveedor configurado: el correo se puede leer, pero no entregar.'
     });
   }
 
