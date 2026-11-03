@@ -230,29 +230,33 @@ const GeneratedCover: React.FC<{ book: Book; compact: boolean }> = ({ book, comp
 
 export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', compact = false }) => {
   const remota = PORTADAS_POR_ID[book.id];
-  const [falla, setFalla] = useState(false);
-  const usarRemota = Boolean(remota) && !falla;
+  const [estado, setEstado] = useState<'cargando' | 'lista' | 'falla'>('cargando');
 
   return (
-    <div
-      className={`relative overflow-hidden bg-mist ${className}`}
-      aria-hidden="true"
-    >
-      {usarRemota ? (
+    <div className={`relative overflow-hidden bg-mist ${className}`} aria-hidden="true">
+      {/*
+        La portada diseñada se pinta siempre debajo. La foto real entra encima
+        cuando termina de cargar: así el estante nunca enseña un hueco gris
+        mientras Open Library responde, y si la imagen falla no se nota.
+      */}
+      <GeneratedCover book={book} compact={compact} />
+
+      {remota && estado !== 'falla' && (
         <>
           <img
             src={remota}
             alt=""
-            loading="lazy"
+            loading={compact ? 'lazy' : 'eager'}
             decoding="async"
-            onError={() => setFalla(true)}
-            className="absolute inset-0 h-full w-full object-cover"
+            onLoad={() => setEstado('lista')}
+            onError={() => setEstado('falla')}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+              estado === 'lista' ? 'opacity-100' : 'opacity-0'
+            }`}
           />
           {/* velo tenue: las portadas llegan con blancos distintos y el estante tiene que leerse parejo */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/[0.10] via-transparent to-white/[0.04]" />
         </>
-      ) : (
-        <GeneratedCover book={book} compact={compact} />
       )}
     </div>
   );
