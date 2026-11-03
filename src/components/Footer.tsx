@@ -42,11 +42,11 @@ export const Footer: React.FC = () => {
               </span>
               <span className="font-display text-xl font-semibold tracking-tight">Librería AI Salamanca</span>
             </div>
-            <p className="mt-4 max-w-xs text-[12px] leading-relaxed text-[#a8a29e]">
+            <p className="mt-4 max-w-xs text-[12px] leading-relaxed text-[#8b8b95]">
               Librería de fondo antiguo y narrativa viva en la Rúa Mayor. Digitalizamos lo que
               tenemos para que puedas encontrarlo mejor, pero seguimos recomendando a viva voz.
             </p>
-            <div className="mt-5 space-y-2 text-[11.5px] text-[#d6d3d1]">
+            <div className="mt-5 space-y-2 text-[11.5px] text-[#c9c9d0]">
               <p className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold" />
                 Calle Rúa Mayor 14, 37002 Salamanca
@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
 
           <div>
             <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-gold">La casa</h3>
-            <ul className="mt-4 space-y-2.5 text-[12px] text-[#d6d3d1]">
+            <ul className="mt-4 space-y-2.5 text-[12px] text-[#c9c9d0]">
               {[
                 ['#catalogo', 'Catálogo completo'],
                 ['#laboratorio', 'Laboratorio del fondo'],
@@ -83,7 +83,7 @@ export const Footer: React.FC = () => {
 
           <div>
             <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-gold">Servicios</h3>
-            <ul className="mt-4 space-y-2.5 text-[12px] text-[#d6d3d1]">
+            <ul className="mt-4 space-y-2.5 text-[12px] text-[#c9c9d0]">
               {[
                 ['Fondo antiguo y facsímiles', '#catalogo'],
                 ['Búsqueda por entidades', '#laboratorio'],
@@ -102,7 +102,7 @@ export const Footer: React.FC = () => {
 
           <div>
             <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-gold">Carta de novedades</h3>
-            <p className="mt-4 text-[12px] leading-relaxed text-[#a8a29e]">
+            <p className="mt-4 text-[12px] leading-relaxed text-[#8b8b95]">
               Una recomendación cada quince días, escrita por quien la ha leído. Sin ruido.
             </p>
 
@@ -118,7 +118,7 @@ export const Footer: React.FC = () => {
                 <label htmlFor="newsletter-email" className="sr-only">
                   Correo electrónico
                 </label>
-                <div className="flex overflow-hidden rounded-lg border border-[#57534e] bg-bark-soft focus-within:border-gold/60">
+                <div className="flex overflow-hidden rounded-lg border border-[#2a2a31] bg-bark-soft focus-within:border-gold/60">
                   <input
                     id="newsletter-email"
                     type="email"
@@ -129,7 +129,7 @@ export const Footer: React.FC = () => {
                       if (estado === 'error') setEstado('inicial');
                     }}
                     placeholder="tu@correo.es"
-                    className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[12px] text-paper placeholder-[#78716c] outline-none"
+                    className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-[12px] text-paper placeholder-[#6f6f79] outline-none"
                   />
                   <button
                     type="submit"
@@ -145,7 +145,7 @@ export const Footer: React.FC = () => {
                   </button>
                 </div>
                 {estado === 'error' && (
-                  <p role="alert" className="mt-2 text-[11px] text-[#e7b4a1]">
+                  <p role="alert" className="mt-2 text-[11px] text-[#ff9d8a]">
                     No se ha podido guardar. Revisa el correo o inténtalo más tarde.
                   </p>
                 )}
@@ -158,24 +158,24 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram de la librería"
-                className="grid h-8 w-8 place-items-center rounded-lg border border-[#57534e] text-[#d6d3d1] transition-colors hover:border-gold/50 hover:text-paper"
+                className="grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a31] text-[#c9c9d0] transition-colors hover:border-gold/50 hover:text-paper"
               >
                 <Instagram className="h-3.5 w-3.5" />
               </a>
-              <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#78716c]">
+              <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#6f6f79]">
                 @libreriaaisalamanca
               </span>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-[#57534e]/60 pt-5 text-[10.5px] text-[#a8a29e] sm:flex-row sm:items-center">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-[#2a2a31]/60 pt-5 text-[10.5px] text-[#8b8b95] sm:flex-row sm:items-center">
           <p>© {new Date().getFullYear()} Librería AI Salamanca · Todos los derechos reservados</p>
           <div className="flex flex-wrap items-center gap-4">
             <a href="#" className="transition-colors hover:text-paper">Aviso legal</a>
             <a href="#" className="transition-colors hover:text-paper">Privacidad</a>
             <a href="#" className="transition-colors hover:text-paper">Cookies</a>
-            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[#78716c]">Hecho en Salamanca</span>
+            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[#6f6f79]">Hecho en Salamanca</span>
           </div>
         </div>
       </div>

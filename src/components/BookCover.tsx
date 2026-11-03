@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Book } from '../data/library';
+import PORTADAS from '../data/portadas.json';
 
 interface BookCoverProps {
   book: Book;
@@ -8,15 +9,18 @@ interface BookCoverProps {
 }
 
 /**
- * Portada de serie editorial, generada en SVG.
+ * Portada de la obra.
  *
- * Reglas de la casa:
- *  - nunca una imagen externa (el catálogo no puede mostrar la portada de otra
- *    edición, y una portada equivocada es peor que ninguna);
- *  - un ornamento distinto por materia, para que el estante se lea de un vistazo;
- *  - tipografía y filetes a la manera de las colecciones de clásicos;
- *  - variación determinista por obra (hash del id): ni dos portadas idénticas
- *    ni un patrón que cambie entre renderizados.
+ * Dos caminos:
+ *  1. Portada real de una edición en español (src/data/portadas.json, la rellena
+ *     `npm run portadas` desde Google Books y Open Library). Se muestra tal cual,
+ *     sin recortes ni marcos añadidos.
+ *  2. Si no hay portada localizable, o la imagen falla, se dibuja la portada de
+ *     serie editorial en SVG: nunca queda un hueco gris ni una portada de otra
+ *     edición distinta a la que se vende.
+ *
+ * El respaldo generado mantiene la regla de la casa: un ornamento por materia y
+ * variación determinista por obra (hash del id).
  */
 
 const ORNAMENTS: Record<string, 'lineas' | 'rombos' | 'arcos' | 'cruces' | 'ondas'> = {
@@ -32,6 +36,8 @@ const ORNAMENTS: Record<string, 'lineas' | 'rombos' | 'arcos' | 'cruces' | 'onda
   'Infantil & Juvenil': 'ondas'
 };
 
+const PORTADAS_POR_ID = PORTADAS as Record<string, string>;
+
 function hash(text: string): number {
   let value = 0;
   for (let i = 0; i < text.length; i += 1) {
@@ -40,9 +46,21 @@ function hash(text: string): number {
   return value;
 }
 
+/** Lleva un color hacia un gris tinta: quita el caramelo de cuero viejo sin perder la materia. */
+function towardNeutral(hex: string, amount: number): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const num = parseInt(full, 16);
+  const target = { r: 0x14, g: 0x15, b: 0x1b };
+  const r = Math.round(((num >> 16) & 255) * (1 - amount) + target.r * amount);
+  const g = Math.round(((num >> 8) & 255) * (1 - amount) + target.g * amount);
+  const b = Math.round((num & 255) * (1 - amount) + target.b * amount);
+  return `rgb(${r} ${g} ${b})`;
+}
+
 const Pattern: React.FC<{ kind: string; id: string; accent: string }> = ({ kind, id, accent }) => {
   const seed = hash(id);
-  const common = { stroke: accent, fill: 'none', strokeWidth: 0.6, opacity: 0.28 } as const;
+  const common = { stroke: accent, fill: 'none', strokeWidth: 0.45, opacity: 0.22 } as const;
 
   return (
     <svg
@@ -110,51 +128,34 @@ const Pattern: React.FC<{ kind: string; id: string; accent: string }> = ({ kind,
           />
         ))}
 
-      {/* filete de la casa: doble línea, arriba y abajo */}
-      <rect x="5" y="5" width="110" height="158" {...common} strokeWidth={0.9} opacity={0.5} />
-      <rect x="8" y="8" width="104" height="152" {...common} strokeWidth={0.4} opacity={0.35} />
+      {/* Un solo filete: fuera el marco doble de colección antigua */}
       <line
-        x1={20 + (seed % 12)}
-        x2={100 - (seed % 12)}
+        x1={16 + (seed % 12)}
+        x2={104 - (seed % 12)}
         y1={34 + (seed % 6)}
         y2={34 + (seed % 6)}
         stroke={accent}
-        strokeWidth={0.7}
-        opacity={0.55}
+        strokeWidth={0.8}
+        opacity={0.5}
       />
     </svg>
   );
 };
 
-export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', compact = false }) => {
+const GeneratedCover: React.FC<{ book: Book; compact: boolean }> = ({ book, compact }) => {
   const { from, to, accent } = book.cover;
-  const ornament = ORNAMENTS[book.category] ?? 'lineas';
+  const base = towardNeutral(from, 0.42);
+  const deep = towardNeutral(to, 0.5);
   const seed = hash(book.id);
   const initial = (book.author.match(/[A-ZÁÉÍÓÚÑ]/g) ?? ['L'])[0];
 
   return (
     <div
-      className={`relative overflow-hidden book-spine ${className}`}
-      style={{
-        backgroundImage: `linear-gradient(${140 + (seed % 40)}deg, ${from} 0%, ${to} 92%)`
-      }}
+      className="absolute inset-0"
+      style={{ backgroundImage: `linear-gradient(${140 + (seed % 40)}deg, ${base} 0%, ${deep} 92%)` }}
       aria-hidden="true"
     >
-      {/* lomo */}
-      <div
-        className="absolute inset-y-0 left-0 w-[6%]"
-        style={{ background: 'linear-gradient(90deg, rgba(0,0,0,.45), rgba(255,255,255,.06) 70%, transparent)' }}
-      />
-      {/* grano del papel */}
-      <div
-        className="absolute inset-0 opacity-[0.16] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(115deg, rgba(255,255,255,.16) 0 1px, transparent 1px 3px), radial-gradient(circle at 30% 20%, rgba(255,255,255,.12), transparent 60%)'
-        }}
-      />
-
-      <Pattern kind={ornament} id={book.id} accent={accent} />
+      <Pattern kind={ORNAMENTS[book.category] ?? 'lineas'} id={book.id} accent={accent} />
 
       <div
         className={`relative flex h-full flex-col justify-between ${
@@ -164,27 +165,26 @@ export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', comp
         <div className="flex items-start justify-between gap-2">
           <span
             className={`font-mono uppercase ${compact ? 'text-[7px]' : 'text-[9px]'} tracking-[0.2em]`}
-            style={{ color: accent, opacity: 0.85 }}
+            style={{ color: accent, opacity: 0.8 }}
           >
             {book.year}
           </span>
           {!compact && (
             <span
               className="shrink-0 text-right font-mono text-[7px] uppercase leading-tight tracking-[0.14em]"
-              style={{ color: accent, opacity: 0.55 }}
+              style={{ color: accent, opacity: 0.5 }}
             >
               {book.epoch}
             </span>
           )}
         </div>
 
-        {/* emblema */}
         <div className="flex items-center justify-center">
           <div
             className={`flex items-center justify-center rounded-full border ${
               compact ? 'h-6 w-6' : 'h-11 w-11'
             }`}
-            style={{ borderColor: accent, opacity: 0.75 }}
+            style={{ borderColor: accent, opacity: 0.7 }}
           >
             <span
               className={`font-display ${compact ? 'text-[9px]' : 'text-base'} leading-none`}
@@ -197,19 +197,19 @@ export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', comp
 
         <div className={compact ? 'space-y-0.5' : 'space-y-1.5'}>
           <h4
-            className={`font-display font-semibold leading-[1.06] tracking-tight ${
+            className={`font-display font-semibold leading-[1.06] tracking-[-0.02em] ${
               compact ? 'line-clamp-4 text-[9.5px]' : 'line-clamp-4 text-[1.05rem] leading-[1.08] sm:text-lg'
             }`}
             style={{ color: accent }}
           >
             {book.title}
           </h4>
-          <div className="h-px w-6" style={{ backgroundColor: accent, opacity: 0.5 }} />
+          <div className="h-px w-6" style={{ backgroundColor: accent, opacity: 0.45 }} />
           <p
             className={`font-sans uppercase tracking-[0.1em] ${
               compact ? 'line-clamp-2 text-[6.5px]' : 'truncate text-[9px]'
             }`}
-            style={{ color: accent, opacity: 0.8 }}
+            style={{ color: accent, opacity: 0.75 }}
           >
             {book.author}
           </p>
@@ -218,21 +218,42 @@ export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', comp
         {!compact && (
           <div
             className="mt-1 font-mono text-[7px] uppercase leading-tight tracking-[0.16em]"
-            style={{ color: accent, opacity: 0.45 }}
+            style={{ color: accent, opacity: 0.4 }}
           >
             Librería AI · Rúa Mayor
           </div>
         )}
       </div>
+    </div>
+  );
+};
 
-      {/* brillo de estante */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(105deg, rgba(255,255,255,.14) 0%, transparent 35%, transparent 70%, rgba(0,0,0,.22) 100%)'
-        }}
-      />
+export const BookCover: React.FC<BookCoverProps> = ({ book, className = '', compact = false }) => {
+  const remota = PORTADAS_POR_ID[book.id];
+  const [falla, setFalla] = useState(false);
+  const usarRemota = Boolean(remota) && !falla;
+
+  return (
+    <div
+      className={`relative overflow-hidden bg-mist ${className}`}
+      aria-hidden="true"
+    >
+      {usarRemota ? (
+        <>
+          <img
+            src={remota}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setFalla(true)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* velo tenue: las portadas llegan con blancos distintos y el estante tiene que leerse parejo */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/[0.10] via-transparent to-white/[0.04]" />
+        </>
+      ) : (
+        <GeneratedCover book={book} compact={compact} />
+      )}
     </div>
   );
 };

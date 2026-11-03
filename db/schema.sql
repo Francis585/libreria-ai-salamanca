@@ -253,4 +253,22 @@ create table if not exists outbox (
 
 create index if not exists outbox_creado_idx on outbox (creado_en desc);
 
+
+-- Novedades traídas de una fuente externa (Open Library). Se sincronizan solas
+-- cada semana con un cron de Vercel; la web las pinta sin tocar código.
+create table if not exists novedades_feed (
+  id          text primary key,
+  titulo      text not null,
+  autor       text,
+  anio        integer,
+  editorial   text,
+  paginas     integer,
+  portada_url text,
+  fuente      text not null default 'openlibrary',
+  activo      boolean not null default true,
+  creado_en   timestamptz not null default now()
+);
+
+create index if not exists novedades_feed_anio_idx on novedades_feed (anio desc);
+
 commit;

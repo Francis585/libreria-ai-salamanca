@@ -201,7 +201,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           <h2 className="mt-5 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-paper">
             Dinos qué te pasa. <span className="italic text-gold">Te damos un libro.</span>
           </h2>
-          <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#d6d3d1] sm:text-[15px]">
+          <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#c9c9d0] sm:text-[15px]">
             El Oráculo no inventa títulos: elige entre las {BOOKS.length} obras que están
             físicamente en la sala y explica por qué. Si no encuentra nada, lo dice. Y si no
             sabes qué pedir, no te devuelve la pregunta: te enseña por dónde empezar.
@@ -210,13 +210,13 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-10 rounded-2xl border border-[#57534e] bg-bark-soft/70 p-5 backdrop-blur-sm sm:p-7"
+          className="mt-10 rounded-2xl border border-[#2a2a31] bg-bark-soft/70 p-5 backdrop-blur-sm sm:p-7"
         >
           <div className="grid gap-4 lg:grid-cols-[1fr_1.15fr]">
             <div>
               <label
                 htmlFor="oraculo-mood"
-                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#d6d3d1]"
+                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#c9c9d0]"
               >
                 Estado de ánimo o tema
               </label>
@@ -224,7 +224,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 id="oraculo-mood"
                 value={mood}
                 onChange={(event) => setMood(event.target.value)}
-                className="w-full appearance-none rounded-xl border border-[#57534e] bg-bark px-4 py-3 text-sm text-paper outline-none transition-colors focus:border-gold"
+                className="w-full appearance-none rounded-xl border border-[#2a2a31] bg-bark px-4 py-3 text-sm text-paper outline-none transition-colors focus:border-gold"
               >
                 {ORACLE_MOOD_LABELS.map((option) => (
                   <option key={option} value={option}>
@@ -237,9 +237,9 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             <div>
               <label
                 htmlFor="oraculo-query"
-                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#d6d3d1]"
+                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#c9c9d0]"
               >
-                Cuéntalo con tus palabras <span className="normal-case tracking-normal text-[#a8a29e]">(opcional)</span>
+                Cuéntalo con tus palabras <span className="normal-case tracking-normal text-[#8b8b95]">(opcional)</span>
               </label>
               <input
                 id="oraculo-query"
@@ -247,13 +247,13 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Ej. un regalo de menos de 20 €, o una novela para el tren"
-                className="w-full rounded-xl border border-[#57534e] bg-bark px-4 py-3 text-sm text-paper placeholder-[#78716c] outline-none transition-colors focus:border-gold"
+                className="w-full rounded-xl border border-[#2a2a31] bg-bark px-4 py-3 text-sm text-paper placeholder-[#6f6f79] outline-none transition-colors focus:border-gold"
               />
             </div>
           </div>
 
           <fieldset className="mt-5">
-            <legend className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#d6d3d1]">
+            <legend className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#c9c9d0]">
               ¿Cómo te lo explico?
             </legend>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Registro de la respuesta">
@@ -270,7 +270,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     className={`rounded-full border px-3.5 py-1.5 text-[11px] transition-colors ${
                       active
                         ? 'border-gold bg-gold/15 text-paper'
-                        : 'border-[#57534e]/70 text-[#d6d3d1] hover:border-gold/60'
+                        : 'border-[#2a2a31]/70 text-[#c9c9d0] hover:border-gold/60'
                     }`}
                   >
                     {option.label}
@@ -281,21 +281,21 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           </fieldset>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">Prueba:</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b8b95]">Prueba:</span>
             {EXAMPLES.map((example) => (
               <button
                 key={example.label}
                 type="button"
                 onClick={() => setQuery(example.query)}
-                className="rounded-full border border-[#57534e]/70 px-3 py-1.5 text-[11px] text-[#d6d3d1] transition-colors hover:border-gold/60 hover:text-paper"
+                className="rounded-full border border-[#2a2a31]/70 px-3 py-1.5 text-[11px] text-[#c9c9d0] transition-colors hover:border-gold/60 hover:text-paper"
               >
                 {example.label}
               </button>
             ))}
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-[#57534e]/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[11px] leading-relaxed text-[#a8a29e]">
+          <div className="mt-6 flex flex-col gap-3 border-t border-[#2a2a31]/60 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[11px] leading-relaxed text-[#8b8b95]">
               Sin registro. No guardamos tu consulta.
             </p>
             <button
@@ -321,15 +321,15 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
         {loading && (
           <div className="mt-8 grid gap-5 md:grid-cols-3" aria-hidden="true">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="overflow-hidden rounded-xl border border-[#57534e]/60 bg-bark-soft/40 p-4">
-                <div className="shimmer h-3 w-24 rounded bg-[#57534e]/40" />
+              <div key={i} className="overflow-hidden rounded-xl border border-[#2a2a31]/60 bg-bark-soft/40 p-4">
+                <div className="shimmer h-3 w-24 rounded bg-[#2a2a31]/40" />
                 <div className="mt-4 space-y-2">
-                  <div className="shimmer h-5 w-3/4 rounded bg-[#57534e]/40" />
-                  <div className="shimmer h-3 w-1/2 rounded bg-[#57534e]/30" />
+                  <div className="shimmer h-5 w-3/4 rounded bg-[#2a2a31]/40" />
+                  <div className="shimmer h-3 w-1/2 rounded bg-[#2a2a31]/30" />
                 </div>
                 <div className="mt-6 space-y-2">
-                  <div className="shimmer h-3 w-full rounded bg-[#57534e]/30" />
-                  <div className="shimmer h-3 w-5/6 rounded bg-[#57534e]/30" />
+                  <div className="shimmer h-3 w-full rounded bg-[#2a2a31]/30" />
+                  <div className="shimmer h-3 w-5/6 rounded bg-[#2a2a31]/30" />
                 </div>
               </div>
             ))}
@@ -343,13 +343,13 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 <Sparkles className="h-4 w-4 text-gold" />
                 Preferimos decírtelo
               </h3>
-              <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-[#d6d3d1]">
+              <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-[#c9c9d0]">
                 {abstention.message}
               </p>
 
               {abstention.nearest.length > 0 && (
                 <>
-                  <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">
+                  <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b8b95]">
                     Lo más cercano en la sala
                   </p>
                   <ul className="mt-2 space-y-1.5">
@@ -363,7 +363,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                             className="text-left text-[13px] text-[#e7e5e4] underline decoration-gold/40 underline-offset-4 transition-colors hover:text-gold"
                           >
                             {item.title}
-                            <span className="ml-2 text-[11px] no-underline text-[#a8a29e]">
+                            <span className="ml-2 text-[11px] no-underline text-[#8b8b95]">
                               {item.reason}
                             </span>
                           </button>
@@ -375,7 +375,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
               )}
 
               {meta && (
-                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#78716c]">{meta}</p>
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f6f79]">{meta}</p>
               )}
             </div>
           </div>
@@ -383,12 +383,12 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
         {suggestions && suggestions.length > 0 && !loading && (
           <div ref={resultsRef} className="mt-10 scroll-mt-28 animate-fade-up">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#57534e] pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2a2a31] pb-4">
               <h3 className="flex items-center gap-2 font-display text-2xl font-semibold text-paper">
                 <Sparkles className="h-4 w-4 text-gold" />
                 {suggestions.length === 1 ? 'Un libro del fondo' : `${suggestions.length} libros del fondo`}
               </h3>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#8b8b95]">
                 {source === 'gemini'
                   ? `Selección del Oráculo · ${registro}`
                   : source === 'catalogo'
@@ -398,14 +398,14 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             </div>
 
             {notice && (
-              <p className="mt-3 text-[11px] text-[#a8a29e]">{notice}</p>
+              <p className="mt-3 text-[11px] text-[#8b8b95]">{notice}</p>
             )}
 
             <div className="mt-6 grid gap-5 md:grid-cols-3">
               {suggestions.map(({ book, rationale, glossary }, index) => (
                 <article
                   key={book.id}
-                  className="group flex flex-col rounded-xl border border-[#57534e]/70 bg-[#3a352e] p-4 transition-colors hover:border-gold/60"
+                  className="group flex flex-col rounded-xl border border-[#2a2a31]/70 bg-[#3a352e] p-4 transition-colors hover:border-gold/60"
                   style={{ animationDelay: `${index * 70}ms` }}
                 >
                   <div className="flex gap-3">
@@ -426,21 +426,21 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                           {book.title}
                         </button>
                       </h4>
-                      <p className="mt-0.5 text-[11px] text-[#a8a29e]">{book.author}</p>
+                      <p className="mt-0.5 text-[11px] text-[#8b8b95]">{book.author}</p>
                       <p className="mt-2 font-mono text-xs tabular-nums text-[#e7e5e4]">
                         {book.price.toFixed(2)} €
                       </p>
                     </div>
                   </div>
 
-                  <p className="mt-4 border-t border-[#57534e]/60 pt-3 text-[12px] leading-relaxed text-[#d6d3d1]">
+                  <p className="mt-4 border-t border-[#2a2a31]/60 pt-3 text-[12px] leading-relaxed text-[#c9c9d0]">
                     {rationale}
                   </p>
 
                   {glossary && glossary.length > 0 && (
                     <ul className="mt-3 space-y-1">
                       {glossary.map((entry) => (
-                        <li key={entry} className="text-[11px] leading-snug text-[#a8a29e]">
+                        <li key={entry} className="text-[11px] leading-snug text-[#8b8b95]">
                           <span className="text-gold/80">·</span> {entry}
                         </li>
                       ))}
@@ -459,7 +459,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     <button
                       type="button"
                       onClick={() => onOpenBook(book)}
-                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-[#57534e] px-3 py-2 text-[11px] font-semibold text-paper transition-colors hover:border-gold/60"
+                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-[#2a2a31] px-3 py-2 text-[11px] font-semibold text-paper transition-colors hover:border-gold/60"
                     >
                       Ficha
                       <ArrowRight className="h-3 w-3" />
@@ -470,12 +470,12 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             </div>
 
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <p className="flex items-center gap-2 text-[11px] text-[#a8a29e]">
+              <p className="flex items-center gap-2 text-[11px] text-[#8b8b95]">
                 <BookOpen className="h-3.5 w-3.5" />
                 Puedes recogerlo en la Rúa Mayor en 2 horas o recibirlo mañana en casa.
               </p>
               {meta && (
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#78716c]">{meta}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f6f79]">{meta}</p>
               )}
             </div>
           </div>

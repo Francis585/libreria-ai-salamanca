@@ -282,7 +282,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                     <span className="rounded border border-gold/30 bg-gold/10 px-2 py-0.5 font-mono text-[9.5px] text-gold">
                       {selected.accessionCode ?? selected.id.toUpperCase()}
                     </span>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#a8a29e]">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#8b8b95]">
                       Inspector
                     </span>
                   </div>
@@ -293,7 +293,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                     {selected.author} ({selected.year})
                   </p>
                   {activeResult && (
-                    <p className="relative mt-3 border-t border-[#57534e]/60 pt-2 text-[10.5px] leading-relaxed text-[#d6d3d1]">
+                    <p className="relative mt-3 border-t border-[#2a2a31]/60 pt-2 text-[10.5px] leading-relaxed text-[#c9c9d0]">
                       {activeResult.reason}
                     </p>
                   )}

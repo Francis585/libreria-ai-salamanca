@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
+import { FeedNovedades } from './components/FeedNovedades';
 import { Lab } from './components/Lab';
 import { Events } from './components/Events';
 import { Cafe } from './components/Cafe';
@@ -135,6 +136,7 @@ export default function App() {
       <main>
         <Hero featured={featured} onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Oracle onOpenBook={setSelectedBook} onAdd={addToCart} />
+        <FeedNovedades />
         <Catalog onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Lab onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Events />

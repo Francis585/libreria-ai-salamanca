@@ -15,6 +15,8 @@
  *   GET  /api/admin/resumen   (Authorization: Bearer ADMIN_SECRET)
  */
 import { neon } from '@neondatabase/serverless';
+
+export const maxDuration = 30;
 import { createHash, timingSafeEqual } from 'node:crypto';
 
 const sql = neon(process.env.DATABASE_URL ?? '');
@@ -423,6 +425,177 @@ async function handleEmailReenviar(req: any, res: any) {
   return json(res, 200, { ok: true, correo: { ...rows[0], id: Number(rows[0].id) } });
 }
 
+/* ------------------------------------------------------------ novedades */
+
+/**
+ * Novedades automáticas.
+ *
+ * `GET /api/novedades` devuelve lo último que ha entrado de la fuente externa.
+ * `POST /api/novedades-sync` la consulta y guarda lo nuevo. Lo llama un cron
+ * de Vercel cada semana (cabecera x-vercel-cron) o el admin a mano.
+ *
+ * Fuente: Open Library, sin clave y sin cuota compartida.
+ */
+
+// Editoriales de referencia en castellano. Pedir por editorial es lo único que
+// devuelve novedades reales: el "sort=new" global está lleno de autoeditados.
+const EDITORIALES = [
+  'Anagrama',
+  'Tusquets',
+  'Seix Barral',
+  'Siruela',
+  'Alfaguara',
+  'Destino',
+  'Salamandra',
+  'Lumen',
+  'Ediciones B',
+  'Galaxia Gutenberg',
+  'Libros del Asteroide',
+  'Impedimenta'
+];
+
+/**
+ * Open Library marca el idioma a nivel de OBRA, no de edición: una novela
+ * francesa de Lumen entra como `spa` porque existe una traducción. El resultado
+ * era un escaparate con «Et la joie de vivre» y «Les Belles Promesses».
+ *
+ * Hasta que la fuente lo arregle, la puerta la cierra el título: si lleva
+ * marcadores claros de francés, inglés, italiano o alemán, no entra.
+ */
+const MARCAS_OTRO_IDIOMA = new RegExp(
+  [
+    // francés (sin «sur», «entre», «plus» ni «tout»: son castellanas normales)
+    String.raw`\b(les|des|aux|une|belles|joie|dans|pour|avec|nuit|monde|femme|homme|fille|guerre|amour|sang|ciel|petite|maison|années|temps|jamais|encore)\b`,
+    // inglés
+    String.raw`\b(the|of|and|with|from|into|night|house|girl|boy|world|book|story|love|war|dead|secret|sister|wife|husband|river|mountain|winter|summer|never|always|between|after|before|little|long|last|first)\b`,
+    // italiano / alemán
+    String.raw`\b(il|gli|della|delle|degli|notte|mondo|vita|amore|guerra|und|der|die|das|nacht|welt|haus)\b`
+  ].join('|'),
+  'i'
+);
+
+function esTituloEnEspanol(titulo: string): boolean {
+  const limpio = String(titulo ?? '').trim();
+  if (!limpio) return false;
+  // La ñ y los signos de apertura solo existen en castellano
+  if (/[ñÑ¿¡]/.test(limpio)) return true;
+  return !MARCAS_OTRO_IDIOMA.test(limpio);
+}
+
+const feedUrl = (editorial: string, desde: number, hasta: number) =>
+  `https://openlibrary.org/search.json?q=${encodeURIComponent(
+    `publisher:"${editorial}" language:spa first_publish_year:[${desde} TO ${hasta}]`
+  )}&sort=new&limit=10&fields=key,title,author_name,first_publish_year,publisher,number_of_pages_median,cover_i,language`;
+
+type FeedRow = {
+  id: string;
+  titulo: string;
+  autor: string | null;
+  anio: number | null;
+  editorial: string | null;
+  paginas: number | null;
+  portada_url: string | null;
+};
+
+async function unaEditorial(editorial: string, desde: number, hasta: number): Promise<FeedRow[]> {
+  try {
+    const response = await fetch(feedUrl(editorial, desde, hasta), {
+      headers: { 'User-Agent': 'LibreriaAI-Salamanca/1.0 (demo)' },
+      signal: AbortSignal.timeout(7000)
+    });
+    if (!response.ok) return [];
+    const data: any = await response.json();
+    const docs: any[] = Array.isArray(data?.docs) ? data.docs : [];
+
+    return docs
+      .filter(
+        (doc) =>
+          doc?.title &&
+          doc?.cover_i &&
+          Array.isArray(doc.author_name) &&
+          doc.author_name.length &&
+          Array.isArray(doc.language) &&
+          doc.language.includes('spa')
+      )
+      .map((doc) => ({
+        id: String(doc.key ?? '').replace('/works/', ''),
+        titulo: text(doc.title, 200),
+        autor: text(doc.author_name[0], 120) || null,
+        anio: Number.isInteger(doc.first_publish_year) ? doc.first_publish_year : null,
+        editorial,
+        paginas: Number.isInteger(doc.number_of_pages_median) ? doc.number_of_pages_median : null,
+        portada_url: `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
+      }))
+      .filter((row) => row.id && row.titulo && esTituloEnEspanol(row.titulo));
+  } catch {
+    return [];
+  }
+}
+
+async function traerNovedades(): Promise<FeedRow[]> {
+  const hasta = new Date().getFullYear();
+  const desde = hasta - 1;
+
+  // En paralelo: doce peticiones de ~1 s caben en el límite de la función.
+  const tandas = await Promise.all(EDITORIALES.map((editorial) => unaEditorial(editorial, desde, hasta)));
+
+  const porId = new Map<string, FeedRow>();
+  for (const fila of tandas.flat()) {
+    if (!porId.has(fila.id)) porId.set(fila.id, fila);
+  }
+
+  return [...porId.values()]
+    .filter((fila) => !/autoeditad|independently published|createspace|lulu/i.test(fila.editorial ?? ''))
+    .slice(0, 48);
+}
+
+async function handleNovedades(req: any, res: any) {
+  if (req.method !== 'GET') return methodNotAllowed(res, ['GET']);
+  try {
+    const rows = await sql.query(
+      `select id, titulo, autor, anio, editorial, paginas, portada_url, fuente, creado_en
+         from novedades_feed where activo order by anio desc nulls last, creado_en desc limit 80`,
+      []
+    );
+    // Lo ya guardado también pasa el filtro: las filas en francés que entraron
+    // antes de este arreglo desaparecen del escaparate sin tocar la base.
+    const visibles = (rows as any[]).filter((fila) => esTituloEnEspanol(fila.titulo)).slice(0, 24);
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300, stale-while-revalidate=3600');
+    return json(res, 200, { libros: visibles });
+  } catch (error) {
+    console.error('[novedades]', error);
+    return json(res, 500, { error: 'error_interno', libros: [] });
+  }
+}
+
+async function handleNovedadesSync(req: any, res: any) {
+  const desdeCron = typeof req.headers?.['x-vercel-cron'] === 'string';
+  if (req.method !== 'POST' && !desdeCron) return methodNotAllowed(res, ['POST']);
+  if (!desdeCron && !validAdminToken(req.headers?.authorization)) return json(res, 401, { error: 'no_autorizado' });
+
+  try {
+    const novedades = await traerNovedades();
+    let nuevas = 0;
+
+    for (const libro of novedades) {
+      const rows = await sql.query(
+        `insert into novedades_feed (id, titulo, autor, anio, editorial, paginas, portada_url)
+         values ($1, $2, $3, $4, $5, $6, $7)
+         on conflict (id) do nothing
+         returning id`,
+        [libro.id, libro.titulo, libro.autor, libro.anio, libro.editorial, libro.paginas, libro.portada_url]
+      );
+      if (rows.length > 0) nuevas += 1;
+    }
+
+    const total = (await sql.query(`select count(*)::int as n from novedades_feed where activo`, [])).at(0)?.n ?? 0;
+    return json(res, 200, { ok: true, recibidas: novedades.length, nuevas, total });
+  } catch (error) {
+    console.error('[novedades-sync]', error);
+    return json(res, 502, { error: 'fuente_no_disponible', detalle: errorMessage(error).slice(0, 200) });
+  }
+}
+
 /* ------------------------------------------------------------------ rutas */
 
 async function handleStock(req: any, res: any) {
@@ -768,6 +941,10 @@ export default async function handler(req: any, res: any) {
       return handleEmailsPrueba(req, res);
     case 'emails-reenviar':
       return handleEmailReenviar(req, res);
+    case 'novedades':
+      return handleNovedades(req, res);
+    case 'novedades-sync':
+      return handleNovedadesSync(req, res);
     default:
       return json(res, 404, { error: 'ruta_desconocida' });
   }

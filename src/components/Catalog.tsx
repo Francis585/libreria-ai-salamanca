@@ -180,7 +180,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                     className="h-1.5 w-1.5 shrink-0 rounded-full"
                     style={{
                       backgroundColor:
-                        CATEGORY_ACCENTS[cat as keyof typeof CATEGORY_ACCENTS] ?? '#8c6a3f',
+                        CATEGORY_ACCENTS[cat as keyof typeof CATEGORY_ACCENTS] ?? '#3b3bf5',
                       opacity: active ? 1 : 0.55
                     }}
                   />
@@ -254,7 +254,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
               setCategory('Todos');
               setEpoch('Todas');
             }}
-            className="mt-6 rounded-lg bg-bark px-5 py-2.5 text-xs font-semibold text-paper transition-colors hover:bg-ink"
+            className="mt-6 rounded-lg bg-clay px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-clay-deep"
           >
             Limpiar la búsqueda
           </button>
@@ -304,7 +304,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                 <div className="flex items-center justify-between gap-2">
                   <span
                     className="font-mono text-[9px] uppercase tracking-[0.14em]"
-                    style={{ color: CATEGORY_ACCENTS[book.category] ?? '#a8442a' }}
+                    style={{ color: CATEGORY_ACCENTS[book.category] ?? '#3b3bf5' }}
                   >
                     {book.category}
                   </span>
@@ -348,7 +348,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                       type="button"
                       onClick={() => onAdd(book)}
                       disabled={agotado}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-bark px-3 py-2 text-[11px] font-semibold text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:bg-muted/40"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-clay px-3 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-clay-deep disabled:cursor-not-allowed disabled:bg-muted/40"
                     >
                       <ShoppingBag className="h-3.5 w-3.5" />
                       {agotado ? 'Agotado' : 'Añadir'}

@@ -143,7 +143,7 @@ export const Cafe: React.FC = () => {
             <div
               aria-hidden="true"
               className="absolute inset-x-0 bottom-0 h-40 opacity-[0.07]"
-              style={{ backgroundImage: 'repeating-linear-gradient(90deg, #FBF9F5 0 1px, transparent 1px 34px)' }}
+              style={{ backgroundImage: 'repeating-linear-gradient(90deg, #f7f7f5 0 1px, transparent 1px 34px)' }}
             />
             <div className="relative">
               <div className="flex items-center justify-between">
@@ -151,16 +151,16 @@ export const Cafe: React.FC = () => {
                 <Sun className="h-5 w-5 text-gold" />
               </div>
 
-              <dl className="mt-6 divide-y divide-[#57534e]/60">
+              <dl className="mt-6 divide-y divide-[#2a2a31]/60">
                 {HOURS.map(([label, value]) => (
                   <div key={label} className="flex items-baseline justify-between gap-4 py-3">
-                    <dt className="text-[13px] text-[#d6d3d1]">{label}</dt>
+                    <dt className="text-[13px] text-[#c9c9d0]">{label}</dt>
                     <dd className="font-mono text-[12px] tabular-nums text-paper">{value}</dd>
                   </div>
                 ))}
               </dl>
 
-              <div className="mt-6 space-y-3 border-t border-[#57534e]/60 pt-6 text-[12px] text-[#d6d3d1]">
+              <div className="mt-6 space-y-3 border-t border-[#2a2a31]/60 pt-6 text-[12px] text-[#c9c9d0]">
                 <p className="flex items-start gap-2">
                   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold" />
                   Calle Rúa Mayor 14, 37002 Salamanca
