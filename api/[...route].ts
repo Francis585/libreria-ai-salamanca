@@ -1367,8 +1367,10 @@ async function handleAsistente(req: any, res: any) {
 
   try {
     const modelo = process.env.ORACULO_MODEL || 'gemini-3.8-flash';
-    const respuesta = await llamarModelo(`${PROMPT_ASISTENTE}${contexto}\n\nCLIENTE: ${mensaje}\nLIBRERO:`, apiKey, modelo);
-    if (!respuesta) throw new Error('respuesta vacía');
+    const cruda = await llamarModelo(`${PROMPT_ASISTENTE}${contexto}\n\nCLIENTE: ${mensaje}\nLIBRERO:`, apiKey, modelo);
+    if (!cruda) throw new Error('respuesta vacía');
+    // El chat no pinta Markdown: fuera los asteriscos de énfasis.
+    const respuesta = cruda.replace(/\*\*?([^*\n]+)\*\*?/g, '$1').trim();
 
     // Las fichas que se pintan son las que la respuesta nombra, no las que le
     // pasamos por si acaso: nada de seis portadas al preguntar por el horario.
