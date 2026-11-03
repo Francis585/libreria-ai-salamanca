@@ -188,25 +188,72 @@ export function searchBooks(query: string, options: SearchOptions = {}): SearchR
   return results.sort((a, b) => b.score - a.score);
 }
 
+/**
+ * Materias y temas que el catálogo puede ofrecer HOY, sacados de las etiquetas
+ * reales de las fichas. El selector del Oráculo se construye con esto, así que
+ * crece solo cuando crece el fondo: no hay ninguna lista escrita a mano.
+ */
+export interface TemaGrupo {
+  materia: string;
+  temas: string[];
+}
+
+export function temasDelCatalogo(): TemaGrupo[] {
+  const porMateria = new Map<string, Map<string, number>>();
+
+  for (const book of BOOKS) {
+    const etiquetas = porMateria.get(book.category) ?? new Map<string, number>();
+    for (const tag of book.tags) etiquetas.set(tag, (etiquetas.get(tag) ?? 0) + 1);
+    porMateria.set(book.category, etiquetas);
+  }
+
+  // Cada materia enseña sus seis temas más frecuentes: así ninguna sección de la
+  // librería desaparece del selector y la lista sigue siendo legible cuando el
+  // fondo crezca. Lo que no quepa, se pide escribiéndolo en el campo libre.
+  const POR_MATERIA = 6;
+
+  return [...porMateria.entries()]
+    .map(([materia, etiquetas]) => ({
+      materia,
+      temas: [...etiquetas.entries()]
+        .filter(([tema]) => tema.trim().length >= 3)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'es'))
+        .slice(0, POR_MATERIA)
+        .map(([tema]) => tema)
+    }))
+    .filter((grupo) => grupo.temas.length > 0);
+}
+
+/** Cuántas obras responden a un tema concreto (para el contador del selector). */
+export function obrasPorTema(tema: string): number {
+  return BOOKS.filter((book) => book.tags.includes(tema)).length;
+}
+
 /** Recomendador local: respaldo del Oráculo cuando no hay clave de IA configurada. */
-export function localRecommendations(query = '', mood = '', count = 3): SearchResult[] {
+export function localRecommendations(query = '', mood = '', count = 3, temas: string[] = []): SearchResult[] {
   const trimmedQuery = query.trim();
   const matched = trimmedQuery
     ? new Map(searchBooks(trimmedQuery).map((result) => [result.book.id, result]))
     : new Map<string, SearchResult>();
   const moodPicks = ORACLE_MOODS.find((entry) => entry.label === mood)?.picks ?? [];
 
-  // Cada ánimo tiene su lista curada; la consulta libre se suma por puntuación.
+  // Cada ánimo tiene su lista curada; los temas elegidos y la consulta libre se
+  // suman por puntuación, de modo que se puedan combinar varios a la vez.
   const results: SearchResult[] = BOOKS.map((book) => {
     const base = matched.get(book.id);
     const moodIndex = moodPicks.indexOf(book.id);
-    if (!base && moodIndex === -1) return null;
+    const aciertosTema = temas.filter(
+      (tema) => book.tags.includes(tema) || book.thematic === tema
+    );
+    if (!base && moodIndex === -1 && aciertosTema.length === 0) return null;
+
+    const bonusTema = Math.min(42, aciertosTema.length * 24);
 
     return {
       book,
-      score: Math.min(99, (base?.score ?? 64) + (moodIndex >= 0 ? 40 - moodIndex * 6 : 0)),
-      matchedConcepts: base?.matchedConcepts ?? [book.thematic],
-      reason: base?.reason ?? ''
+      score: Math.min(99, (base?.score ?? 64) + (moodIndex >= 0 ? 40 - moodIndex * 6 : 0) + bonusTema),
+      matchedConcepts: base?.matchedConcepts ?? (aciertosTema.length ? aciertosTema : [book.thematic]),
+      reason: base?.reason ?? (aciertosTema.length ? `Temas elegidos: ${aciertosTema.join(', ')}` : '')
     };
   })
     .filter((result): result is SearchResult => result !== null)

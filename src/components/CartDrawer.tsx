@@ -66,12 +66,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <BookOpen className="h-9 w-9 text-muted/50" />
               <p className="mt-4 font-display text-xl font-semibold text-ink">Todavía no hay libros</p>
               <p className="mt-1.5 max-w-xs text-[12.5px] leading-relaxed text-muted-warm">
-                Elige en el catálogo o deja que el Oráculo te proponga tres lecturas.
+                Elige en el catálogo o deja que el librero te proponga tres lecturas.
               </p>
               <button
                 type="button"
                 onClick={onClose}
-                className="mt-5 rounded-lg bg-bark px-4 py-2.5 text-xs font-semibold text-paper hover:bg-ink"
+                className="mt-5 rounded-lg bg-clay px-4 py-2.5 text-xs font-semibold text-white hover:bg-clay-deep"
               >
                 Seguir mirando
               </button>

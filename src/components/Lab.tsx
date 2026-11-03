@@ -185,7 +185,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                 <button
                   type="button"
                   onClick={reset}
-                  className="mt-5 rounded-lg bg-bark px-4 py-2 text-xs font-semibold text-paper hover:bg-ink"
+                  className="mt-5 rounded-lg bg-clay px-4 py-2 text-xs font-semibold text-white hover:bg-clay-deep"
                 >
                   Restablecer
                 </button>
@@ -450,7 +450,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                   <button
                     type="button"
                     onClick={() => onOpenBook(selected)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-bark px-3 py-1.5 text-[10.5px] font-semibold text-paper hover:bg-ink"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-clay px-3 py-1.5 text-[10.5px] font-semibold text-white hover:bg-clay-deep"
                   >
                     Abrir ficha
                     <ArrowRight className="h-3 w-3" />

@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, ArrowUpRight, BookOpen, Coffee, Quote, Sparkles, Star } from 'lucide-react';
 import type { Book } from '../data/library';
 import { BOOKS } from '../data/library';
+import { SECCION_IA } from '../lib/brand';
 import { BookCover } from './BookCover';
 
 interface HeroProps {
@@ -53,11 +54,11 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </a>
             <a
-              href="#oraculo"
+              href={SECCION_IA.href}
               className="group inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-paper px-5 py-3 text-[13.5px] font-semibold text-ink transition-all hover:border-ink/25"
             >
               <Sparkles className="h-4 w-4 text-clay" />
-              Pedir al Oráculo
+              {SECCION_IA.cta}
             </a>
           </div>
 

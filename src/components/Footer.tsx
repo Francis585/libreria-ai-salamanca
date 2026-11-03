@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Check, Instagram, Loader2, Mail, MapPin, Phone } from 'lucide-react';
+import { SECCION_IA } from '../lib/brand';
 
 type Estado = 'inicial' | 'enviando' | 'nuevo' | 'repetido' | 'error';
 
@@ -68,7 +69,7 @@ export const Footer: React.FC = () => {
               {[
                 ['#catalogo', 'Catálogo completo'],
                 ['#laboratorio', 'Laboratorio del fondo'],
-                ['#oraculo', 'Oráculo literario'],
+                [SECCION_IA.href, 'El librero'],
                 ['#tertulias', 'Tertulias y talleres'],
                 ['#cafe', 'Café Melchor Cano']
               ].map(([href, label]) => (

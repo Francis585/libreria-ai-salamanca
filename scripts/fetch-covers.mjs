@@ -135,6 +135,36 @@ async function portadaEspanola(titulo, autor) {
   return null;
 }
 
+/**
+ * Último recurso: Google Books. Devuelve la portada más grande del volumen
+ * cuya edición esté en español. Sin clave la cuota es compartida y a veces
+ * responde 429; en ese caso se sigue sin portada, nunca con una inglesa.
+ */
+async function porGoogle(titulo, autor) {
+  try {
+    const q = `intitle:${titulo} inauthor:${autor}`;
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=es&maxResults=8`,
+      { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(10000) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    for (const item of data?.items ?? []) {
+      const info = item?.volumeInfo ?? {};
+      if (info.language && info.language !== 'es') continue;
+      const links = info.imageLinks ?? {};
+      const candidata = links.extraLarge || links.large || links.medium || links.small || links.thumbnail;
+      if (!candidata) continue;
+      if (!tituloParecido(titulo, info.title)) continue;
+      const url = candidata.replace('&zoom=5', '&zoom=1').replace('http://', 'https://');
+      if (await imagenValida(url)) return url;
+    }
+  } catch {
+    /* cuota agotada o sin red */
+  }
+  return null;
+}
+
 let nuevas = 0;
 const sinPortada = [];
 
@@ -143,7 +173,8 @@ for (const libro of BOOKS) {
     console.log(`· ya tenía     ${libro.id}`);
     continue;
   }
-  const url = await portadaEspanola(libro.title.replace(/[()]/g, ' ').trim(), libro.author);
+  const limpio = libro.title.replace(/[()]/g, ' ').trim();
+  const url = (await portadaEspanola(limpio, libro.author)) || (await porGoogle(limpio, libro.author));
   if (url) {
     resultado[libro.id] = url;
     nuevas += 1;

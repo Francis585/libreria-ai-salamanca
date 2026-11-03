@@ -18,6 +18,7 @@ import { getBook } from '../data/library';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
 import { Modal } from './Modal';
+import { Reviews, useResenas } from './Reviews';
 
 interface BookModalProps {
   book: Book | null;
@@ -26,7 +27,7 @@ interface BookModalProps {
   onOpenBook: (book: Book) => void;
 }
 
-type Tab = 'sinopsis' | 'entidades' | 'texto' | 'afines';
+type Tab = 'sinopsis' | 'entidades' | 'texto' | 'opiniones' | 'afines';
 
 export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOpenBook }) => {
   const [tab, setTab] = useState<Tab>('sinopsis');
@@ -34,6 +35,8 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
   const stock = useStock();
   const disponibles = book ? stock[book.id] : undefined;
   const agotado = disponibles === 0;
+  const opiniones = useResenas(book?.id);
+  const nota = opiniones.media ?? book?.rating ?? 0;
 
   useEffect(() => {
     setTab('sinopsis');
@@ -52,6 +55,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
     { key: 'sinopsis', label: 'Sinopsis', show: true },
     { key: 'entidades', label: 'Entidades', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
     { key: 'texto', label: 'Extracto y métricas', show: Boolean(book?.excerpt || book?.metrics) },
+    { key: 'opiniones', label: 'Opiniones', count: opiniones.total || undefined, show: true },
     { key: 'afines', label: 'Afines', count: related.length || undefined, show: related.length > 0 }
   ];
 
@@ -105,17 +109,23 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                       {book.price.toFixed(2)} <span className="text-lg">€</span>
                     </p>
                   </div>
-                  <span className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 font-mono text-[11px] text-muted-warm ring-1 ring-line">
-                    <Star className="h-3 w-3 fill-gold text-gold" />
-                    {book.rating.toFixed(1)}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setTab('opiniones')}
+                    className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 font-mono text-[11px] text-muted-warm ring-1 ring-line transition-colors hover:ring-clay/50"
+                    aria-label={`Ver las ${opiniones.total} opiniones y valorar`}
+                  >
+                    <Star className="h-3 w-3 fill-clay text-clay" />
+                    {nota.toFixed(1)}
+                    {opiniones.total > 0 && <span className="text-muted">({opiniones.total})</span>}
+                  </button>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => onAdd(book)}
                   disabled={agotado}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-bark px-4 py-3 text-sm font-semibold text-paper transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:bg-muted/50"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-clay px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-clay-deep disabled:cursor-not-allowed disabled:bg-muted/50"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   {agotado ? 'Sin ejemplares ahora' : 'Añadir a la cesta'}
@@ -335,6 +345,10 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                       </div>
                     )}
                   </div>
+                )}
+
+                {tab === 'opiniones' && (
+                  <Reviews libroId={book.id} valoracionEditorial={book.rating} datos={opiniones} />
                 )}
 
                 {tab === 'afines' && (

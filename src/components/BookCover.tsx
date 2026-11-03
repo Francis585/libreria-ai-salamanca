@@ -142,87 +142,78 @@ const Pattern: React.FC<{ kind: string; id: string; accent: string }> = ({ kind,
   );
 };
 
+/** Oscurece un color hacia la tinta de la casa. */
+function oscurece(hex: string, amount: number): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const num = parseInt(full, 16);
+  const target = { r: 0x0e, g: 0x0e, b: 0x10 };
+  const r = Math.round(((num >> 16) & 255) * (1 - amount) + target.r * amount);
+  const g = Math.round(((num >> 8) & 255) * (1 - amount) + target.g * amount);
+  const b = Math.round((num & 255) * (1 - amount) + target.b * amount);
+  return `rgb(${r} ${g} ${b})`;
+}
+
+/**
+ * Portada tipográfica para las obras sin edición española con portada
+ * localizable (y para los títulos inventados del catálogo). Nada de ornamento
+ * de colección antigua: bloque de color, título grande y pie de la casa, al
+ * estilo de las colecciones actuales.
+ */
 const GeneratedCover: React.FC<{ book: Book; compact: boolean }> = ({ book, compact }) => {
-  const { from, to, accent } = book.cover;
-  const base = towardNeutral(from, 0.42);
-  const deep = towardNeutral(to, 0.5);
-  const seed = hash(book.id);
-  const initial = (book.author.match(/[A-ZÁÉÍÓÚÑ]/g) ?? ['L'])[0];
+  const { to, accent } = book.cover;
+  const fondo = oscurece(to, 0.28);
+  const franja = accent;
 
   return (
-    <div
-      className="absolute inset-0"
-      style={{ backgroundImage: `linear-gradient(${140 + (seed % 40)}deg, ${base} 0%, ${deep} 92%)` }}
-      aria-hidden="true"
-    >
-      <Pattern kind={ORNAMENTS[book.category] ?? 'lineas'} id={book.id} accent={accent} />
+    <div className="absolute inset-0" style={{ backgroundColor: fondo }} aria-hidden="true">
+      {/* franja de materia */}
+      <div className="absolute inset-x-0 top-0" style={{ height: compact ? '4px' : '7px', backgroundColor: franja }} />
 
       <div
-        className={`relative flex h-full flex-col justify-between ${
-          compact ? 'px-[9%] py-[8%]' : 'px-[9%] pb-[9%] pt-[7%]'
+        className={`relative flex h-full flex-col ${
+          compact ? 'px-[9%] pb-[8%] pt-[10%]' : 'px-[9%] pb-[8%] pt-[11%]'
         }`}
       >
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-baseline justify-between gap-2">
           <span
-            className={`font-mono uppercase ${compact ? 'text-[7px]' : 'text-[9px]'} tracking-[0.2em]`}
-            style={{ color: accent, opacity: 0.8 }}
+            className={`font-mono uppercase ${compact ? 'text-[6.5px]' : 'text-[8.5px]'} tracking-[0.18em]`}
+            style={{ color: franja }}
           >
             {book.year}
           </span>
           {!compact && (
-            <span
-              className="shrink-0 text-right font-mono text-[7px] uppercase leading-tight tracking-[0.14em]"
-              style={{ color: accent, opacity: 0.5 }}
-            >
+            <span className="shrink-0 font-mono text-[6.5px] uppercase tracking-[0.14em] text-paper/40">
               {book.epoch}
             </span>
           )}
         </div>
 
-        <div className="flex items-center justify-center">
-          <div
-            className={`flex items-center justify-center rounded-full border ${
-              compact ? 'h-6 w-6' : 'h-11 w-11'
-            }`}
-            style={{ borderColor: accent, opacity: 0.7 }}
-          >
-            <span
-              className={`font-display ${compact ? 'text-[9px]' : 'text-base'} leading-none`}
-              style={{ color: accent }}
-            >
-              {initial}
-            </span>
-          </div>
-        </div>
+        <h4
+          className={`mt-[12%] font-display font-semibold text-paper ${
+            compact
+              ? 'line-clamp-4 text-[9.5px] leading-[1.15] tracking-[-0.02em]'
+              : 'line-clamp-4 text-[1.12rem] leading-[1.12] tracking-[-0.025em] sm:text-[1.3rem]'
+          }`}
+        >
+          {book.title}
+        </h4>
 
-        <div className={compact ? 'space-y-0.5' : 'space-y-1.5'}>
-          <h4
-            className={`font-display font-semibold leading-[1.06] tracking-[-0.02em] ${
-              compact ? 'line-clamp-4 text-[9.5px]' : 'line-clamp-4 text-[1.05rem] leading-[1.08] sm:text-lg'
-            }`}
-            style={{ color: accent }}
-          >
-            {book.title}
-          </h4>
-          <div className="h-px w-6" style={{ backgroundColor: accent, opacity: 0.45 }} />
+        <div className="mt-auto">
+          <div className="mb-[6%] h-px w-full bg-paper/25" />
           <p
-            className={`font-sans uppercase tracking-[0.1em] ${
-              compact ? 'line-clamp-2 text-[6.5px]' : 'truncate text-[9px]'
+            className={`uppercase text-paper/75 ${
+              compact ? 'line-clamp-2 text-[6px] tracking-[0.1em]' : 'truncate text-[8.5px] tracking-[0.12em]'
             }`}
-            style={{ color: accent, opacity: 0.75 }}
           >
             {book.author}
           </p>
+          {!compact && (
+            <p className="mt-1.5 font-mono text-[6px] uppercase tracking-[0.16em] text-paper/35">
+              Librería AI · Rúa Mayor
+            </p>
+          )}
         </div>
-
-        {!compact && (
-          <div
-            className="mt-1 font-mono text-[7px] uppercase leading-tight tracking-[0.16em]"
-            style={{ color: accent, opacity: 0.4 }}
-          >
-            Librería AI · Rúa Mayor
-          </div>
-        )}
       </div>
     </div>
   );

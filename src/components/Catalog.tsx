@@ -10,13 +10,36 @@ interface CatalogProps {
   onAdd: (book: Book) => void;
 }
 
-type SortKey = 'relevancia' | 'titulo' | 'precio' | 'reciente';
+type SortKey = 'relevancia' | 'titulo' | 'precio' | 'reciente' | 'valoracion';
+type RangoPrecio = 'todos' | 'menos15' | '15a25' | 'mas25';
+type Formato = 'todos' | 'tapa' | 'rustica' | 'bolsillo';
 
 const SORTS: { key: SortKey; label: string }[] = [
   { key: 'relevancia', label: 'Selección de la casa' },
   { key: 'titulo', label: 'Título (A–Z)' },
   { key: 'precio', label: 'Precio (menor a mayor)' },
-  { key: 'reciente', label: 'Año (más reciente)' }
+  { key: 'reciente', label: 'Año (más reciente)' },
+  { key: 'valoracion', label: 'Mejor valorados' }
+];
+
+const PRECIOS: { key: RangoPrecio; label: string }[] = [
+  { key: 'todos', label: 'Cualquiera' },
+  { key: 'menos15', label: 'Hasta 15 €' },
+  { key: '15a25', label: '15–25 €' },
+  { key: 'mas25', label: 'Más de 25 €' }
+];
+
+const FORMATOS: { key: Formato; label: string }[] = [
+  { key: 'todos', label: 'Todos' },
+  { key: 'tapa', label: 'Tapa dura' },
+  { key: 'rustica', label: 'Rústica' },
+  { key: 'bolsillo', label: 'Bolsillo' }
+];
+
+const NOTAS = [
+  { key: 0, label: 'Todas' },
+  { key: 4.5, label: '4,5 o más' },
+  { key: 4.8, label: '4,8 o más' }
 ];
 
 export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
@@ -25,6 +48,11 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
   const [category, setCategory] = useState<string>('Todos');
   const [epoch, setEpoch] = useState<string>('Todas');
   const [sort, setSort] = useState<SortKey>('reciente');
+  const [precio, setPrecio] = useState<RangoPrecio>('todos');
+  const [notaMinima, setNotaMinima] = useState<number>(0);
+  const [formato, setFormato] = useState<Formato>('todos');
+  const [soloDisponibles, setSoloDisponibles] = useState(false);
+  const [panelAbierto, setPanelAbierto] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const stock = useStock();
 
@@ -43,14 +71,40 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  /** Filtros finos: precio, nota mínima, formato y disponibilidad. */
+  const pasaFiltros = (book: Book) => {
+    if (precio === 'menos15' && book.price >= 15) return false;
+    if (precio === '15a25' && (book.price < 15 || book.price > 25)) return false;
+    if (precio === 'mas25' && book.price <= 25) return false;
+    if (notaMinima > 0 && book.rating < notaMinima) return false;
+    if (formato !== 'todos' && !book.format.toLowerCase().includes(formato === 'tapa' ? 'tapa dura' : formato === 'rustica' ? 'rústica' : 'bolsillo')) return false;
+    if (soloDisponibles && stock[book.id] === 0) return false;
+    return true;
+  };
+
+  const activos =
+    (precio !== 'todos' ? 1 : 0) +
+    (notaMinima > 0 ? 1 : 0) +
+    (formato !== 'todos' ? 1 : 0) +
+    (soloDisponibles ? 1 : 0);
+
+  const limpiarFiltros = () => {
+    setPrecio('todos');
+    setNotaMinima(0);
+    setFormato('todos');
+    setSoloDisponibles(false);
+  };
+
   const results = useMemo(() => {
-    const matched = query.trim()
-      ? searchBooks(query, { category, epoch: epoch === 'Todas' ? undefined : epoch }).map((result) => result.book)
-      : BOOKS.filter(
-          (book) =>
-            (category === 'Todos' || book.category === category) &&
-            (epoch === 'Todas' || book.epoch === epoch)
-        );
+    const matched = (
+      query.trim()
+        ? searchBooks(query, { category, epoch: epoch === 'Todas' ? undefined : epoch }).map((result) => result.book)
+        : BOOKS.filter(
+            (book) =>
+              (category === 'Todos' || book.category === category) &&
+              (epoch === 'Todas' || book.epoch === epoch)
+          )
+    ).filter(pasaFiltros);
 
     const sorted = [...matched];
     switch (sort) {
@@ -63,11 +117,14 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
       case 'reciente':
         sorted.sort((a, b) => b.year - a.year);
         break;
+      case 'valoracion':
+        sorted.sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title, 'es'));
+        break;
       default:
         break;
     }
     return sorted;
-  }, [query, category, epoch, sort]);
+  }, [query, category, epoch, sort, precio, notaMinima, formato, soloDisponibles, stock]);
 
   const countFor = (cat: string) =>
     cat === 'Todos' ? BOOKS.length : BOOKS.filter((book) => book.category === cat).length;
@@ -195,8 +252,27 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:flex">
+          <button
+            type="button"
+            onClick={() => setPanelAbierto((abierto) => !abierto)}
+            aria-expanded={panelAbierto}
+            aria-controls="catalogo-filtros"
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors ${
+              activos > 0
+                ? 'border-clay/50 bg-clay/[0.07] text-clay'
+                : 'border-line text-muted hover:border-muted/40 hover:text-ink'
+            }`}
+          >
             <SlidersHorizontal className="h-3 w-3" />
+            Filtros
+            {activos > 0 && (
+              <span className="grid h-4 min-w-4 place-items-center rounded-full bg-clay px-1 text-[9px] font-semibold text-white">
+                {activos}
+              </span>
+            )}
+          </button>
+
+          <span className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted sm:flex">
             {results.length} {results.length === 1 ? 'obra' : 'obras'}
           </span>
           <div className="relative">
@@ -239,13 +315,112 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         </div>
       </div>
 
+      {panelAbierto && (
+        <div
+          id="catalogo-filtros"
+          className="mt-4 grid gap-5 rounded-xl border border-line bg-mist/30 p-4 animate-fade-in sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Precio</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {PRECIOS.map((opcion) => {
+                const activo = precio === opcion.key;
+                return (
+                  <button
+                    key={opcion.key}
+                    type="button"
+                    onClick={() => setPrecio(opcion.key)}
+                    aria-pressed={activo}
+                    className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+                      activo ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                    }`}
+                  >
+                    {opcion.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Valoración</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {NOTAS.map((opcion) => {
+                const activo = notaMinima === opcion.key;
+                return (
+                  <button
+                    key={opcion.key}
+                    type="button"
+                    onClick={() => setNotaMinima(opcion.key)}
+                    aria-pressed={activo}
+                    className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+                      activo ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                    }`}
+                  >
+                    {opcion.key > 0 && <Star className={`h-2.5 w-2.5 ${activo ? 'fill-paper text-paper' : 'fill-clay text-clay'}`} />}
+                    {opcion.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Formato</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {FORMATOS.map((opcion) => {
+                const activo = formato === opcion.key;
+                return (
+                  <button
+                    key={opcion.key}
+                    type="button"
+                    onClick={() => setFormato(opcion.key)}
+                    aria-pressed={activo}
+                    className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+                      activo ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                    }`}
+                  >
+                    {opcion.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Disponibilidad</p>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSoloDisponibles((valor) => !valor)}
+                aria-pressed={soloDisponibles}
+                className={`rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
+                  soloDisponibles ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                }`}
+              >
+                Solo con ejemplares
+              </button>
+              {activos > 0 && (
+                <button
+                  type="button"
+                  onClick={limpiarFiltros}
+                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-clay hover:underline"
+                >
+                  <X className="h-3 w-3" /> Limpiar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {results.length === 0 ? (
         <div className="mt-12 rounded-2xl border border-dashed border-line bg-mist/40 px-6 py-16 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-muted/60" />
           <h3 className="mt-4 font-display text-2xl font-semibold text-ink">No hay nada con ese nombre</h3>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-warm">
             Prueba con otra palabra o mira el catálogo completo. También puedes pedirle al
-            Oráculo que busque por lo que quieres sentir, no por el título.
+            librero que busque por lo que quieres sentir, no por el título.
           </p>
           <button
             type="button"
@@ -253,6 +428,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
               setQuery('');
               setCategory('Todos');
               setEpoch('Todas');
+              limpiarFiltros();
             }}
             className="mt-6 rounded-lg bg-clay px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-clay-deep"
           >

@@ -142,7 +142,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ open, cart, onClos
             <button
               type="button"
               onClick={close}
-              className="mt-6 rounded-lg bg-bark px-5 py-2.5 text-xs font-semibold text-paper hover:bg-ink"
+              className="mt-6 rounded-lg bg-clay px-5 py-2.5 text-xs font-semibold text-white hover:bg-clay-deep"
             >
               Volver a la librería
             </button>

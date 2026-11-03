@@ -917,6 +917,99 @@ async function handleAdmin(res: any, req: any) {
   }
 }
 
+/* ---------------------------------------------------------------- reseñas */
+
+/**
+ * Opiniones de lectores.
+ *
+ * `GET /api/resenas?libro=<id>` devuelve media, distribución y reseñas.
+ * `POST /api/resenas` guarda una (nombre, valoración de 1 a 5 y texto).
+ *
+ * Reglas: nada de medias inventadas — la media se calcula con lo que hay en la
+ * tabla, y si no hay reseñas la ficha sigue enseñando la valoración editorial.
+ */
+async function handleResenas(req: any, res: any) {
+  if (req.method === 'OPTIONS') return json(res, 204, {});
+
+  if (req.method === 'GET') {
+    // El runtime no siempre rellena req.query: se lee también de la URL real.
+    const url = new URL(String(req.url ?? '/'), 'http://localhost');
+    const libroId = text(req.query?.libro ?? url.searchParams.get('libro') ?? '', 120);
+    if (!libroId) return json(res, 400, { error: 'falta_libro' });
+    try {
+      const rows = await sql.query(
+        `select id, nombre, valoracion, texto, origen, creado_en
+           from resenas
+          where libro_id = $1 and aprobada
+          order by origen = 'casa' desc, creado_en desc
+          limit 40`,
+        [libroId]
+      );
+      const resenas = rows.map((row: any) => ({
+        id: Number(row.id),
+        nombre: row.nombre,
+        valoracion: Number(row.valoracion),
+        texto: row.texto,
+        origen: row.origen,
+        creado_en: row.creado_en
+      }));
+      const total = resenas.length;
+      const media = total ? resenas.reduce((sum: number, r: any) => sum + r.valoracion, 0) / total : null;
+      const distribucion = [5, 4, 3, 2, 1].map((estrellas) => ({
+        estrellas,
+        cuantas: resenas.filter((r: any) => r.valoracion === estrellas).length
+      }));
+      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=30, stale-while-revalidate=120');
+      return json(res, 200, { resenas, total, media, distribucion });
+    } catch (error) {
+      console.error('[resenas:get]', error);
+      return json(res, 500, { error: 'error_interno', resenas: [] });
+    }
+  }
+
+  if (req.method !== 'POST') return methodNotAllowed(res, ['GET', 'POST']);
+  if (!rateLimit(req, 'resenas', 8)) return json(res, 429, { error: 'demasiadas_peticiones' });
+
+  const body = readBody(req);
+  if (text(body.website, 50)) return json(res, 200, { ok: true, guardada: false });
+
+  const libroId = text(body.libro_id, 120);
+  const nombre = text(body.nombre, 40);
+  const valoracion = Number(body.valoracion);
+  const textoResena = text(body.texto, 600);
+
+  if (!libroId) return json(res, 400, { error: 'falta_libro' });
+  if (nombre.length < 2) return json(res, 400, { error: 'nombre_corto' });
+  if (!Number.isInteger(valoracion) || valoracion < 1 || valoracion > 5) {
+    return json(res, 400, { error: 'valoracion_invalida' });
+  }
+  if (textoResena.length < 12) return json(res, 400, { error: 'texto_corto' });
+
+  try {
+    const rows = await sql.query(
+      `insert into resenas (libro_id, nombre, valoracion, texto)
+       values ($1, $2, $3, $4)
+       returning id, nombre, valoracion, texto, origen, creado_en`,
+      [libroId, nombre, valoracion, textoResena]
+    );
+    const row: any = rows[0];
+    return json(res, 201, {
+      ok: true,
+      resena: {
+        id: Number(row.id),
+        nombre: row.nombre,
+        valoracion: Number(row.valoracion),
+        texto: row.texto,
+        origen: row.origen,
+        creado_en: row.creado_en
+      }
+    });
+  } catch (error) {
+    console.error('[resenas:post]', error);
+    return json(res, 500, { error: 'error_interno' });
+  }
+}
+
 /* ---------------------------------------------------------------- router */
 
 export default async function handler(req: any, res: any) {
@@ -949,6 +1042,9 @@ export default async function handler(req: any, res: any) {
       return handleEmailsPrueba(req, res);
     case 'emails-reenviar':
       return handleEmailReenviar(req, res);
+    case 'resenas':
+    case 'reseñas':
+      return handleResenas(req, res);
     case 'novedades':
       return handleNovedades(req, res);
     case 'novedades-sync':

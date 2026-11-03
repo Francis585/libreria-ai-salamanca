@@ -271,4 +271,21 @@ create table if not exists novedades_feed (
 
 create index if not exists novedades_feed_anio_idx on novedades_feed (anio desc);
 
+
+-- Opiniones de lectores. `origen = 'casa'` son las reseñas que firma el equipo
+-- de la librería (no cuentan como opinión de un cliente); `'lector'` son las que
+-- llegan por el formulario de la ficha y se guardan tal cual.
+create table if not exists resenas (
+  id         bigserial primary key,
+  libro_id   text not null,
+  nombre     text not null,
+  valoracion smallint not null check (valoracion between 1 and 5),
+  texto      text not null,
+  origen     text not null default 'lector' check (origen in ('lector', 'casa')),
+  aprobada   boolean not null default true,
+  creado_en  timestamptz not null default now()
+);
+
+create index if not exists resenas_libro_idx on resenas (libro_id, creado_en desc);
+
 commit;

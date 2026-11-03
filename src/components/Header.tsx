@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, Search, ShoppingBag, Sparkles, X } from 'lucide-react';
+import { SECCION_IA } from '../lib/brand';
 
 interface HeaderProps {
   cartCount: number;
@@ -9,7 +10,7 @@ interface HeaderProps {
 
 const LINKS = [
   { href: '#catalogo', label: 'Catálogo' },
-  { href: '#oraculo', label: 'Oráculo IA', accent: true },
+  { href: SECCION_IA.href, label: SECCION_IA.etiqueta, accent: true },
   { href: '#laboratorio', label: 'Laboratorio' },
   { href: '#tertulias', label: 'Tertulias' },
   { href: '#cafe', label: 'Café' }
