@@ -12,9 +12,18 @@ interface OracleProps {
 interface Suggestion {
   book: Book;
   rationale: string;
+  glossary?: string[];
 }
 
 type Source = 'gemini' | 'local' | null;
+
+type Registro = 'llano' | 'divulgativo' | 'erudito';
+
+const REGISTROS: { value: Registro; label: string; hint: string }[] = [
+  { value: 'llano', label: 'Sin dar nada por sabido', hint: 'Frases cortas, cero jerga, con glosario' },
+  { value: 'divulgativo', label: 'Divulgativo', hint: 'Lenguaje corriente, sin academicismo' },
+  { value: 'erudito', label: 'Erudito', hint: 'Tradición, escuela y época' }
+];
 
 const EXAMPLES = [
   {
@@ -28,32 +37,52 @@ const EXAMPLES = [
   {
     label: 'Poesía para una tarde de lluvia',
     query: 'Poesía que se lea en una tarde de lluvia'
+  },
+  {
+    label: 'Un regalo de menos de 20 €',
+    query: 'Quiero un regalo de menos de 20 euros para mi madre'
   }
 ];
+
+interface Abstention {
+  message: string;
+  nearest: { id: string; title: string; reason: string }[];
+}
 
 export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState(ORACLE_MOOD_LABELS[0]);
+  const [registro, setRegistro] = useState<Registro>('divulgativo');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[] | null>(null);
+  const [abstention, setAbstention] = useState<Abstention | null>(null);
   const [source, setSource] = useState<Source>(null);
   const [notice, setNotice] = useState('');
+  const [meta, setMeta] = useState<string>('');
   const resultsRef = useRef<HTMLDivElement>(null);
 
   // Al llegar la selección, la traemos a la vista sin sacar al lector de la sección.
   useEffect(() => {
-    if (!suggestions || suggestions.length === 0) return;
+    if ((!suggestions || suggestions.length === 0) && !abstention) return;
     const timer = window.setTimeout(() => {
       resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 120);
     return () => window.clearTimeout(timer);
-  }, [suggestions]);
+  }, [suggestions, abstention]);
 
   const runLocal = (reason: string) => {
     const local = localRecommendations(query, mood, 3);
     setSuggestions(local.map((item) => ({ book: item.book, rationale: item.reason })));
     setSource('local');
     setNotice(reason);
+    setMeta('');
+  };
+
+  const reset = () => {
+    setSuggestions(null);
+    setAbstention(null);
+    setNotice('');
+    setMeta('');
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -62,49 +91,77 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
     setLoading(true);
     setNotice('');
-    setSuggestions(null);
+    reset();
 
     const catalogue = BOOKS.map((book) => ({
       id: book.id,
       title: book.title,
       author: book.author,
       year: book.year,
+      price: book.price,
       category: book.category,
-      tags: book.tags.slice(0, 6),
-      synopsis: book.synopsis
+      thematic: book.thematic,
+      epoch: book.epoch,
+      tags: book.tags,
+      keywords: book.keywords,
+      synopsis: book.synopsis,
+      entities: book.entities
     }));
 
     try {
       const response = await fetch('/api/ai-recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, mood, catalogue })
+        body: JSON.stringify({ query, mood, registro, catalogue })
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
-      const items: { id: string; rationale: string }[] = Array.isArray(data?.recommendations)
+      const items: { id: string; rationale: string; glossary?: string[] }[] = Array.isArray(
+        data?.recommendations
+      )
         ? data.recommendations
         : [];
 
       const resolved = items
-        .map((item) => {
+        .map((item): Suggestion | null => {
           const book = getBook(item.id);
-          return book ? { book, rationale: item.rationale } : null;
+          if (!book) return null;
+          return item.glossary && item.glossary.length > 0
+            ? { book, rationale: item.rationale, glossary: item.glossary }
+            : { book, rationale: item.rationale };
         })
         .filter((entry): entry is Suggestion => entry !== null);
+
+      const stats = data?.meta
+        ? data.meta.ms < 200
+          ? 'Respuesta directa del fondo · sin llamar al modelo'
+          : `${data.meta.candidatos} de ${data.meta.catalogo} fichas · ${(data.meta.ms / 1000).toFixed(1)} s`
+        : '';
 
       if (data?.source === 'gemini' && resolved.length > 0) {
         setSuggestions(resolved);
         setSource('gemini');
-      } else {
-        runLocal(
-          data?.source === 'unconfigured'
-            ? 'El Oráculo responde hoy con el motor semántico de la casa.'
-            : 'Selección del motor semántico de la casa mientras el Oráculo vuelve.'
-        );
+        setMeta(stats);
+        return;
       }
+
+      if (data?.source === 'no_match') {
+        setAbstention({
+          message: data?.message ?? 'No hay nada en la sala que responda a eso.',
+          nearest: Array.isArray(data?.nearest) ? data.nearest : []
+        });
+        setSource('gemini');
+        setMeta(stats);
+        return;
+      }
+
+      runLocal(
+        data?.source === 'unconfigured'
+          ? 'El Oráculo responde hoy con el motor semántico de la casa.'
+          : 'Selección del motor semántico de la casa mientras el Oráculo vuelve.'
+      );
     } catch {
       runLocal('El Oráculo descansa un momento: aquí tienes la selección del motor semántico de la casa.');
     } finally {
@@ -139,7 +196,8 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-relaxed text-[#d6d3d1] sm:text-[15px]">
             El Oráculo no inventa títulos: elige entre las {BOOKS.length} obras que están
-            físicamente en la sala y explica por qué. Si no encuentra nada, lo dice.
+            físicamente en la sala y explica por qué. Si no encuentra nada, lo dice. Y si no
+            sabes qué pedir, no te devuelve la pregunta: te enseña por dónde empezar.
           </p>
         </div>
 
@@ -181,11 +239,39 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Ej. un manuscrito perdido y un librero que no quiere venderlo"
+                placeholder="Ej. un regalo de menos de 20 €, o una novela para el tren"
                 className="w-full rounded-xl border border-[#57534e] bg-bark px-4 py-3 text-sm text-paper placeholder-[#78716c] outline-none transition-colors focus:border-gold"
               />
             </div>
           </div>
+
+          <fieldset className="mt-5">
+            <legend className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#d6d3d1]">
+              ¿Cómo te lo explico?
+            </legend>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Registro de la respuesta">
+              {REGISTROS.map((option) => {
+                const active = registro === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    title={option.hint}
+                    onClick={() => setRegistro(option.value)}
+                    className={`rounded-full border px-3.5 py-1.5 text-[11px] transition-colors ${
+                      active
+                        ? 'border-gold bg-gold/15 text-paper'
+                        : 'border-[#57534e]/70 text-[#d6d3d1] hover:border-gold/60'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">Prueba:</span>
@@ -243,15 +329,60 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           </div>
         )}
 
-        {suggestions && !loading && (
+        {abstention && !loading && (
+          <div ref={resultsRef} className="mt-10 scroll-mt-28 animate-fade-up">
+            <div className="rounded-xl border border-gold/30 bg-[#3a352e] p-5 sm:p-6">
+              <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-paper">
+                <Sparkles className="h-4 w-4 text-gold" />
+                Preferimos decírtelo
+              </h3>
+              <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-[#d6d3d1]">
+                {abstention.message}
+              </p>
+
+              {abstention.nearest.length > 0 && (
+                <>
+                  <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">
+                    Lo más cercano en la sala
+                  </p>
+                  <ul className="mt-2 space-y-1.5">
+                    {abstention.nearest.map((item) => {
+                      const book = getBook(item.id);
+                      return (
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            onClick={() => book && onOpenBook(book)}
+                            className="text-left text-[13px] text-[#e7e5e4] underline decoration-gold/40 underline-offset-4 transition-colors hover:text-gold"
+                          >
+                            {item.title}
+                            <span className="ml-2 text-[11px] no-underline text-[#a8a29e]">
+                              {item.reason}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
+
+              {meta && (
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#78716c]">{meta}</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {suggestions && suggestions.length > 0 && !loading && (
           <div ref={resultsRef} className="mt-10 scroll-mt-28 animate-fade-up">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#57534e] pb-4">
               <h3 className="flex items-center gap-2 font-display text-2xl font-semibold text-paper">
                 <Sparkles className="h-4 w-4 text-gold" />
-                Tres libros del fondo
+                {suggestions.length === 1 ? 'Un libro del fondo' : `${suggestions.length} libros del fondo`}
               </h3>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">
-                {source === 'gemini' ? 'Selección del Oráculo · Gemini' : 'Motor semántico de la casa'}
+                {source === 'gemini' ? `Selección del Oráculo · ${registro}` : 'Motor semántico de la casa'}
               </span>
             </div>
 
@@ -260,7 +391,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             )}
 
             <div className="mt-6 grid gap-5 md:grid-cols-3">
-              {suggestions.map(({ book, rationale }, index) => (
+              {suggestions.map(({ book, rationale, glossary }, index) => (
                 <article
                   key={book.id}
                   className="group flex flex-col rounded-xl border border-[#57534e]/70 bg-[#3a352e] p-4 transition-colors hover:border-gold/60"
@@ -295,6 +426,16 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     {rationale}
                   </p>
 
+                  {glossary && glossary.length > 0 && (
+                    <ul className="mt-3 space-y-1">
+                      {glossary.map((entry) => (
+                        <li key={entry} className="text-[11px] leading-snug text-[#a8a29e]">
+                          <span className="text-gold/80">·</span> {entry}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
                   <div className="mt-auto flex items-center gap-2 pt-4">
                     <button
                       type="button"
@@ -317,10 +458,15 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
               ))}
             </div>
 
-            <p className="mt-5 flex items-center gap-2 text-[11px] text-[#a8a29e]">
-              <BookOpen className="h-3.5 w-3.5" />
-              Puedes recogerlo en la Rúa Mayor en 2 horas o recibirlo mañana en casa.
-            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+              <p className="flex items-center gap-2 text-[11px] text-[#a8a29e]">
+                <BookOpen className="h-3.5 w-3.5" />
+                Puedes recogerlo en la Rúa Mayor en 2 horas o recibirlo mañana en casa.
+              </p>
+              {meta && (
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#78716c]">{meta}</p>
+              )}
+            </div>
           </div>
         )}
       </div>

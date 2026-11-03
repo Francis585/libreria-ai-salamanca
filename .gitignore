@@ -9,3 +9,7 @@ dist/
 Thumbs.db
 .agents/
 skills-lock.json
+
+# banco de pruebas del Oráculo
+.eval/
+tmp/
