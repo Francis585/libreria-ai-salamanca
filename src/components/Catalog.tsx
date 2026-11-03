@@ -21,9 +21,10 @@ const SORTS: { key: SortKey; label: string }[] = [
 
 export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
   const [query, setQuery] = useState('');
+  const recientes = useMemo(() => [...BOOKS].sort((a, b) => b.year - a.year).slice(0, 5), []);
   const [category, setCategory] = useState<string>('Todos');
   const [epoch, setEpoch] = useState<string>('Todas');
-  const [sort, setSort] = useState<SortKey>('relevancia');
+  const [sort, setSort] = useState<SortKey>('reciente');
   const inputRef = useRef<HTMLInputElement>(null);
   const stock = useStock();
 
@@ -116,6 +117,45 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-line bg-mist/40 p-4 sm:p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-clay">
+            Recién llegado · {new Date().getFullYear()}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSort('reciente');
+              setEpoch('Todas');
+              setCategory('Todos');
+              setQuery('');
+            }}
+            className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted hover:text-ink"
+          >
+            Ver todo lo nuevo
+          </button>
+        </div>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {recientes.map((libro) => (
+            <li key={libro.id}>
+              <button
+                type="button"
+                onClick={() => onOpenBook(libro)}
+                className="w-full rounded-lg border border-line/70 bg-paper px-3 py-2.5 text-left transition-colors hover:border-clay/50"
+              >
+                <span className="block font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                  {libro.year} · {libro.category}
+                </span>
+                <span className="mt-0.5 block truncate font-display text-[13px] font-semibold text-ink">
+                  {libro.title}
+                </span>
+                <span className="block truncate text-[10px] text-muted">{libro.author}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="mt-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

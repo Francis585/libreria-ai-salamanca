@@ -36,14 +36,14 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
           </div>
 
           <h1 className="mt-7 max-w-[15ch] font-display text-[clamp(2.9rem,7vw,5.1rem)] font-semibold leading-[0.94] tracking-[-0.02em] text-ink text-balance">
-            Ocho siglos de letras.
-            <span className="mt-1 block italic text-clay">Una forma nueva de encontrarlas.</span>
+            De 1492 a 2026.
+            <span className="mt-1 block italic text-clay">Todo el fondo, en una sola conversación.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-[15px] leading-[1.75] text-muted-warm sm:text-base">
-            Somos la librería de la Rúa Mayor: fondo salmantino, ediciones cuidadas y un
-            mostrador de madera donde todavía se recomienda de viva voz. Ahora ese mostrador
-            también entiende lo que buscas cuando no recuerdas el título.
+            Somos la librería de la Rúa Mayor: fondo salmantino, clásicos, novedades e
+            infantil, y un mostrador de madera donde todavía se recomienda de viva voz. Ahora
+            ese mostrador también entiende lo que buscas cuando no recuerdas el título.
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
