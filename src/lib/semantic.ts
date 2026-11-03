@@ -243,7 +243,7 @@ export function localRecommendations(query = '', mood = '', count = 3, temas: st
     const base = matched.get(book.id);
     const moodIndex = moodPicks.indexOf(book.id);
     const aciertosTema = temas.filter(
-      (tema) => book.tags.includes(tema) || book.thematic === tema
+      (tema) => book.tags.includes(tema) || book.thematic === tema || book.category === tema
     );
     if (!base && moodIndex === -1 && aciertosTema.length === 0) return null;
 

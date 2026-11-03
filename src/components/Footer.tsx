@@ -68,7 +68,6 @@ export const Footer: React.FC = () => {
             <ul className="mt-4 space-y-2.5 text-[12px] text-[#c9c9d0]">
               {[
                 ['#catalogo', 'Catálogo completo'],
-                ['#laboratorio', 'Cómo buscamos'],
                 [SECCION_IA.href, 'El librero'],
                 ['#tertulias', 'Tertulias y talleres'],
                 ['#encargos', 'Encargos de cualquier libro']

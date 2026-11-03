@@ -7,7 +7,6 @@ import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
 import { Encargables } from './components/Encargables';
 import { Asistente } from './components/Asistente';
-import { Lab } from './components/Lab';
 import { Events } from './components/Events';
 import { Footer } from './components/Footer';
 import { BookModal } from './components/BookModal';
@@ -138,7 +137,6 @@ export default function App() {
         <Oracle onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Catalog onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Encargables />
-        <Lab onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Events />
         
       </main>

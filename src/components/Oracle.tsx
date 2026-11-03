@@ -53,8 +53,9 @@ interface Abstention {
 export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState('');
-  const [temas, setTemas] = useState<string[]>([]);
-  const gruposTemas = React.useMemo(() => temasDelCatalogo(), []);
+  const [materia, setMateria] = useState('');
+  // Las materias salen del catálogo, no de una lista escrita a mano.
+  const materias = React.useMemo(() => temasDelCatalogo().map((grupo) => grupo.materia), []);
   const [registro, setRegistro] = useState<Registro>('divulgativo');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[] | null>(null);
@@ -74,7 +75,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
   }, [suggestions, abstention]);
 
   const runLocal = (reason: string) => {
-    const local = localRecommendations(query, mood, 3, temas);
+    const local = localRecommendations(query, mood, 3, materia ? [materia] : []);
     setSuggestions(local.map((item) => ({ book: item.book, rationale: item.reason })));
     setSource('local');
     setNotice(reason);
@@ -118,8 +119,8 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
         body: JSON.stringify({
           query,
           // el modelo recibe el ánimo y los temas elegidos en el mismo campo de contexto
-          mood: [mood, ...temas].filter(Boolean).join(' · '),
-          temas,
+          mood: [mood, materia].filter(Boolean).join(' · '),
+          temas: materia ? [materia] : [],
           registro,
           catalogue
         })
@@ -220,184 +221,79 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-10 rounded-2xl border border-line bg-paper p-5 backdrop-blur-sm sm:p-7"
+          className="mt-10 rounded-2xl border border-line bg-paper p-5 shadow-[0_18px_40px_-30px_rgba(14,14,16,0.35)] sm:p-7"
         >
-          {/* Atajos de la casa: los ánimos curados de siempre, ahora como chips */}
-          <div>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-warm">
-              Atajos de la casa
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {ORACLE_MOOD_LABELS.map((option) => {
-                const activo = mood === option;
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    aria-pressed={activo}
-                    onClick={() => setMood(activo ? '' : option)}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] transition-colors ${
-                      activo
-                        ? 'border-gold bg-gold/15 text-gold'
-                        : 'border-line text-muted-warm hover:border-gold/50 hover:text-ink'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Un solo campo grande: es lo que la gente sabe usar */}
+          <label htmlFor="oraculo-query" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            Qué te apetece leer
+          </label>
+          <div className="relative">
+            <input
+              id="oraculo-query"
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Ej. una novela corta para el tren, o algo sobre la Escuela de Salamanca"
+              className="w-full rounded-lg border border-line bg-paper px-4 py-3.5 text-[15px] text-ink placeholder-muted/80 outline-none transition-colors focus:border-clay/60"
+            />
           </div>
 
-          {/* Materias y temas: se construyen con las etiquetas reales del fondo */}
-          <div className="mt-5">
-            <div className="flex items-baseline justify-between gap-2">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-warm">
-                O busca por materia y tema
-                <span className="ml-2 normal-case tracking-normal text-muted">
-                  {gruposTemas.length} materias · {gruposTemas.reduce((n, g) => n + g.temas.length, 0)} temas
-                </span>
-              </p>
-              {(temas.length > 0 || mood) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTemas([]);
-                    setMood('');
-                  }}
-                  className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted hover:text-ink"
-                >
-                  Limpiar
-                </button>
-              )}
-            </div>
-
-            {temas.length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-1.5">
-                {temas.map((tema) => (
-                  <li key={tema}>
-                    <button
-                      type="button"
-                      onClick={() => setTemas((prev) => prev.filter((t) => t !== tema))}
-                      className="inline-flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[10.5px] font-semibold text-bark hover:bg-gold-deep"
-                    >
-                      {tema}
-                      <span aria-hidden="true">×</span>
-                      <span className="sr-only">Quitar {tema}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <div className="mt-2 max-h-[204px] space-y-3 overflow-y-auto rounded-xl border border-line bg-paper p-3 thin-scroll">
-              {gruposTemas.map((grupo) => (
-                <div key={grupo.materia}>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                    {grupo.materia}
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {grupo.temas.map((tema) => {
-                      const activo = temas.includes(tema);
-                      return (
-                        <button
-                          key={tema}
-                          type="button"
-                          aria-pressed={activo}
-                          onClick={() =>
-                            setTemas((prev) => (activo ? prev.filter((t) => t !== tema) : [...prev, tema]))
-                          }
-                          className={`rounded border px-2 py-1 text-[10.5px] transition-colors ${
-                            activo
-                              ? 'border-gold bg-gold/15 text-gold'
-                              : 'border-line text-muted-warm hover:border-muted/40 hover:text-ink'
-                          }`}
-                        >
-                          {tema}
-                          <span className="ml-1 font-mono text-[8.5px] text-muted">{obrasPorTema(tema)}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-            <div>
-              <label
-                htmlFor="oraculo-query"
-                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-muted-warm"
-              >
-                Cuéntalo con tus palabras <span className="normal-case tracking-normal text-muted">(opcional)</span>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="sm:w-[240px]">
+              <label htmlFor="oraculo-materia" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+                Materia <span className="normal-case tracking-normal">(opcional)</span>
               </label>
-              <input
-                id="oraculo-query"
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Ej. un regalo de menos de 20 €, o una novela para el tren"
-                className="w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm text-ink placeholder-muted outline-none transition-colors focus:border-gold"
-              />
-            </div>
-
-            <fieldset>
-              <legend className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-muted-warm">
-              ¿Cómo te lo explico?
-            </legend>
-            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Registro de la respuesta">
-              {REGISTROS.map((option) => {
-                const active = registro === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    title={option.hint}
-                    onClick={() => setRegistro(option.value)}
-                    className={`rounded-full border px-3.5 py-1.5 text-[11px] transition-colors ${
-                      active
-                        ? 'border-gold bg-gold/15 text-ink'
-                        : 'border-line text-muted-warm hover:border-gold/60'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-            </fieldset>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Prueba:</span>
-            {EXAMPLES.map((example) => (
-              <button
-                key={example.label}
-                type="button"
-                onClick={() => setQuery(example.query)}
-                className="rounded-full border border-line px-3 py-1.5 text-[11px] text-muted-warm transition-colors hover:border-gold/60 hover:text-ink"
+              <select
+                id="oraculo-materia"
+                value={materia}
+                onChange={(event) => setMateria(event.target.value)}
+                className="w-full appearance-none rounded-lg border border-line bg-paper px-3 py-3 text-[13px] text-ink outline-none transition-colors focus:border-clay/60"
               >
-                {example.label}
-              </button>
-            ))}
+                <option value="">Todas las materias</option>
+                {materias.map((opcion) => (
+                  <option key={opcion} value={opcion}>
+                    {opcion}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">O empieza por aquí</p>
+              <div className="flex flex-wrap gap-1.5">
+                {ORACLE_MOOD_LABELS.slice(0, 5).map((opcion) => {
+                  const activo = mood === opcion;
+                  return (
+                    <button
+                      key={opcion}
+                      type="button"
+                      aria-pressed={activo}
+                      onClick={() => setMood(activo ? '' : opcion)}
+                      className={`rounded-full border px-3 py-1.5 text-[11px] transition-colors ${
+                        activo ? 'border-clay bg-clay/[0.08] text-clay' : 'border-line text-muted-warm hover:border-muted/40 hover:text-ink'
+                      }`}
+                    >
+                      {opcion}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col gap-3 border-t border-line-soft pt-5 sm:flex-row sm:items-center sm:justify-start sm:gap-6">
             <p className="text-[11px] leading-relaxed text-muted">
-              Sin registro. No guardamos tu consulta.
+              Sin registro y sin guardar tu consulta. Si nada encaja, te lo decimos.
             </p>
             <button
               type="submit"
               disabled={loading}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-bold text-ink transition-all hover:bg-gold-deep disabled:cursor-wait disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-clay px-5 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-clay-deep disabled:opacity-60"
             >
               {loading ? (
                 <>
                   <RefreshCw className="h-4 w-4 animate-spin" />
-                  Consultando el fondo…
+                  Consultando…
                 </>
               ) : (
                 <>
