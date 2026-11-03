@@ -42,14 +42,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ open, cart, onClos
     notes: ''
   });
   const [honeypot, setHoneypot] = useState('');
-  const [delivery, setDelivery] = useState<Delivery>('recogida');
+  const [delivery, setDelivery] = useState<Delivery>('envio');
   const [done, setDone] = useState<OrderResult | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const idempotencyKey = useRef<string>(crypto.randomUUID());
 
   const subtotal = cart.reduce((sum, line) => sum + line.book.price * line.quantity, 0);
-  const shipping = delivery === 'recogida' || subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTE_ENVIO;
+  const shipping = subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTE_ENVIO;
   const total = subtotal + shipping;
 
   const close = () => {
@@ -158,39 +158,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ open, cart, onClos
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Forma de entrega">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={delivery === 'recogida'}
-                onClick={() => setDelivery('recogida')}
-                className={`flex items-start gap-2 rounded-xl border p-3 text-left transition-colors ${
-                  delivery === 'recogida' ? 'border-clay/60 bg-clay/[0.06]' : 'border-line hover:border-muted/40'
-                }`}
-              >
-                <Store className="mt-0.5 h-4 w-4 shrink-0 text-clay" />
-                <span>
-                  <span className="block text-[12px] font-semibold text-ink">Recoger en tienda</span>
-                  <span className="block text-[10.5px] text-muted">Gratis · en 2 horas</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={delivery === 'envio'}
-                onClick={() => setDelivery('envio')}
-                className={`flex items-start gap-2 rounded-xl border p-3 text-left transition-colors ${
-                  delivery === 'envio' ? 'border-clay/60 bg-clay/[0.06]' : 'border-line hover:border-muted/40'
-                }`}
-              >
-                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-clay" />
-                <span>
-                  <span className="block text-[12px] font-semibold text-ink">Enviar a casa</span>
-                  <span className="block text-[10.5px] text-muted">
-                    24/48 h · {subtotal >= ENVIO_GRATIS_DESDE ? 'gratis' : '4,50 €'}
-                  </span>
-                </span>
-              </button>
+            {/* Solo hay envío: la tienda no tiene local, así que no se ofrece recogida */}
+            <div className="rounded-xl border border-line bg-mist/40 p-3">
+              <p className="flex items-center gap-2 text-[12px] font-semibold text-ink">
+                <Truck className="h-4 w-4 text-clay" />
+                Envío a casa
+              </p>
+              <p className="mt-1 text-[10.5px] leading-relaxed text-muted">
+                Entrega en 24–48 h en península. {subtotal >= ENVIO_GRATIS_DESDE ? 'Gratis en este pedido.' : '4,50 € · gratis desde 35 €.'}
+              </p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">

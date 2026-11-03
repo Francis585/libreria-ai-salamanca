@@ -45,7 +45,7 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-clay" />
             </span>
             <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-warm sm:text-[10px] sm:tracking-[0.18em]">
-              Librería abierta · Rúa Mayor 14
+              Librería online · envíos a toda España
             </span>
           </div>
 
@@ -57,9 +57,9 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
           </h1>
 
           <p className="mt-6 max-w-[54ch] text-[15px] leading-[1.65] text-muted-warm sm:text-[16px]">
-            Somos la librería de la Rúa Mayor: fondo salmantino, clásicos, novedades e
-            infantil, y un mostrador de madera donde todavía se recomienda de viva voz. Ahora
-            ese mostrador también entiende lo que buscas cuando no recuerdas el título.
+            Somos una librería online desde Salamanca: fondo salmantino, clásicos, novedades e
+            infantil, y un equipo que todavía recomienda de viva voz. Escríbenos lo que buscas,
+            aunque no recuerdes el título, y te lo encontramos.
           </p>
 
           <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
@@ -81,7 +81,7 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
 
           <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-5">
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">En sala</dt>
+              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">En catálogo</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
                 {BOOKS.length}
                 <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">títulos</span>
@@ -95,9 +95,10 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">En la Rúa</dt>
+              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Entrega</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
-                1987
+                24–48
+                <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">h</span>
               </dd>
             </div>
           </dl>
@@ -154,7 +155,7 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
             </span>
             <span className="h-3 w-px bg-line" />
             <span className="flex items-center gap-1.5">
-              <Coffee className="h-3.5 w-3.5" /> Café en el patio
+              <Coffee className="h-3.5 w-3.5" /> Envío a toda España
             </span>
           </div>
         </div>

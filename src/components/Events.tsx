@@ -23,7 +23,7 @@ const EVENTS: EventItem[] = [
     weekday: 'Jueves',
     title: 'El Oráculo: ¿puede una máquina escribir un soneto?',
     time: '19:00 h',
-    location: 'Bodega de la librería · Rúa Mayor 14',
+    location: 'En directo por videollamada',
     description:
       'Demostración en directo con Elena Sotomayor: escribimos un soneto entre todos y la IA propone variantes. Después lo corregimos a mano, que es donde está la gracia.',
     speaker: 'Elena Sotomayor',
@@ -36,9 +36,9 @@ const EVENTS: EventItem[] = [
     weekday: 'Jueves',
     title: 'Club de lectura: Niebla, de Unamuno',
     time: '18:30 h',
-    location: 'Patio de arenisca · Café Melchor Cano',
+    location: 'En directo por videollamada',
     description:
-      'Tertulia abierta sobre Augusto Pérez y su discusión con el autor. Trae el libro subrayado; el café corre de nuestra cuenta.',
+      'Tertulia abierta sobre Augusto Pérez y su discusión con el autor. Trae el libro subrayado y las ganas de discutir; el enlace se manda por correo el día antes.',
     speaker: 'Bernardo Carvajal',
     plazas: 14
   },
@@ -49,7 +49,7 @@ const EVENTS: EventItem[] = [
     weekday: 'Sábado',
     title: 'Taller: leer un incunable sin miedo',
     time: '11:00 h',
-    location: 'Sala de fondo antiguo',
+    location: 'En directo por videollamada · con guantes de algodón',
     description:
       'Una hora y media con guantes de algodón: abrimos la Gramática de Nebrija de 1492 y explicamos cómo se coteja un ejemplar, qué mira un bibliófilo y por qué huele así el papel.',
     speaker: 'Equipo de fondo antiguo',
@@ -147,11 +147,11 @@ export const Events: React.FC = () => {
           <div className="max-w-xl">
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-clay">Agenda de la casa</span>
             <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
-              Tertulias y talleres
+              Club de lectura y talleres
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-warm">
-              Tres citas al mes, nunca más. En la bodega, en el patio o entre los incunables.
-              Aforo pequeño y conversación larga.
+              Tres citas al mes, nunca más. Siempre en directo por videollamada, con aforo
+              pequeño para que se pueda hablar.
             </p>
           </div>
           <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">

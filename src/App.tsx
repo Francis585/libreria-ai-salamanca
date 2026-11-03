@@ -9,7 +9,6 @@ import { Encargables } from './components/Encargables';
 import { Asistente } from './components/Asistente';
 import { Lab } from './components/Lab';
 import { Events } from './components/Events';
-import { Cafe } from './components/Cafe';
 import { Footer } from './components/Footer';
 import { BookModal } from './components/BookModal';
 import { CartDrawer, type CartLine } from './components/CartDrawer';
@@ -122,13 +121,13 @@ export default function App() {
             Envío gratis desde 35 €
           </span>
           <span className="h-2.5 w-px bg-line" />
-          <span className="whitespace-nowrap">Recogida en tienda en 2 horas</span>
+          <span className="whitespace-nowrap">Entrega en 24–48 h en toda España</span>
           <span className="h-2.5 w-px bg-line" />
-          <span className="whitespace-nowrap">Lun–Sáb · 09:00–21:00 · Rúa Mayor 14</span>
+          <span className="whitespace-nowrap">Atención al lector por correo y teléfono</span>
         </div>
         <p className="flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-1.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-muted-warm sm:hidden">
           <Truck className="h-2.5 w-2.5 text-clay" />
-          Envío gratis desde 35 € · Recogida en 2 h
+          Envío gratis desde 35 € · Entrega en 24–48 h
         </p>
       </div>
 
@@ -141,7 +140,7 @@ export default function App() {
         <Encargables />
         <Lab onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Events />
-        <Cafe />
+        
       </main>
 
       <Footer />

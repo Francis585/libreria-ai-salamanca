@@ -44,17 +44,17 @@ export const Footer: React.FC = () => {
               <span className="font-display text-xl font-semibold tracking-tight">Librería AI Salamanca</span>
             </div>
             <p className="mt-4 max-w-xs text-[12px] leading-relaxed text-[#8b8b95]">
-              Librería de fondo antiguo y narrativa viva en la Rúa Mayor. Digitalizamos lo que
-              tenemos para que puedas encontrarlo mejor, pero seguimos recomendando a viva voz.
+              Librería online con acento salmantino: fondo antiguo, clásicos y narrativa viva.
+              Enviamos a toda España y seguimos recomendando a viva voz, aunque sea por correo.
             </p>
             <div className="mt-5 space-y-2 text-[11.5px] text-[#c9c9d0]">
               <p className="flex items-start gap-2">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold" />
-                Calle Rúa Mayor 14, 37002 Salamanca
+                Salamanca · tienda solo online, sin local
               </p>
               <p className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 shrink-0 text-gold" />
-                923 21 40 14
+                923 21 40 14 · de lunes a viernes, 9–18 h
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5 shrink-0 text-gold" />
@@ -68,10 +68,10 @@ export const Footer: React.FC = () => {
             <ul className="mt-4 space-y-2.5 text-[12px] text-[#c9c9d0]">
               {[
                 ['#catalogo', 'Catálogo completo'],
-                ['#laboratorio', 'Laboratorio del fondo'],
+                ['#laboratorio', 'Cómo buscamos'],
                 [SECCION_IA.href, 'El librero'],
                 ['#tertulias', 'Tertulias y talleres'],
-                ['#cafe', 'Café Melchor Cano']
+                ['#encargos', 'Encargos de cualquier libro']
               ].map(([href, label]) => (
                 <li key={href}>
                   <a href={href} className="transition-colors hover:text-paper">

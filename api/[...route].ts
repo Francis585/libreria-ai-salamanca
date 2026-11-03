@@ -145,7 +145,7 @@ function emailHtml({ titulo, entradilla, bloques, cierre }: EmailContent): strin
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:${b.card};border:1px solid #E4DCCB;border-radius:10px;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:${b.ink};">
     <tr><td style="padding:22px 32px 18px;border-bottom:1px solid #E4DCCB;">
       <div style="font:600 13px/1.2 Georgia,serif;letter-spacing:.16em;text-transform:uppercase;">Librería AI Salamanca</div>
-      <div style="font:400 10px/1.6 -apple-system,Segoe UI,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:${b.muted};margin-top:4px;">Rúa Mayor 14 · desde 1987</div>
+      <div style="font:400 10px/1.6 -apple-system,Segoe UI,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:${b.muted};margin-top:4px;">Librería online · envíos a toda España</div>
     </td></tr>
     <tr><td style="padding:28px 32px 8px;">
       <h1 style="margin:0 0 10px;font:400 26px/1.2 Georgia,serif;color:${b.ink};">${esc(titulo)}</h1>
@@ -166,7 +166,7 @@ function emailHtml({ titulo, entradilla, bloques, cierre }: EmailContent): strin
       <a href="https://libreria-ai-salamanca.vercel.app/#catalogo" style="display:inline-block;padding:11px 18px;background:${b.ink};color:${b.paper};text-decoration:none;border-radius:6px;font:600 13px/1 -apple-system,Segoe UI,sans-serif;letter-spacing:.04em;">Ver el catálogo</a>
     </td></tr>
     <tr><td style="padding:16px 32px 24px;border-top:1px solid #E4DCCB;font:400 11px/1.7 -apple-system,Segoe UI,sans-serif;color:${b.muted};">
-      Librería AI Salamanca · Rúa Mayor 14, 37002 Salamanca · 923 21 40 14<br>
+      Librería AI Salamanca · tienda online · 923 21 40 14<br>
       Este correo se ha generado automáticamente. Si algo no cuadra, responde y lo lee una persona.
     </td></tr>
   </table>
@@ -192,7 +192,7 @@ function draftTertulia(nombre: string, evento: string, plazasRestantes: number):
       bloques,
       cierre: 'La fecha y la hora están en la agenda de la web, en Tertulias.'
     }),
-    texto: `${nombre}, te guardamos sitio para «${evento}». Quedan ${plazasRestantes} plazas. Si no puedes venir, avísanos. Librería AI Salamanca, Rúa Mayor 14.`
+    texto: `${nombre}, te guardamos sitio para «${evento}». Quedan ${plazasRestantes} plazas. Si no puedes venir, avísanos. Librería AI Salamanca.`
   };
 }
 
@@ -203,7 +203,7 @@ function draftMesa(nombre: string, fecha: string, hora: string, personas: number
     asunto: `Mesa reservada · ${fecha} a las ${hora}`,
     html: emailHtml({
       titulo: 'Mesa reservada',
-      entradilla: `${nombre}, os esperamos en el Café Melchor Cano.`,
+      entradilla: `${nombre}, aquí tienes el enlace de la videollamada.`,
       bloques: [
         `<strong>${esc(fecha)} · ${esc(hora)}</strong><br>${personas} ${personas === 1 ? 'persona' : 'personas'}, bajo los arcos del patio.`,
         'Se puede leer, se puede callar y se puede discutir de libros. El café lo tostamos a cuatro calles de aquí.'
@@ -218,7 +218,7 @@ function draftBienvenida(email: string): EmailDraft {
   return {
     tipo: 'newsletter_alta',
     destinatario: email,
-    asunto: 'Aquí empieza el boletín de la Rúa Mayor',
+    asunto: 'Aquí empieza el boletín de la librería',
     html: emailHtml({
       titulo: 'Bienvenido al boletín',
       entradilla: 'Tres citas al mes, nunca más. Esa es la promesa.',
@@ -372,7 +372,7 @@ async function handleEmailsPrueba(req: any, res: any) {
     const destino = text(cuerpo.email, 254).toLowerCase();
     if (!isEmail(destino)) return json(res, 400, { error: 'email_invalido' });
 
-    const nombre = text(cuerpo.nombre, 120) || 'Lectora de la Rúa Mayor';
+    const nombre = text(cuerpo.nombre, 120) || 'Lectora';
     const draft = [
       draftTertulia(nombre, 'El Oráculo: ¿puede una máquina escribir un soneto?', 9),
       draftMesa(nombre, '2026-11-21', '18:30', 2),
@@ -890,29 +890,13 @@ async function handleReservas(req: any, res: any) {
       });
     }
 
+    // No hay local físico: las mesas del café dejaron de existir. Se responde
+    // con 410 para que cualquier cliente viejo no crea que se ha guardado nada.
     if (tipo === 'mesa') {
-      const fecha = text(body.fecha, 10);
-      const hora = text(body.hora, 5);
-      if (!isDate(fecha, 90)) return json(res, 400, { error: 'fecha_invalida' });
-      if (!HORAS_MESA.includes(hora)) return json(res, 400, { error: 'hora_invalida' });
-
-      const ocupadas = await sql.query(
-        `select coalesce(sum(personas), 0)::int as personas from reservas
-          where tipo = 'mesa' and fecha = $1 and hora = $2`,
-        [fecha, hora]
-      );
-      if (Number(ocupadas[0]?.personas ?? 0) + personas > AFORO_MESA) {
-        return json(res, 409, { error: 'sin_mesas', mensaje: 'Esa franja está completa. Prueba otra hora.' });
-      }
-
-      const rows = await sql.query(
-        `insert into reservas (tipo, referencia, nombre, email, fecha, hora, personas)
-         values ('mesa', 'cafe', $1, $2, $3, $4, $5)
-         returning id`,
-        [nombre, email || null, fecha, hora, personas]
-      );
-      if (email) await queueEmail(draftMesa(nombre, fecha, hora, personas), email);
-      return json(res, 201, { ok: true, id: Number(rows[0].id) });
+      return json(res, 410, {
+        error: 'no_disponible',
+        mensaje: 'No tenemos local físico, así que no hay mesas. Escríbenos y te ayudamos por correo.'
+      });
     }
 
     return json(res, 400, { error: 'tipo_invalido' });
@@ -1132,11 +1116,12 @@ async function handleResenas(req: any, res: any) {
  * correo. Nunca inventa un título, un precio ni una plaza.
  */
 
-const DATOS_CASA = `Librería AI Salamanca, Rúa Mayor 14, 37002 Salamanca. Teléfono 923 21 40 14. Correo hola@libreriaiasalamanca.es.
-Horario: lunes a jueves 09:00–21:00; viernes y sábado 09:00–23:00; domingo 10:00–20:00. Cocina del café hasta una hora antes del cierre.
-Envío gratis desde 35 € · recogida en tienda en 2 horas · encargos de títulos que no están en la sala en 2–4 días.`;
+const DATOS_CASA = `Librería AI Salamanca. Tienda SOLO online: no hay local físico, no se puede recoger en mano.
+Correo hola@libreriaiasalamanca.es · teléfono 923 21 40 14 (lunes a viernes, 9–18 h).
+Envío a toda España en 24–48 h; gratis desde 35 €. Encargos de títulos que no están en el catálogo: 2–4 días.
+Club de lectura y talleres en directo por videollamada, con plazas limitadas.`;
 
-const PROMPT_ASISTENTE = `Eres el librero de guardia de una librería de Salamanca. Hablas en castellano de España, cercano y sin florituras.
+const PROMPT_ASISTENTE = `Eres el librero de guardia de una librería ONLINE con acento salmantino (no hay tienda física). Hablas en castellano de España, cercano y sin florituras.
 
 Reglas estrictas:
 - Responde SOLO con la información del CONTEXTO. Si algo no aparece, di que no lo sabes y ofrece el correo hola@libreriaiasalamanca.es o el teléfono 923 21 40 14.

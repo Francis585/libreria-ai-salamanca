@@ -133,10 +133,10 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
 
                 <p className="text-center font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
                   {disponibles !== undefined && !agotado
-                    ? `${disponibles} en el almacén · recogida en 2 h`
+                    ? `${disponibles} en stock · envío en 24–48 h`
                     : agotado
                       ? 'Podemos avisarte cuando vuelva'
-                      : 'Recogida en tienda en 2 h · Envío 24/48 h'}
+                      : 'Envío en 24–48 h · gratis desde 35 €'}
                 </p>
               </div>
 

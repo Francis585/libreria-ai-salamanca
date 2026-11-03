@@ -6,7 +6,7 @@ import { ArrowUpRight, Loader2, Search, Truck, X } from 'lucide-react';
  *
  * Arriba está el fondo de la sala (46 obras con ficha propia). Aquí va todo lo
  * demás que se publica en castellano —originales españoles y traducciones— y
- * que se puede encargar en el mostrador. Sale de la base, que el cron rellena
+ * que se puede encargar y llega a casa. Sale de la base, que el cron rellena
  * con las editoriales españolas, así que la lista crece sin tocar código.
  */
 
@@ -137,7 +137,7 @@ export const Encargables: React.FC = () => {
             <p className="mt-4 text-sm leading-relaxed text-muted-warm">
               Arriba está el fondo de la sala, con su ficha y su ejemplar. Aquí va el resto del
               catálogo español: lo que escriben autores de aquí y lo que se traduce, siempre en
-              edición castellana. Se encarga en el mostrador y llega en dos o cuatro días.
+              edición castellana. Te lo conseguimos y llega en dos o cuatro días.
             </p>
           </div>
 

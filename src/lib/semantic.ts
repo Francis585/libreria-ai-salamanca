@@ -119,7 +119,7 @@ export function searchBooks(query: string, options: SearchOptions = {}): SearchR
       book,
       score: 100,
       matchedConcepts: [book.thematic, book.epoch],
-      reason: 'Fondo catalogado y digitalizado en la Rúa Mayor'
+      reason: 'Fondo catalogado en el catálogo de la casa'
     }));
   }
 
@@ -266,7 +266,7 @@ export function localRecommendations(query = '', mood = '', count = 3, temas: st
         book,
         score: 82,
         matchedConcepts: [book.thematic],
-        reason: 'Una de las obras que más se prestan en la Rúa Mayor esta temporada.'
+        reason: 'Una de las obras que más recomendamos esta temporada.'
       }));
   }
 

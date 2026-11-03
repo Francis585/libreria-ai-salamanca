@@ -166,7 +166,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
       if (data?.source === 'no_match') {
         setAbstention({
-          message: data?.message ?? 'No hay nada en la sala que responda a eso.',
+          message: data?.message ?? 'No hay nada en el catálogo que responda a eso.',
           nearest: Array.isArray(data?.nearest) ? data.nearest : []
         });
         setSource('gemini');
@@ -212,8 +212,8 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             Dinos qué te pasa. <span className="italic text-gold">Te damos un libro.</span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-warm sm:text-[15px]">
-            El librero no inventa títulos: elige entre las {BOOKS.length} obras que están
-            físicamente en la sala y explica por qué. Si no encuentra nada, lo dice. Y si no
+            El librero no inventa títulos: elige entre las {BOOKS.length} obras de
+            nuestro catálogo y explica por qué. Si no encuentra nada, lo dice. Y si no
             sabes qué pedir, no te devuelve la pregunta: te enseña por dónde empezar.
           </p>
         </div>
@@ -441,7 +441,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
               {abstention.nearest.length > 0 && (
                 <>
                   <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-                    Lo más cercano en la sala
+                    Lo más cercano en el catálogo
                   </p>
                   <ul className="mt-2 space-y-1.5">
                     {abstention.nearest.map((item) => {
@@ -563,7 +563,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
               <p className="flex items-center gap-2 text-[11px] text-muted">
                 <BookOpen className="h-3.5 w-3.5" />
-                Puedes recogerlo en la Rúa Mayor en 2 horas o recibirlo mañana en casa.
+                Te lo enviamos a casa en 24–48 h, gratis desde 35 €.
               </p>
               {meta && (
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">{meta}</p>

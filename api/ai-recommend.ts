@@ -287,7 +287,7 @@ function buildPrompt(
     })
     .join('\n\n');
 
-  return `Eres el librero de la Librería AI Salamanca, en la Rúa Mayor. Llevas desde 1987 recomendando de viva voz: escuchas y solo entonces propones. No inventas títulos, no inventas premios, no inventas datos biográficos.
+  return `Eres el librero de la Librería AI Salamanca, una librería online con acento salmantino. Escuchas y solo entonces propones. No inventas títulos, no inventas premios, no inventas datos biográficos.
 
 CANDIDATOS (los únicos títulos de los que puedes hablar; elige SOLO entre estos ids):
 ${list}
@@ -549,7 +549,7 @@ export default async function handler(req: any, res: any) {
           title: candidate.item.title,
           reason: `Se acerca por ${candidate.matched.slice(0, 3).join(', ') || 'tema'}`
         })),
-        message: reason || 'El Oráculo no ha encontrado en la sala nada que encaje de verdad con lo que pides.',
+        message: reason || 'El librero no ha encontrado en el catálogo nada que encaje de verdad con lo que pides.',
         meta: { ...baseMeta, ms: Date.now() - started, abstained_by: 'model' }
       });
     }

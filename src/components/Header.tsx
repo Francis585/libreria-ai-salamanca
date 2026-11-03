@@ -9,11 +9,11 @@ interface HeaderProps {
 }
 
 const LINKS = [
-  { href: '#catalogo', label: 'En la tienda' },
+  { href: '#catalogo', label: 'Catálogo' },
   { href: '#encargos', label: 'Encargos' },
   { href: SECCION_IA.href, label: SECCION_IA.etiqueta, accent: true },
   { href: '#tertulias', label: 'Tertulias' },
-  { href: '#cafe', label: 'Café' }
+  { href: '#tertulias', label: 'Club de lectura' }
 ];
 
 export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch }) => {
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch 
               Librería AI<span className="hidden sm:inline"> Salamanca</span>
             </span>
             <span className="mt-1 hidden truncate font-mono text-[9px] uppercase tracking-[0.22em] text-muted sm:block">
-              Rúa Mayor 14 · desde 1987
+              Librería online · envíos a toda España
             </span>
           </span>
         </a>
@@ -138,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch 
             ))}
           </nav>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
-            Lun–Sáb · 09:00–21:00 · Rúa Mayor 14
+            Tienda online · envíos a toda España
           </p>
         </div>
       )}

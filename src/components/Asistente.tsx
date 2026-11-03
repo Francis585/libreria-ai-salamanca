@@ -4,7 +4,7 @@ import { BOOKS, getBook, type Book } from '../data/library';
 import { BookCover } from './BookCover';
 
 /**
- * Asistente del mostrador.
+ * Asistente de la librería.
  *
  * A diferencia de El Librero (que recomienda lecturas), este contesta a lo que
  * hoy se pregunta por teléfono: si hay ejemplares, hasta qué hora abrimos, qué

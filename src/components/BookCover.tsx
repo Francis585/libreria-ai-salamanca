@@ -210,7 +210,7 @@ const GeneratedCover: React.FC<{ book: Book; compact: boolean }> = ({ book, comp
           </p>
           {!compact && (
             <p className="mt-1.5 font-mono text-[6px] uppercase tracking-[0.16em] text-paper/35">
-              Librería AI · Rúa Mayor
+              Librería AI · Salamanca
             </p>
           )}
         </div>
