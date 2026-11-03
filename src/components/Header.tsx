@@ -53,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch 
               Librería AI<span className="hidden sm:inline"> Salamanca</span>
             </span>
             <span className="mt-1 hidden truncate font-mono text-[9px] uppercase tracking-[0.22em] text-muted sm:block">
-              Librería online · envíos a toda España
+              Envíos a toda España · 24–48 h
             </span>
           </span>
         </a>

@@ -45,7 +45,7 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-clay" />
             </span>
             <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-warm sm:text-[10px] sm:tracking-[0.18em]">
-              Librería online · envíos a toda España
+              Librería online desde Salamanca
             </span>
           </div>
 
