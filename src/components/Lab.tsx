@@ -29,6 +29,9 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
   const [thematic, setThematic] = useState('Todas las materias');
   const [selectedId, setSelectedId] = useState<string>(BOOKS[0].id);
   const [tab, setTab] = useState<InspectorTab>('entidades');
+  // El laboratorio viene plegado: ocupa un tercio de la página y casi nadie
+  // llega hasta aquí, así que se abre solo si alguien lo pide.
+  const [abierto, setAbierto] = useState(false);
 
   const results = useMemo(
     () => searchBooks(query, { epoch, thematic }),
@@ -80,8 +83,21 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
           </div>
         </div>
 
+        <button
+          type="button"
+          onClick={() => setAbierto((valor) => !valor)}
+          aria-expanded={abierto}
+          className="mt-8 inline-flex items-center gap-2 rounded-lg border border-line bg-paper px-4 py-2.5 text-xs font-semibold text-ink transition-colors hover:border-ink/25"
+        >
+          <Search className="h-3.5 w-3.5 text-clay" />
+          {abierto ? 'Cerrar el buscador por ideas' : 'Probar el buscador por ideas'}
+          <span aria-hidden="true" className="text-muted">{abierto ? '−' : '+'}</span>
+        </button>
+
+        {abierto && (
+        <>
         {/* Buscador */}
-        <div className="mt-9 rounded-2xl border border-line bg-paper p-5 shadow-[0_18px_40px_-30px_rgba(45,40,34,0.5)] sm:p-6">
+        <div className="mt-6 rounded-2xl border border-line bg-paper p-5 shadow-[0_18px_40px_-30px_rgba(45,40,34,0.5)] sm:p-6">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-clay" />
             <input
@@ -465,6 +481,8 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
             </div>
           </aside>
         </div>
+        </>
+        )}
       </div>
     </section>
   );

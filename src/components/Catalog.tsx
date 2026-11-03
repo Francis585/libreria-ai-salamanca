@@ -53,6 +53,9 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
   const [formato, setFormato] = useState<Formato>('todos');
   const [soloDisponibles, setSoloDisponibles] = useState(false);
   const [panelAbierto, setPanelAbierto] = useState(false);
+  // El catálogo se enseña por tandas: 46 fichas de golpe hacían la página
+  // interminable. Doce y un botón para seguir.
+  const [visibles, setVisibles] = useState(12);
   const inputRef = useRef<HTMLInputElement>(null);
   const stock = useStock();
 
@@ -125,6 +128,10 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     }
     return sorted;
   }, [query, category, epoch, sort, precio, notaMinima, formato, soloDisponibles, stock]);
+
+  useEffect(() => {
+    setVisibles(12);
+  }, [query, category, epoch, precio, notaMinima, formato, soloDisponibles]);
 
   const countFor = (cat: string) =>
     cat === 'Todos' ? BOOKS.length : BOOKS.filter((book) => book.category === cat).length;
@@ -437,7 +444,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((book, index) => {
+          {results.slice(0, visibles).map((book, index) => {
             const disponibles = stock[book.id];
             const agotado = disponibles === 0;
             return (
@@ -535,6 +542,24 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             </article>
             );
           })}
+        </div>
+      )}
+
+      {results.length > visibles && (
+        <div className="mt-12 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setVisibles((n) => n + 12)}
+            className="inline-flex items-center gap-2 rounded-lg border border-line bg-paper px-5 py-2.5 text-xs font-semibold text-ink transition-colors hover:border-ink/25"
+          >
+            Ver más obras
+            <span className="font-mono text-[10px] text-muted">
+              quedan {results.length - visibles}
+            </span>
+          </button>
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
+            {visibles} de {results.length}
+          </p>
         </div>
       )}
     </section>
