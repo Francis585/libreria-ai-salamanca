@@ -473,7 +473,7 @@ export default async function handler(req: any, res: any) {
       recommendations: [] as Recommendation[],
       nearest: [],
       message:
-        'No tenemos fondo infantil ni juvenil. Es una ausencia de la casa, no un descuido del Oráculo: preferimos decírtelo antes que venderte un clásico para adultos como si sirviera para una niña de nueve años.',
+        'No tenemos fondo infantil ni juvenil. Es una ausencia de la casa, no un descuido del Oráculo: preferimos decírtelo antes que venderte un clásico para adultos como si sirviera para esa edad.',
       meta: { ...baseMeta, motivo: 'sin_fondo_infantil' }
     });
   }
