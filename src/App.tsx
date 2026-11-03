@@ -6,6 +6,7 @@ import { Hero } from './components/Hero';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
 import { Encargables } from './components/Encargables';
+import { Asistente } from './components/Asistente';
 import { Lab } from './components/Lab';
 import { Events } from './components/Events';
 import { Cafe } from './components/Cafe';
@@ -144,6 +145,8 @@ export default function App() {
       </main>
 
       <Footer />
+
+      <Asistente onOpenBook={setSelectedBook} />
 
       <BookModal
         book={selectedBook}

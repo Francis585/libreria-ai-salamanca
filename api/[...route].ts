@@ -1120,7 +1120,276 @@ async function handleResenas(req: any, res: any) {
   }
 }
 
+/* --------------------------------------------------------------- asistente */
+
+/**
+ * Asistente del mostrador.
+ *
+ * Responde a las cuatro cosas que hoy se preguntan por teléfono —«¿lo tenéis?»,
+ * «¿hasta qué hora abrís?», «¿quedan plazas?», «¿dónde está mi pedido?»— y
+ * recomienda delegando en el fondo. Todo lo que dice sale de la base o de los
+ * datos fijos de la casa: si no está ahí, contesta que no lo sabe y da el
+ * correo. Nunca inventa un título, un precio ni una plaza.
+ */
+
+const DATOS_CASA = `Librería AI Salamanca, Rúa Mayor 14, 37002 Salamanca. Teléfono 923 21 40 14. Correo hola@libreriaiasalamanca.es.
+Horario: lunes a jueves 09:00–21:00; viernes y sábado 09:00–23:00; domingo 10:00–20:00. Cocina del café hasta una hora antes del cierre.
+Envío gratis desde 35 € · recogida en tienda en 2 horas · encargos de títulos que no están en la sala en 2–4 días.`;
+
+const PROMPT_ASISTENTE = `Eres el librero de guardia de una librería de Salamanca. Hablas en castellano de España, cercano y sin florituras.
+
+Reglas estrictas:
+- Responde SOLO con la información del CONTEXTO. Si algo no aparece, di que no lo sabes y ofrece el correo hola@libreriaiasalamanca.es o el teléfono 923 21 40 14.
+- Nunca inventes títulos, precios, stock, plazas ni fechas.
+- Máximo 90 palabras. Sin listas de más de tres elementos. Nada de Markdown complicado.
+- Si el cliente pide una recomendación, propone como mucho tres títulos del contexto y una razón breve de cada uno, apoyándote solo en los temas que aparecen entre corchetes.
+- Para recomendar puedes usar los títulos de FONDO DISPONIBLE PARA RECOMENDAR; no inventes otros.
+- Si pregunta por un pedido y falta la referencia o el correo, pídelos.
+
+CONTEXTO:
+`;
+
+function normaliza(texto: string) {
+  return texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+type AccionLibro = { id: string; titulo: string };
+
+async function contextoAsistente(
+  mensaje: string,
+  referencia?: string,
+  email?: string,
+  catalogoCliente?: { id: string; titulo: string; autor?: string; temas?: string[] }[]
+) {
+  const lineas: string[] = [DATOS_CASA];
+  const acciones: AccionLibro[] = [];
+  let nombres: AccionLibro[] = [];
+
+  // 1. ¿Pregunta por un título concreto? Se compara contra el fondo de la sala.
+  try {
+    const catalogo = await sql.query(`select id, titulo, precio, stock from libros`, []);
+    nombres = catalogo.map((libro: any) => ({ id: String(libro.id), titulo: String(libro.titulo) }));
+    // Solo cuentan las palabras con peso: sin esta lista, «regalar algo» casaba
+    // con cualquier título que llevara «algo» y el asistente respondía con un
+    // libro que nadie había pedido.
+    const SIN_PESO = new Set([
+      'algo', 'libro', 'libros', 'quiero', 'queria', 'teneis', 'tienen', 'tienes', 'queda',
+      'quedan', 'cuantos', 'cuanto', 'cuesta', 'precio', 'regalo', 'regalar', 'comprar',
+      'busco', 'buscar', 'sobre', 'para', 'donde', 'cuando', 'como', 'esta', 'este', 'esto',
+      'algun', 'alguna', 'podeis', 'podrias', 'necesito', 'recomiendas', 'recomendar'
+    ]);
+    const buscado = normaliza(mensaje);
+    const palabras = buscado
+      .split(/[^a-z0-9ñ]+/)
+      .filter((w) => w.length >= 5 && !SIN_PESO.has(w));
+
+    const aciertos = catalogo
+      .map((libro: any) => {
+        const titulo = normaliza(String(libro.titulo));
+        const aciertos = palabras.filter((w) => titulo.includes(w));
+        return { libro, puntos: aciertos.length, larga: aciertos.some((w) => w.length >= 6) };
+      })
+      .filter((fila: { puntos: number; larga: boolean }) => fila.puntos >= 2 || (fila.puntos === 1 && fila.larga))
+      .sort((a: any, b: any) => b.puntos - a.puntos)
+      .slice(0, 4);
+
+    if (!aciertos.length) {
+      // Para una recomendación sin título concreto se le da una lista corta del
+      // fondo. Si el cliente manda sus temas, se eligen por afinidad con lo que
+      // ha preguntado; si no, se toma el fondo disponible tal cual.
+      const porTitulo = new Map(catalogo.map((libro: any) => [String(libro.titulo), libro]));
+      const todos = catalogoCliente?.length
+        ? catalogoCliente.map((ficha) => ({ ficha, datos: porTitulo.get(ficha.titulo) }))
+        : [];
+
+      const afinidad = (texto: string, temas: string[] = []) => {
+        const plano = normaliza(`${texto} ${temas.join(' ')}`);
+        return palabras.filter((w) => plano.includes(w)).length;
+      };
+
+      const ordenados = todos
+        .filter((fila) => fila.datos && Number(fila.datos.stock) > 0)
+        .sort((a, b) => afinidad(b.ficha.titulo, b.ficha.temas) - afinidad(a.ficha.titulo, a.ficha.temas));
+
+      const sugerencias = (ordenados.length ? ordenados.map((fila) => fila.datos) : catalogo.filter((libro: any) => Number(libro.stock) > 0))
+        .slice(0, 6);
+      if (sugerencias.length) {
+        lineas.push('FONDO DISPONIBLE PARA RECOMENDAR (elige como mucho tres):');
+        for (const libro of sugerencias as any[]) {
+          const ficha = catalogoCliente?.find((c) => c.titulo === libro.titulo);
+          const temas = ficha?.temas?.length ? ` [${ficha.temas.slice(0, 3).join(', ')}]` : '';
+          lineas.push(`- ${libro.titulo}: ${Number(libro.precio).toFixed(2)} €, ${libro.stock} ejemplar(es).${temas}`);
+        }
+      }
+    }
+
+    if (aciertos.length) {
+      lineas.push('FONDO DE LA SALA QUE ENCAJA CON LA PREGUNTA:');
+      for (const fila of aciertos) {
+        const libro: any = fila.libro;
+        lineas.push(
+          `- ${libro.titulo}: ${Number(libro.precio).toFixed(2)} €, ${libro.stock} ejemplar(es) en el almacén.`
+        );
+        acciones.push({ id: String(libro.id), titulo: String(libro.titulo) });
+      }
+    }
+  } catch {
+    /* sin catálogo se sigue con lo demás */
+  }
+
+  // 2. Agenda y plazas libres, en vivo.
+  try {
+    const eventos = await sql.query(
+      `select e.titulo, e.plazas, coalesce(sum(r.personas), 0)::int as ocupadas
+         from eventos e
+         left join reservas r on r.tipo = 'tertulia' and r.referencia = e.id
+        group by e.titulo, e.plazas
+        order by e.titulo`,
+      []
+    );
+    if (eventos.length) {
+      lineas.push('TERTULIAS Y TALLERES (plazas libres ahora mismo):');
+      for (const fila of eventos as any[]) {
+        lineas.push(`- ${fila.titulo}: ${Math.max(0, Number(fila.plazas) - Number(fila.ocupadas))} plazas libres de ${fila.plazas}.`);
+      }
+    }
+  } catch {
+    /* seguimos */
+  }
+
+  // 3. Estado del pedido, solo con referencia y correo.
+  if (referencia && email) {
+    try {
+      const filas = await sql.query(
+        `select referencia, estado, entrega, total, creado_en from pedidos
+          where upper(referencia) = upper($1) and lower(email) = lower($2) limit 1`,
+        [referencia, email]
+      );
+      if (filas.length) {
+        const pedido: any = filas[0];
+        lineas.push(
+          `PEDIDO ${pedido.referencia}: estado ${pedido.estado}, entrega ${pedido.entrega}, total ${Number(pedido.total).toFixed(2)} €, del ${pedido.creado_en}.`
+        );
+      } else {
+        lineas.push('No hay ningún pedido con esa referencia y ese correo.');
+      }
+    } catch {
+      /* seguimos */
+    }
+  }
+
+  return { contexto: lineas.join('\n'), acciones, nombres };
+}
+
+async function llamarModelo(prompt: string, apiKey: string, modelo: string, maxTokens = 700): Promise<string> {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.35,
+          maxOutputTokens: maxTokens,
+          topP: 0.9,
+          // Sin esto el modelo se gasta el presupuesto razonando y devuelve
+          // la frase cortada a la mitad.
+          thinkingConfig: { thinkingBudget: 0 }
+        }
+      }),
+      signal: AbortSignal.timeout(20000)
+    }
+  );
+  if (!res.ok) throw new Error(`modelo ${res.status}`);
+  const data: any = await res.json();
+  const texto = data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') ?? '';
+  return String(texto).trim();
+}
+
+/** Respuesta sin modelo: sale del mismo contexto, con plantilla. Sirve de red. */
+function respuestaPlantilla(mensaje: string, contexto: string, acciones: AccionLibro[]): string {
+  const bajo = normaliza(mensaje);
+
+  if (/pedido|envio|llega|referencia/.test(bajo)) {
+    return 'Para mirarte el pedido necesito la referencia (empieza por LAI-) y el correo con el que lo hiciste. Si prefieres, llámanos al 923 21 40 14.';
+  }
+  if (/hora|abierto|abris|cierra|donde|direccion/.test(bajo)) {
+    return 'Estamos en Rúa Mayor 14. Abrimos de lunes a jueves de 9 a 21, viernes y sábado de 9 a 23 y domingo de 10 a 20.';
+  }
+  if (acciones.length) {
+    const primera = acciones[0];
+    const linea = contexto.split('\n').find((l) => l.includes(primera.titulo));
+    return linea
+      ? `Sí lo tenemos. ${linea.replace(/^- /, '')} ¿Te lo guardo?`
+      : `Sí, está en la sala: ${primera.titulo}.`;
+  }
+  if (/tertulia|plaza|taller|club/.test(bajo)) {
+    const linea = contexto.split('\n').find((l) => l.includes('plazas libres'));
+    return linea ? linea.replace(/^- /, '') : 'Escríbenos y te digo las plazas que quedan.';
+  }
+  return 'Eso no lo sé con seguridad. Escríbenos a hola@libreriaiasalamanca.es o llámanos al 923 21 40 14 y te lo miramos.';
+}
+
+async function handleAsistente(req: any, res: any) {
+  if (req.method === 'OPTIONS') return json(res, 204, {});
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (!rateLimit(req, 'asistente', 20)) return json(res, 429, { error: 'demasiadas_peticiones' });
+
+  const body = readBody(req);
+  if (text(body.website, 50)) return json(res, 200, { ok: true, respuesta: '' });
+
+  const mensaje = text(body.mensaje, 500);
+  // En un chat la gente pega la referencia y el correo en la misma frase, así
+  // que se sacan de ahí antes de pedírselos otra vez.
+  const referencia =
+    text(body.referencia, 20) || (mensaje.match(/LAI-\d+/i)?.[0] ?? '');
+  const email =
+    text(body.email, 254).toLowerCase() ||
+    (mensaje.match(/[^\s@]+@[^\s@]+\.[a-z]{2,}/i)?.[0]?.toLowerCase() ?? '');
+
+  if (mensaje.length < 2) return json(res, 400, { error: 'mensaje_corto' });
+
+  const catalogoCliente = Array.isArray(body.catalogo) ? body.catalogo.slice(0, 80) : undefined;
+  const { contexto, acciones, nombres } = await contextoAsistente(mensaje, referencia, email, catalogoCliente);
+
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return json(res, 200, {
+      respuesta: respuestaPlantilla(mensaje, contexto, acciones),
+      fuente: 'plantilla',
+      acciones
+    });
+  }
+
+  try {
+    const modelo = process.env.ORACULO_MODEL || 'gemini-3.8-flash';
+    const respuesta = await llamarModelo(`${PROMPT_ASISTENTE}${contexto}\n\nCLIENTE: ${mensaje}\nLIBRERO:`, apiKey, modelo);
+    if (!respuesta) throw new Error('respuesta vacía');
+
+    // Las fichas que se pintan son las que la respuesta nombra, no las que le
+    // pasamos por si acaso: nada de seis portadas al preguntar por el horario.
+    const respuestaPlana = normaliza(respuesta).replace(/[*_]/g, '');
+    const citados = nombres
+      .filter((n) => respuestaPlana.includes(normaliza(n.titulo)))
+      .slice(0, 3);
+
+    return json(res, 200, { respuesta, fuente: 'modelo', acciones: citados });
+  } catch (error) {
+    console.error('[asistente]', errorMessage(error).slice(0, 200));
+    return json(res, 200, {
+      respuesta: respuestaPlantilla(mensaje, contexto, acciones),
+      fuente: 'plantilla',
+      acciones
+    });
+  }
+}
+
 /* ---------------------------------------------------------------- router */
+
 
 export default async function handler(req: any, res: any) {
   // En el runtime de Vercel el catch-all no siempre rellena req.query.route,
@@ -1152,6 +1421,8 @@ export default async function handler(req: any, res: any) {
       return handleEmailsPrueba(req, res);
     case 'emails-reenviar':
       return handleEmailReenviar(req, res);
+    case 'asistente':
+      return handleAsistente(req, res);
     case 'resenas':
     case 'reseñas':
       return handleResenas(req, res);
