@@ -465,20 +465,28 @@ const EDITORIALES = [
 const MARCAS_OTRO_IDIOMA = new RegExp(
   [
     // francés (sin «sur», «entre», «plus» ni «tout»: son castellanas normales)
-    String.raw`\b(les|des|aux|une|belles|joie|dans|pour|avec|nuit|monde|femme|homme|fille|guerre|amour|sang|ciel|petite|maison|années|temps|jamais|encore)\b`,
+    String.raw`\b(les|des|aux|une|belles|joie|dans|pour|avec|nuit|monde|femme|homme|fille|guerre|amour|sang|ciel|petite|maison|années|temps|jamais|encore|visit[ea]|catastrophique)\b`,
     // inglés
-    String.raw`\b(the|of|and|with|from|into|night|house|girl|boy|world|book|story|love|war|dead|secret|sister|wife|husband|river|mountain|winter|summer|never|always|between|after|before|little|long|last|first)\b`,
+    String.raw`\b(the|of|and|with|from|into|night|house|girl|boy|world|book|story|love|war|dead|secret|sister|wife|husband|river|mountain|winter|summer|never|always|between|after|before|little|long|last|first|psycho|victorian)\b`,
     // italiano / alemán
-    String.raw`\b(il|gli|della|delle|degli|notte|mondo|vita|amore|guerra|und|der|die|das|nacht|welt|haus)\b`
+    String.raw`\b(il|gli|della|delle|degli|notte|mondo|vita|amore|guerra|und|der|die|das|nacht|welt|haus|anniversario)\b`
   ].join('|'),
   'i'
 );
+
+/** Diacríticos que el castellano no usa y sí el francés, el italiano o el portugués. */
+const DIACRITICOS_AJENOS = /[èêàìòùçÈÊÀÌÒÙÇ]/;
+
+/** Elisión tipo «l'anniversario», «d'amore»: en castellano no existe. */
+const ELISION_AJENA = /(^|\s)[ldj]'/i;
 
 function esTituloEnEspanol(titulo: string): boolean {
   const limpio = String(titulo ?? '').trim();
   if (!limpio) return false;
   // La ñ y los signos de apertura solo existen en castellano
   if (/[ñÑ¿¡]/.test(limpio)) return true;
+  if (DIACRITICOS_AJENOS.test(limpio)) return false;
+  if (ELISION_AJENA.test(limpio)) return false;
   return !MARCAS_OTRO_IDIOMA.test(limpio);
 }
 
