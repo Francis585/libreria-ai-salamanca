@@ -322,7 +322,7 @@ async function deliverEmail(id: number): Promise<void> {
       text: mail.texto ?? undefined
     });
 
-    await sql.query(`update outbox set estado = 'enviado', proveedor = 'gmail', enviado_en = now() where id = $1`, [id]);
+    await sql.query(`update outbox set estado = 'enviado', proveedor = 'smtp', enviado_en = now() where id = $1`, [id]);
   } catch (error) {
     await sql
       .query(`update outbox set estado = 'error', proveedor = $3, error = $2 where id = $1`, [
