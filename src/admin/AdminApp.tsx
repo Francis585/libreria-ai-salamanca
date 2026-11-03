@@ -50,7 +50,20 @@ interface Resumen {
   stockBajo: { id: string; titulo: string; stock: number }[];
 }
 
-type Tab = 'pedidos' | 'reservas' | 'suscriptores' | 'stock';
+interface Correo {
+  id: number;
+  tipo: string;
+  destinatario: string;
+  asunto: string;
+  estado: 'encolado' | 'enviado' | 'error' | 'simulado';
+  proveedor: string | null;
+  error: string | null;
+  creado_en: string;
+  enviado_en: string | null;
+  html: string;
+}
+
+type Tab = 'pedidos' | 'reservas' | 'suscriptores' | 'stock' | 'correos';
 
 const STORAGE_KEY = 'las-admin-token';
 
@@ -71,6 +84,11 @@ export const AdminApp: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<Tab>('pedidos');
+  const [correos, setCorreos] = useState<Correo[]>([]);
+  const [correoSel, setCorreoSel] = useState<Correo | null>(null);
+  const [avisoCorreo, setAvisoCorreo] = useState('');
+  const [destinoPrueba, setDestinoPrueba] = useState('');
+  const [ocupadoCorreo, setOcupadoCorreo] = useState(false);
 
   const cargar = useCallback(
     async (value: string) => {
@@ -110,6 +128,53 @@ export const AdminApp: React.FC = () => {
   useEffect(() => {
     if (token) void cargar(token);
   }, [token, cargar]);
+
+  const cargarCorreos = useCallback(async () => {
+    if (!token) return;
+    setOcupadoCorreo(true);
+    try {
+      const response = await fetch('/api/admin-emails', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      const payload = (await response.json()) as { correos: Correo[] };
+      setCorreos(payload.correos ?? []);
+      if (!correoSel && payload.correos?.length) setCorreoSel(payload.correos[0]);
+    } catch {
+      setAvisoCorreo('No se pudo leer la bandeja de salida.');
+    } finally {
+      setOcupadoCorreo(false);
+    }
+  }, [token, correoSel]);
+
+  const generarPrueba = useCallback(async () => {
+    if (!token || !destinoPrueba.trim()) {
+      setAvisoCorreo('Escribe un correo de destino para la prueba.');
+      return;
+    }
+    setOcupadoCorreo(true);
+    setAvisoCorreo('');
+    try {
+      const response = await fetch('/api/emails-prueba', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: destinoPrueba.trim(), nombre: 'Prueba de la casa' })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload?.error ?? 'error');
+      setAvisoCorreo(payload?.mensaje ?? 'Correos generados.');
+      await cargarCorreos();
+    } catch {
+      setAvisoCorreo('No se pudieron generar los correos de prueba.');
+    } finally {
+      setOcupadoCorreo(false);
+    }
+  }, [token, destinoPrueba, cargarCorreos]);
+
+  useEffect(() => {
+    if (tab === 'correos' && token) void cargarCorreos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, token]);
 
   if (!data) {
     return (
@@ -176,7 +241,6 @@ export const AdminApp: React.FC = () => {
   const pedidos = data.pedidos;
   const reservas = data.reservas;
   const eventos = data.eventos;
-
   return (
     <div className="min-h-screen bg-mist/40">
       <header className="border-b border-line bg-paper">
@@ -241,7 +305,8 @@ export const AdminApp: React.FC = () => {
               ['pedidos', `Pedidos (${pedidos.length})`],
               ['reservas', `Reservas (${reservas.length})`],
               ['suscriptores', `Suscriptores (${data.suscriptores.length})`],
-              ['stock', 'Stock bajo']
+              ['stock', 'Stock bajo'],
+              ['correos', `Correos (${correos.length})`]
             ] as [Tab, string][]
           ).map(([key, label]) => (
             <button
@@ -387,6 +452,97 @@ export const AdminApp: React.FC = () => {
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {tab === 'correos' && (
+            <div className="grid gap-0 lg:grid-cols-[330px_1fr]">
+              <div className="border-b border-line p-4 lg:border-b-0 lg:border-r">
+                <p className="text-[11px] leading-relaxed text-muted">
+                  Bandeja de salida: todo correo se compone y se guarda antes de intentar enviarse. Sin
+                  proveedor configurado queda como «simulado» y se lee aquí mismo.
+                </p>
+
+                <div className="mt-3 flex gap-2">
+                  <input
+                    value={destinoPrueba}
+                    onChange={(event) => setDestinoPrueba(event.target.value)}
+                    placeholder="tu@correo.com"
+                    className="min-w-0 flex-1 rounded-lg border border-line bg-white px-3 py-2 text-[12px] text-ink outline-none focus:border-clay"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void generarPrueba()}
+                    disabled={ocupadoCorreo}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-[11px] font-semibold text-paper disabled:opacity-60"
+                  >
+                    <Mail className="h-3.5 w-3.5" />
+                    Probar
+                  </button>
+                </div>
+                {avisoCorreo && <p className="mt-2 text-[11px] leading-relaxed text-clay">{avisoCorreo}</p>}
+
+                <ul className="mt-4 divide-y divide-line-soft">
+                  {correos.length === 0 && (
+                    <li className="py-6 text-center text-[12px] text-muted">Todavía no hay correos.</li>
+                  )}
+                  {correos.map((correo) => (
+                    <li key={correo.id}>
+                      <button
+                        type="button"
+                        onClick={() => setCorreoSel(correo)}
+                        className={`w-full px-2 py-2.5 text-left ${correoSel?.id === correo.id ? 'bg-mist/60' : ''}`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="truncate text-[12px] font-semibold text-ink">{correo.asunto}</span>
+                          <span
+                            className={`shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] ${
+                              correo.estado === 'enviado'
+                                ? 'text-emerald-700'
+                                : correo.estado === 'error'
+                                  ? 'text-red-700'
+                                  : 'text-muted'
+                            }`}
+                          >
+                            {correo.estado}
+                          </span>
+                        </span>
+                        <span className="mt-0.5 block truncate text-[10px] text-muted">
+                          {correo.destinatario} · {fecha(correo.creado_en)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="p-4">
+                {correoSel ? (
+                  <>
+                    <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px] text-muted">
+                      <span className="rounded-full border border-line px-2 py-0.5 font-mono uppercase tracking-[0.12em]">
+                        {correoSel.tipo}
+                      </span>
+                      <span>{correoSel.destinatario}</span>
+                      {correoSel.proveedor && <span>· {correoSel.proveedor}</span>}
+                    </div>
+                    {correoSel.error && (
+                      <p className="mb-3 rounded-lg border border-line bg-mist/60 p-2 text-[11px] leading-relaxed text-muted-warm">
+                        {correoSel.error}
+                      </p>
+                    )}
+                    <iframe
+                      title={`Correo ${correoSel.id}`}
+                      srcDoc={correoSel.html}
+                      sandbox="allow-same-origin"
+                      referrerPolicy="no-referrer"
+                      className="h-[540px] w-full rounded-lg border border-line bg-white"
+                    />
+                  </>
+                ) : (
+                  <p className="text-[12px] text-muted">Elige un correo de la lista para verlo.</p>
+                )}
+              </div>
             </div>
           )}
         </div>

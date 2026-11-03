@@ -96,6 +96,264 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/* --------------------------------------------------------------- correo */
+
+/**
+ * Todo correo se compone y se guarda en `outbox` ANTES de intentar enviarse.
+ *
+ * Motivos: (1) se puede enseñar y auditar sin depender de un proveedor,
+ * (2) un fallo del correo nunca rompe una reserva ya confirmada,
+ * (3) si no hay proveedor configurado el mensaje queda como 'simulado' y se ve
+ *     igualmente en el admin, que es justo lo que hace falta en una demo.
+ *
+ * Proveedor: Resend por HTTP (sin dependencias). Variables:
+ *   RESEND_API_KEY   · si falta, no se envía nada (estado 'simulado')
+ *   EMAIL_FROM       · remitente verificado, por defecto el de pruebas de Resend
+ */
+
+const EMAIL_BRAND = {
+  ink: '#2D2822',
+  paper: '#F5F1E8',
+  card: '#FFFFFF',
+  clay: '#A8442A',
+  gold: '#B08A3E',
+  muted: '#6B6259'
+};
+
+type EmailContent = { titulo: string; entradilla: string; bloques: string[]; cierre?: string };
+
+function esc(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function emailHtml({ titulo, entradilla, bloques, cierre }: EmailContent): string {
+  const b = EMAIL_BRAND;
+  return `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(titulo)}</title></head>
+<body style="margin:0;padding:0;background:${b.paper};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${b.paper};padding:28px 12px;">
+<tr><td align="center">
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:${b.card};border:1px solid #E4DCCB;border-radius:10px;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:${b.ink};">
+    <tr><td style="padding:22px 32px 18px;border-bottom:1px solid #E4DCCB;">
+      <div style="font:600 13px/1.2 Georgia,serif;letter-spacing:.16em;text-transform:uppercase;">Librería AI Salamanca</div>
+      <div style="font:400 10px/1.6 -apple-system,Segoe UI,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:${b.muted};margin-top:4px;">Rúa Mayor 14 · desde 1987</div>
+    </td></tr>
+    <tr><td style="padding:28px 32px 8px;">
+      <h1 style="margin:0 0 10px;font:400 26px/1.2 Georgia,serif;color:${b.ink};">${esc(titulo)}</h1>
+      <p style="margin:0 0 18px;font:400 15px/1.6 -apple-system,Segoe UI,sans-serif;color:${b.muted};">${esc(entradilla)}</p>
+      ${bloques
+        .map(
+          (bloque) =>
+            `<div style="margin:0 0 16px;padding:14px 16px;background:#FBF8F1;border-left:2px solid ${b.gold};font:400 14px/1.65 -apple-system,Segoe UI,sans-serif;color:${b.ink};">${bloque}</div>`
+        )
+        .join('\n      ')}
+      ${
+        cierre
+          ? `<p style="margin:22px 0 0;font:400 14px/1.6 -apple-system,Segoe UI,sans-serif;color:${b.muted};">${esc(cierre)}</p>`
+          : ''
+      }
+    </td></tr>
+    <tr><td style="padding:18px 32px 26px;">
+      <a href="https://libreria-ai-salamanca.vercel.app/#catalogo" style="display:inline-block;padding:11px 18px;background:${b.ink};color:${b.paper};text-decoration:none;border-radius:6px;font:600 13px/1 -apple-system,Segoe UI,sans-serif;letter-spacing:.04em;">Ver el catálogo</a>
+    </td></tr>
+    <tr><td style="padding:16px 32px 24px;border-top:1px solid #E4DCCB;font:400 11px/1.7 -apple-system,Segoe UI,sans-serif;color:${b.muted};">
+      Librería AI Salamanca · Rúa Mayor 14, 37002 Salamanca · 923 21 40 14<br>
+      Este correo se ha generado automáticamente. Si algo no cuadra, responde y lo lee una persona.
+    </td></tr>
+  </table>
+</td></tr></table>
+</body></html>`;
+}
+
+type EmailDraft = { tipo: string; destinatario: string; asunto: string; html: string; texto: string };
+
+function draftTertulia(nombre: string, evento: string, plazasRestantes: number): EmailDraft {
+  const titulo = 'Tu plaza está reservada';
+  const bloques = [
+    `<strong>${esc(evento)}</strong><br>Quedan ${plazasRestantes} ${plazasRestantes === 1 ? 'plaza' : 'plazas'} libres para ese encuentro.`,
+    'Te esperamos unos minutos antes en la bodega. Si no puedes venir, avísanos y liberamos la plaza: hay lista de espera.'
+  ];
+  return {
+    tipo: 'reserva_tertulia',
+    destinatario: '',
+    asunto: `Reserva confirmada · ${evento}`,
+    html: emailHtml({
+      titulo,
+      entradilla: `${nombre}, te guardamos sitio.`,
+      bloques,
+      cierre: 'La fecha y la hora están en la agenda de la web, en Tertulias.'
+    }),
+    texto: `${nombre}, te guardamos sitio para «${evento}». Quedan ${plazasRestantes} plazas. Si no puedes venir, avísanos. Librería AI Salamanca, Rúa Mayor 14.`
+  };
+}
+
+function draftMesa(nombre: string, fecha: string, hora: string, personas: number): EmailDraft {
+  return {
+    tipo: 'reserva_mesa',
+    destinatario: '',
+    asunto: `Mesa reservada · ${fecha} a las ${hora}`,
+    html: emailHtml({
+      titulo: 'Mesa reservada',
+      entradilla: `${nombre}, os esperamos en el Café Melchor Cano.`,
+      bloques: [
+        `<strong>${esc(fecha)} · ${esc(hora)}</strong><br>${personas} ${personas === 1 ? 'persona' : 'personas'}, bajo los arcos del patio.`,
+        'Se puede leer, se puede callar y se puede discutir de libros. El café lo tostamos a cuatro calles de aquí.'
+      ],
+      cierre: 'Si cambiáis de plan, responded a este correo y lo movemos.'
+    }),
+    texto: `${nombre}, mesa reservada el ${fecha} a las ${hora} para ${personas}. Café Melchor Cano, Rúa Mayor 14.`
+  };
+}
+
+function draftBienvenida(email: string): EmailDraft {
+  return {
+    tipo: 'newsletter_alta',
+    destinatario: email,
+    asunto: 'Aquí empieza el boletín de la Rúa Mayor',
+    html: emailHtml({
+      titulo: 'Bienvenido al boletín',
+      entradilla: 'Tres citas al mes, nunca más. Esa es la promesa.',
+      bloques: [
+        'Cada mes te contamos qué hemos recibido, qué se está leyendo en el café y qué tertulia viene.',
+        'Sin ruido, sin venta agresiva y sin compartir tu correo con nadie.'
+      ],
+      cierre: 'Si algún día quieres salir, basta con responder «baja» a cualquier envío.'
+    }),
+    texto: 'Bienvenido al boletín de Librería AI Salamanca. Tres citas al mes, nunca más. Responde «baja» para salir.'
+  };
+}
+
+async function queueEmail(draft: EmailDraft, destinatario: string): Promise<number | null> {
+  try {
+    const rows = await sql.query(
+      `insert into outbox (tipo, destinatario, asunto, html, texto, estado)
+       values ($1, $2, $3, $4, $5, 'encolado') returning id`,
+      [draft.tipo, destinatario, draft.asunto, draft.html, draft.texto]
+    );
+    const id = Number(rows[0]?.id);
+    await deliverEmail(id);
+    return id;
+  } catch (error) {
+    // Un correo que falla no puede tumbar una reserva ya confirmada.
+    console.error('[outbox]', errorMessage(error));
+    return null;
+  }
+}
+
+async function deliverEmail(id: number): Promise<void> {
+  if (!Number.isFinite(id)) return;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM || 'Librería AI Salamanca <onboarding@resend.dev>';
+
+  if (!apiKey) {
+    await sql
+      .query(`update outbox set estado = 'simulado', error = $2 where id = $1`, [
+        id,
+        'Sin proveedor configurado (falta RESEND_API_KEY): el correo queda compuesto y visible en el admin.'
+      ])
+      .catch(() => undefined);
+    return;
+  }
+
+  try {
+    const rows = await sql.query(`select destinatario, asunto, html, texto from outbox where id = $1`, [id]);
+    const mail = rows[0];
+    if (!mail) return;
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from,
+        to: [mail.destinatario],
+        subject: mail.asunto,
+        html: mail.html,
+        text: mail.texto ?? undefined
+      }),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    if (!response.ok) {
+      const detail = (await response.text()).slice(0, 300);
+      throw new Error(`resend_${response.status}: ${detail}`);
+    }
+
+    await sql.query(`update outbox set estado = 'enviado', proveedor = 'resend', enviado_en = now() where id = $1`, [id]);
+  } catch (error) {
+    await sql
+      .query(`update outbox set estado = 'error', proveedor = 'resend', error = $2 where id = $1`, [
+        id,
+        errorMessage(error).slice(0, 300)
+      ])
+      .catch(() => undefined);
+  }
+}
+
+async function handleAdminEmails(req: any, res: any) {
+  if (req.method !== 'GET') return methodNotAllowed(res, ['GET']);
+  if (!validAdminToken(req.headers?.authorization)) return json(res, 401, { error: 'no_autorizado' });
+
+  try {
+    const rows = await sql.query(
+      `select id, tipo, destinatario, asunto, estado, proveedor, error, creado_en, enviado_en, html
+         from outbox order by creado_en desc limit 40`,
+      []
+    );
+    const proveedor = process.env.RESEND_API_KEY ? 'resend' : null;
+    return json(res, 200, {
+      proveedor,
+      remitente: process.env.EMAIL_FROM || 'Librería AI Salamanca <onboarding@resend.dev>',
+      correos: rows.map((row: any) => ({ ...row, id: Number(row.id) }))
+    });
+  } catch (error) {
+    console.error('[admin-emails]', error);
+    return json(res, 500, { error: 'error_interno', correos: [] });
+  }
+}
+
+/** Genera los tres correos de la casa para revisarlos sin crear datos falsos. */
+async function handleEmailsPrueba(req: any, res: any) {
+  if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
+  if (!validAdminToken(req.headers?.authorization)) return json(res, 401, { error: 'no_autorizado' });
+
+  try {
+    const cuerpo = readBody(req);
+    const destino = text(cuerpo.email, 254).toLowerCase();
+    if (!isEmail(destino)) return json(res, 400, { error: 'email_invalido' });
+
+    const nombre = text(cuerpo.nombre, 120) || 'Lectora de la Rúa Mayor';
+    const draft = [
+      draftTertulia(nombre, 'El Oráculo: ¿puede una máquina escribir un soneto?', 9),
+      draftMesa(nombre, '2026-11-21', '18:30', 2),
+      draftBienvenida(destino)
+    ];
+
+    const ids: number[] = [];
+    for (const item of draft) {
+      const id = await queueEmail(item, destino);
+      if (id) ids.push(id);
+    }
+
+    return json(res, 201, {
+      ok: true,
+      ids,
+      proveedor: process.env.RESEND_API_KEY ? 'resend' : null,
+      mensaje: process.env.RESEND_API_KEY
+        ? 'Tres correos compuestos y entregados al proveedor.'
+        : 'Tres correos compuestos y guardados. Sin RESEND_API_KEY quedan como «simulado» y se leen en esta misma pantalla.'
+    });
+  } catch (error) {
+    console.error('[emails-prueba]', error);
+    return json(res, 500, { error: 'error_interno' });
+  }
+}
+
 /* ------------------------------------------------------------------ rutas */
 
 async function handleStock(req: any, res: any) {
@@ -260,10 +518,15 @@ async function handleReservas(req: any, res: any) {
         personas
       ]);
       const reserva = rows[0];
+      const plazasRestantes = Number(reserva.plazas_restantes);
+      const eventoInfo = await sql
+        .query(`select titulo from eventos where id = $1`, [evento])
+        .catch(() => [] as any[]);
+      await queueEmail(draftTertulia(nombre, eventoInfo[0]?.titulo ?? evento, plazasRestantes), email);
       return json(res, 201, {
         ok: true,
         id: Number(reserva.id),
-        plazasRestantes: Number(reserva.plazas_restantes)
+        plazasRestantes
       });
     }
 
@@ -288,6 +551,7 @@ async function handleReservas(req: any, res: any) {
          returning id`,
         [nombre, email || null, fecha, hora, personas]
       );
+      if (email) await queueEmail(draftMesa(nombre, fecha, hora, personas), email);
       return json(res, 201, { ok: true, id: Number(rows[0].id) });
     }
 
@@ -330,6 +594,7 @@ async function handleNewsletter(req: any, res: any) {
        returning email`,
       [email]
     );
+    if (rows.length > 0) await queueEmail(draftBienvenida(email), email);
     return json(res, 201, { ok: true, nuevo: rows.length > 0 });
   } catch (error) {
     console.error('[newsletter]', error);
@@ -427,6 +692,11 @@ export default async function handler(req: any, res: any) {
     case 'admin-resumen':
     case 'admin/resumen':
       return handleAdmin(res, req);
+    case 'admin-emails':
+    case 'admin/correos':
+      return handleAdminEmails(req, res);
+    case 'emails-prueba':
+      return handleEmailsPrueba(req, res);
     default:
       return json(res, 404, { error: 'ruta_desconocida' });
   }

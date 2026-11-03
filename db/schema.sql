@@ -234,4 +234,23 @@ begin
 end;
 $$;
 
+
+-- Bandeja de salida: todo correo se compone y se guarda antes de intentar
+-- enviarse, para poder demostrarlo y auditar qué se dijo y cuándo.
+create table if not exists outbox (
+  id bigserial primary key,
+  tipo text not null,
+  destinatario text not null,
+  asunto text not null,
+  html text not null,
+  texto text,
+  estado text not null default 'encolado',
+  proveedor text,
+  error text,
+  creado_en timestamptz not null default now(),
+  enviado_en timestamptz
+);
+
+create index if not exists outbox_creado_idx on outbox (creado_en desc);
+
 commit;
