@@ -12,7 +12,6 @@ const LINKS = [
   { href: '#catalogo', label: 'Catálogo' },
   { href: '#encargos', label: 'Encargos' },
   { href: SECCION_IA.href, label: SECCION_IA.etiqueta, accent: true },
-  { href: '#tertulias', label: 'Tertulias' },
   { href: '#tertulias', label: 'Club de lectura' }
 ];
 
