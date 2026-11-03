@@ -247,9 +247,10 @@ async function queueEmail(draft: EmailDraft, destinatario: string): Promise<numb
   }
 }
 
-const proveedorCorreo = (): 'resend' | 'gmail' | null => {
+const proveedorCorreo = (): 'resend' | 'smtp' | null => {
   if (process.env.RESEND_API_KEY) return 'resend';
-  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) return 'gmail';
+  if ((process.env.SMTP_USER || process.env.GMAIL_USER) && (process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD))
+    return 'smtp';
   return null;
 };
 
@@ -257,9 +258,10 @@ async function deliverEmail(id: number): Promise<void> {
   if (!Number.isFinite(id)) return;
 
   const resendKey = process.env.RESEND_API_KEY;
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
-  const gmailReady = Boolean(gmailUser && gmailPass);
+  // Credenciales SMTP genéricas: sirven para Gmail, Brevo, Mailjet, SendGrid...
+  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+  const gmailReady = Boolean(smtpUser && smtpPass);
 
   if (!resendKey && !gmailReady) {
     await sql
@@ -308,11 +310,12 @@ async function deliverEmail(id: number): Promise<void> {
       host,
       port,
       secure: port === 465,
-      auth: { user: gmailUser as string, pass: gmailPass as string }
+      requireTLS: port === 587,
+      auth: { user: smtpUser as string, pass: smtpPass as string }
     });
 
     await transporte.sendMail({
-      from: `"Librería AI Salamanca" <${gmailUser}>`,
+      from: process.env.SMTP_FROM || `"Librería AI Salamanca" <${smtpUser}>`,
       to: mail.destinatario,
       subject: mail.asunto,
       html: mail.html,
@@ -325,7 +328,7 @@ async function deliverEmail(id: number): Promise<void> {
       .query(`update outbox set estado = 'error', proveedor = $3, error = $2 where id = $1`, [
         id,
         errorMessage(error).slice(0, 300),
-        resendKey ? 'resend' : 'gmail'
+        resendKey ? 'resend' : 'smtp'
       ])
       .catch(() => undefined);
   }
@@ -346,8 +349,8 @@ async function handleAdminEmails(req: any, res: any) {
       proveedor,
       remitente:
         process.env.EMAIL_FROM ||
-        (proveedor === 'gmail'
-          ? `Librería AI Salamanca <${process.env.GMAIL_USER}>`
+        (proveedor === 'smtp'
+          ? process.env.SMTP_FROM || `Librería AI Salamanca <${process.env.SMTP_USER || process.env.GMAIL_USER}>`
           : 'Librería AI Salamanca <onboarding@resend.dev>'),
       correos: rows.map((row: any) => ({ ...row, id: Number(row.id) }))
     });

@@ -141,8 +141,8 @@ for (const mensaje of capturados) {
   console.log(`   ${tipo.trim()} · ${mensaje.bruto.length} bytes`);
 }
 
-const enviados = rows.filter((fila) => fila.estado === 'enviado' && fila.proveedor === 'gmail').length;
-console.log(`\nResultado: ${enviados}/3 en estado 'enviado' por gmail · ${capturados.length} mensajes capturados`);
+const enviados = rows.filter((fila) => fila.estado === 'enviado' && fila.proveedor === 'smtp').length;
+console.log(`\nResultado: ${enviados}/3 en estado 'enviado' por smtp · ${capturados.length} mensajes capturados`);
 
 // Limpieza: no dejamos pruebas en la base.
 await cliente.query(`delete from outbox`);
