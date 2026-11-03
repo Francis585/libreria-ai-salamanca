@@ -227,7 +227,7 @@ function parseBudget(query: string): number | null {
 /** Señales de consulta sin tema: regalo, encargo para otro, "no sé qué". */
 function isTopicless(query: string): boolean {
   const text = normalize(query);
-  return /\b(regalo|regalar|sorpresa|para mi (madre|padre|hijo|hija|hermano|hermana|abuelo|abuela|amigo|amiga|pareja|jefe)|no se que|no tengo ni idea|recomiendame algo|algo para leer|no leo|no suelo leer|empiezo a leer|para empezar a leer)\b/.test(
+  return /\b(regalo|regalar|sorpresa|para mi (madre|padre|hijo|hija|hermano|hermana|abuelo|abuela|amigo|amiga|pareja|jefe)|no se que|no tengo ni idea|recomiendame algo|algo para leer|no leo|no suelo leer|empiezo a leer|empezar a leer|quiero empezar|quiero leer|primera novela|no soy lector|no me gusta leer|para el tren|para el avion|para viajar|para las vacaciones|vacaciones|verano|playa|algo ligero|algo corto|algo breve|facil de leer|lectura facil)\b/.test(
     text
   );
 }
