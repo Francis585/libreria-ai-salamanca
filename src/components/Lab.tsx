@@ -57,7 +57,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-clay">
               <Database className="h-3 w-3" />
-              Laboratorio del fondo
+              Buscador por ideas
             </span>
             <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
               Busca como piensas, <span className="italic text-clay">no como se titula</span>

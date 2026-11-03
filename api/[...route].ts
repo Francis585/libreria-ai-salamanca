@@ -666,6 +666,7 @@ async function handleCatalogo(req: any, res: any) {
   const q = text(url.searchParams.get('q') ?? '', 80);
   const pagina = Math.max(1, Number(url.searchParams.get('pagina') ?? 1) || 1);
   const limite = Math.min(48, Math.max(6, Number(url.searchParams.get('limite') ?? 24) || 24));
+  const desde = Number(url.searchParams.get('desde') ?? 0) || 0;
   const normaliza = (texto: string) =>
   texto
     .toLowerCase()
@@ -679,7 +680,9 @@ const patron = `%${normaliza(q).replace(/[%_]/g, '')}%`;
 
   try {
     // `busqueda` es una columna generada sin acentos ni mayúsculas (ver schema.sql)
-    const filtro = `activo and ($1 = '' or busqueda like $2)`;
+    // Sin casts explícitos Postgres no sabe de qué tipo es cada parámetro cuando
+    // la misma condición se usa en dos consultas con distinto número de ellos.
+    const filtro = `activo and ($1::text = '' or busqueda like $2::text) and ($3::int = 0 or anio >= $3::int)`;
 
     const [filas, cuenta, editoriales] = await Promise.all([
       sql.query(
@@ -687,10 +690,10 @@ const patron = `%${normaliza(q).replace(/[%_]/g, '')}%`;
            from novedades_feed
           where ${filtro}
           order by anio desc nulls last, titulo asc
-          limit $3 offset $4`,
-        [q, patron, limite, (pagina - 1) * limite]
+          limit $4 offset $5`,
+        [q, patron, desde, limite, (pagina - 1) * limite]
       ),
-      sql.query(`select count(*)::int as n from novedades_feed where ${filtro}`, [q, patron]),
+      sql.query(`select count(*)::int as n from novedades_feed where ${filtro}`, [q, patron, desde]),
       sql.query(`select count(distinct editorial)::int as n from novedades_feed where activo`, [])
     ]);
 

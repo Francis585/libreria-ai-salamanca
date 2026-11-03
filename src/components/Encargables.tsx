@@ -66,6 +66,7 @@ export const Encargables: React.FC = () => {
   const [meta, setMeta] = useState<Payload | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
+  const [vista, setVista] = useState<'todo' | 'novedades'>('todo');
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebounced(query.trim()), 320);
@@ -77,8 +78,9 @@ export const Encargables: React.FC = () => {
       setCargando(true);
       setError(false);
       try {
+        const desde = vista === 'novedades' ? new Date().getFullYear() - 1 : 0;
         const res = await fetch(
-          `/api/catalogo?q=${encodeURIComponent(debounced)}&pagina=${paginaPedida}&limite=24`
+          `/api/catalogo?q=${encodeURIComponent(debounced)}&pagina=${paginaPedida}&limite=24&desde=${desde}`
         );
         if (!res.ok) throw new Error(String(res.status));
         const data = (await res.json()) as Payload;
@@ -91,7 +93,7 @@ export const Encargables: React.FC = () => {
         setCargando(false);
       }
     },
-    [debounced]
+    [debounced, vista]
   );
 
   useEffect(() => {
@@ -167,7 +169,29 @@ export const Encargables: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Qué enseñar">
+          {[
+            { key: 'todo' as const, label: 'Todo el catálogo' },
+            { key: 'novedades' as const, label: 'Novedades' }
+          ].map((opcion) => {
+            const activo = vista === opcion.key;
+            return (
+              <button
+                key={opcion.key}
+                type="button"
+                aria-pressed={activo}
+                onClick={() => setVista(opcion.key)}
+                className={`rounded-md border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                  activo ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                }`}
+              >
+                {opcion.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
             <Truck className="h-3 w-3 text-clay" />
             {resumen}

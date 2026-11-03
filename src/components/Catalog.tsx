@@ -136,14 +136,14 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     <section id="catalogo" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 lg:px-10 lg:py-24">
       <div className="flex flex-col gap-8 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-clay">Nuestros anaqueles</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-clay">En la tienda</span>
           <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
-            El catálogo de la casa
+            Lo que puedes llevarte hoy
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-warm">
-            {BOOKS.length} títulos: el fondo histórico salmantino, clásicos del XIX, misterio,
-            aventuras, poesía, ensayo, novedades de 2025–2026 e infantil. Las fichas del fondo
-            antiguo llevan transcripción y entidades; las novedades, ficha comercial.
+            {BOOKS.length} obras que están ahora mismo en la sala: fondo salmantino, clásicos,
+            novela, poesía e infantil. De cada una te contamos de qué va, quién la escribió y
+            qué dicen los lectores. Si buscas otra cosa, abajo puedes <a href="#encargos" className="font-medium text-clay hover:underline">encargarla</a>.
           </p>
         </div>
 

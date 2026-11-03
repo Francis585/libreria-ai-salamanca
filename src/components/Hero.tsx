@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, ArrowUpRight, BookOpen, Coffee, Quote, Sparkles, Star } from 'lucide-react';
 import type { Book } from '../data/library';
 import { BOOKS } from '../data/library';
@@ -12,6 +12,23 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
+  // Cuántos títulos se pueden encargar, para que se vea de un vistazo que la
+  // librería es más grande que la sala.
+  const [encargables, setEncargables] = useState<number | null>(null);
+
+  useEffect(() => {
+    let vivo = true;
+    fetch('/api/catalogo?limite=1')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (vivo && typeof data?.total === 'number') setEncargables(data.total);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
   return (
     <section id="inicio" className="relative overflow-hidden">
       <div aria-hidden="true" className="hero-glow pointer-events-none absolute inset-0" />
@@ -71,10 +88,10 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Fondo digitalizado</dt>
+              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Para encargar</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
-                1.200
-                <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">dpi</span>
+                {encargables === null ? '…' : encargables.toLocaleString('es-ES')}
+                <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">títulos</span>
               </dd>
             </div>
             <div>

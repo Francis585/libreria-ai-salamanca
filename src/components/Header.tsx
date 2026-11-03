@@ -9,10 +9,9 @@ interface HeaderProps {
 }
 
 const LINKS = [
-  { href: '#catalogo', label: 'Catálogo' },
-  { href: SECCION_IA.href, label: SECCION_IA.etiqueta, accent: true },
+  { href: '#catalogo', label: 'En la tienda' },
   { href: '#encargos', label: 'Encargos' },
-  { href: '#laboratorio', label: 'Laboratorio' },
+  { href: SECCION_IA.href, label: SECCION_IA.etiqueta, accent: true },
   { href: '#tertulias', label: 'Tertulias' },
   { href: '#cafe', label: 'Café' }
 ];

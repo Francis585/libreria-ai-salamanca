@@ -53,10 +53,10 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
 
   const tabs: { key: Tab; label: string; count?: number; show: boolean }[] = [
     { key: 'sinopsis', label: 'Sinopsis', show: true },
-    { key: 'entidades', label: 'Entidades', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
-    { key: 'texto', label: 'Extracto y métricas', show: Boolean(book?.excerpt || book?.metrics) },
+    { key: 'entidades', label: 'Personajes y lugares', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
+    { key: 'texto', label: 'Fragmento', show: Boolean(book?.excerpt || book?.metrics) },
     { key: 'opiniones', label: 'Opiniones', count: opiniones.total || undefined, show: true },
-    { key: 'afines', label: 'Afines', count: related.length || undefined, show: related.length > 0 }
+    { key: 'afines', label: 'También te gusta', count: related.length || undefined, show: related.length > 0 }
   ];
 
   const copyCitation = async () => {
