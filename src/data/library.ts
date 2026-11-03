@@ -1,11 +1,18 @@
 import { WORKS_DATABASE, type Work } from './archive';
+import { GENERAL, INFANTIL } from './general';
+import novedadesData from './catalogo.json';
 
 export type Category =
   | 'Clásicos Salmantinos'
   | 'Humanismo & Ciencia'
   | 'Narrativa Contemporánea'
   | 'Ensayo & Pensamiento IA'
-  | 'Poesía';
+  | 'Poesía'
+  | 'Novela & Aventura'
+  | 'Misterio & Policíaco'
+  | 'Teatro'
+  | 'Novedades'
+  | 'Infantil & Juvenil';
 
 export const CATEGORIES: Category[] = [
   'Clásicos Salmantinos',
@@ -13,6 +20,11 @@ export const CATEGORIES: Category[] = [
   'Narrativa Contemporánea',
   'Ensayo & Pensamiento IA',
   'Poesía',
+  'Novela & Aventura',
+  'Misterio & Policíaco',
+  'Teatro',
+  'Novedades',
+  'Infantil & Juvenil',
 ];
 
 export const EPOCHS = ['Siglo XV', 'Siglo XVI', 'Siglo XVII', 'Siglos XIX-XX', 'Siglo XXI'];
@@ -446,9 +458,45 @@ const CONTEMPORARY: Book[] = [
   },
 ];
 
+const PALETAS: CoverPalette[] = [
+  { from: '#3f4a5c', to: '#181d24', accent: '#e3ecf4' },
+  { from: '#5c4033', to: '#241811', accent: '#f3e2cd' },
+  { from: '#3f5c47', to: '#18241c', accent: '#dff0e3' },
+  { from: '#5c4a3f', to: '#241d18', accent: '#f0e3d3' },
+  { from: '#4a3f5c', to: '#1d1824', accent: '#e9e0f4' },
+];
+
+/** Catálogo actualizable (catalogo.json): novedades y fondo del siglo XXI. */
+const CATALOGO: Book[] = (novedadesData.libros as any[]).map((libro, index) => ({
+  id: libro.id,
+  title: libro.titulo,
+  author: libro.autor,
+  year: Number(libro.anio),
+  category: libro.categoria as Category,
+  price: Number(libro.precio),
+  format: libro.formato ?? 'Rústica con solapas',
+  pages: Number(libro.paginas ?? 300),
+  rating: Number(libro.valoracion ?? 4.5),
+  synopsis: libro.sinopsis,
+  tags: libro.etiquetas ?? [],
+  keywords: libro.claves ?? [],
+  epoch: 'Siglo XXI',
+  thematic: libro.tematica ?? 'Literatura y Poesía',
+  collection: libro.editorial ? `${libro.editorial} · ${libro.anio}` : undefined,
+  accessionCode: `LAS-${String(libro.anio).slice(2)}-${libro.id.split('-')[0].toUpperCase().slice(0, 3)}`,
+  authorBio: undefined,
+  badge: libro.categoria === 'Novedades' ? 'Novedad' : undefined,
+  relatedIds: [],
+  reasons: {},
+  cover: PALETAS[index % PALETAS.length],
+}));
+
 export const BOOKS: Book[] = [
   ...WORKS_DATABASE.map(fromArchive),
   ...CONTEMPORARY,
+  ...GENERAL,
+  ...INFANTIL,
+  ...CATALOGO,
 ];
 
 export const BOOKS_BY_ID: Record<string, Book> = Object.fromEntries(BOOKS.map((b) => [b.id, b]));

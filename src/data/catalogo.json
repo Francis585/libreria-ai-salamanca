@@ -1,0 +1,435 @@
+{
+  "_nota": "Catalogo actualizable: novedades y fondo del siglo XXI. Para anadir: npm run libro:add -- nuevo.json",
+  "libros": [
+    {
+      "id": "allende-hora-antes-alba-2026",
+      "titulo": "La hora antes del alba",
+      "autor": "Isabel Allende",
+      "anio": 2026,
+      "editorial": "Planeta",
+      "fecha": "2026-11-04",
+      "precio": 23.9,
+      "paginas": 480,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "La novela con la que Isabel Allende ganó el Premio Planeta 2026: una historia de exilio y memoria que vuelve a los territorios que la autora conoce mejor.",
+      "etiquetas": [
+        "Novedad",
+        "Premio Planeta 2026",
+        "Narrativa"
+      ],
+      "claves": [
+        "allende",
+        "planeta",
+        "exilio",
+        "memoria",
+        "chile",
+        "novedad",
+        "familia"
+      ]
+    },
+    {
+      "id": "castillo-espinas-aire-2026",
+      "titulo": "Espinas en el aire",
+      "autor": "Javier Castillo",
+      "anio": 2026,
+      "editorial": "Suma",
+      "fecha": "2026-11-11",
+      "precio": 21.9,
+      "paginas": 512,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Lo nuevo de Javier Castillo: un thriller de giros medidos y ritmo alto, de esos que se leen en dos noches.",
+      "etiquetas": [
+        "Novedad",
+        "Thriller",
+        "Intriga"
+      ],
+      "claves": [
+        "castillo",
+        "thriller",
+        "intriga",
+        "suspense",
+        "novedad",
+        "misterio",
+        "tension"
+      ]
+    },
+    {
+      "id": "portero-cosamala-2026",
+      "titulo": "Cosamala",
+      "autor": "Alana S. Portero",
+      "anio": 2026,
+      "editorial": "Seix Barral",
+      "fecha": "2026-10-14",
+      "precio": 19.9,
+      "paginas": 272,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Una historia gótica y sureña que parte de un crimen real: brujería, venganza, amor y memoria en el sur.",
+      "etiquetas": [
+        "Novedad",
+        "Gótico",
+        "Narrativa española"
+      ],
+      "claves": [
+        "portero",
+        "cosamala",
+        "gotico",
+        "brujeria",
+        "venganza",
+        "sur",
+        "novedad"
+      ]
+    },
+    {
+      "id": "almodovar-aviones-2026",
+      "titulo": "El hombre que solo escribía en los aviones",
+      "autor": "Pedro Almodóvar",
+      "anio": 2026,
+      "editorial": "Reservoir Books",
+      "fecha": "2026-10-29",
+      "precio": 20.9,
+      "paginas": 288,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "El debut narrativo de Almodóvar: relatos escritos a diez mil metros, con su mundo de siempre y una melancolía nueva.",
+      "etiquetas": [
+        "Novedad",
+        "Relatos",
+        "Cine"
+      ],
+      "claves": [
+        "almodovar",
+        "aviones",
+        "relatos",
+        "cine",
+        "novedad",
+        "viajes"
+      ]
+    },
+    {
+      "id": "abreu-pajaritos-2026",
+      "titulo": "Pajaritos preñados",
+      "autor": "Andrea Abreu",
+      "anio": 2026,
+      "editorial": "Anagrama",
+      "fecha": "2026-09-02",
+      "precio": 18.9,
+      "paginas": 208,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "El regreso de Andrea Abreu al norte rural de Tenerife y a la oralidad canaria que la hizo conocida con «Panza de burro».",
+      "etiquetas": [
+        "Novedad",
+        "Narrativa española",
+        "Canarias"
+      ],
+      "claves": [
+        "abreu",
+        "pajaritos",
+        "tenerife",
+        "canarias",
+        "oralidad",
+        "novedad",
+        "rural"
+      ]
+    },
+    {
+      "id": "uclez-luces-muertas-2026",
+      "titulo": "La ciudad de las luces muertas",
+      "autor": "David Uclés",
+      "anio": 2026,
+      "editorial": "Destino",
+      "fecha": "2026-02-04",
+      "precio": 22.9,
+      "paginas": 560,
+      "categoria": "Novedades",
+      "tematica": "Memoria y Ciudad",
+      "sinopsis": "Premio Nadal 2026: la guerra y la posguerra contadas desde una ciudad que se apaga, con la ambición narrativa de «La península de las casas vacías».",
+      "etiquetas": [
+        "Novedad",
+        "Premio Nadal 2026",
+        "Memoria histórica"
+      ],
+      "claves": [
+        "uclez",
+        "nadal",
+        "guerra civil",
+        "memoria",
+        "posguerra",
+        "novedad",
+        "ciudad"
+      ]
+    },
+    {
+      "id": "vilas-islandia-2026",
+      "titulo": "Islandia",
+      "autor": "Manuel Vilas",
+      "anio": 2026,
+      "editorial": "Destino",
+      "fecha": "2026-02-18",
+      "precio": 19.9,
+      "paginas": 304,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Vilas vuelve a las historias de amor, esta vez con el paisaje helado como espejo de lo que no se dice.",
+      "etiquetas": [
+        "Novedad",
+        "Narrativa española",
+        "Amor"
+      ],
+      "claves": [
+        "vilas",
+        "islandia",
+        "amor",
+        "novedad",
+        "viaje",
+        "melancolia"
+      ]
+    },
+    {
+      "id": "delval-vera-2025",
+      "titulo": "Vera. Una historia de amor",
+      "autor": "Juan del Val",
+      "anio": 2025,
+      "editorial": "Planeta",
+      "fecha": "2025-11-05",
+      "precio": 21.9,
+      "paginas": 448,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Premio Planeta 2025: una historia de amor con humor y mala conciencia, de las que se discuten en el café.",
+      "etiquetas": [
+        "Premio Planeta 2025",
+        "Narrativa",
+        "Humor"
+      ],
+      "claves": [
+        "del val",
+        "vera",
+        "planeta",
+        "amor",
+        "humor",
+        "pareja",
+        "novedad"
+      ]
+    },
+    {
+      "id": "uclez-peninsula-2025",
+      "titulo": "La península de las casas vacías",
+      "autor": "David Uclés",
+      "anio": 2025,
+      "editorial": "Siruela",
+      "fecha": "2025-03-12",
+      "precio": 26,
+      "paginas": 640,
+      "categoria": "Novedades",
+      "tematica": "Memoria y Ciudad",
+      "sinopsis": "La novela que puso a Uclés en todas las listas: la guerra civil como un pueblo lleno de puertas cerradas y gente que habla sola.",
+      "etiquetas": [
+        "Narrativa española",
+        "Memoria histórica",
+        "Fenómeno editorial"
+      ],
+      "claves": [
+        "uclez",
+        "peninsula",
+        "casas vacias",
+        "guerra civil",
+        "memoria",
+        "pueblo"
+      ]
+    },
+    {
+      "id": "posteguillo-tres-mundos-2025",
+      "titulo": "Los tres mundos",
+      "autor": "Santiago Posteguillo",
+      "anio": 2025,
+      "editorial": "Ediciones B",
+      "fecha": "2025-06-04",
+      "precio": 25.9,
+      "paginas": 720,
+      "categoria": "Novedades",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Tercera entrega de la serie de Julio César: Roma, Egipto y el final de una república que se cae a pedazos.",
+      "etiquetas": [
+        "Novela histórica",
+        "Roma",
+        "Serie"
+      ],
+      "claves": [
+        "posteguillo",
+        "julio cesar",
+        "roma",
+        "historica",
+        "serie",
+        "imperio",
+        "novedad"
+      ]
+    },
+    {
+      "id": "zafon-sombra-viento-2001",
+      "titulo": "La sombra del viento",
+      "autor": "Carlos Ruiz Zafón",
+      "anio": 2001,
+      "editorial": "Planeta",
+      "fecha": "2001-09-01",
+      "precio": 21.9,
+      "paginas": 576,
+      "categoria": "Narrativa Contemporánea",
+      "tematica": "Memoria y Ciudad",
+      "sinopsis": "Un niño descubre un libro maldito en el Cementerio de los Libros Olvidados y decide buscar a su autor. El fenómeno que devolvió Barcelona a la novela.",
+      "etiquetas": [
+        "Narrativa española",
+        "Barcelona",
+        "Fenómeno editorial"
+      ],
+      "claves": [
+        "zafon",
+        "sombra del viento",
+        "barcelona",
+        "libro maldito",
+        "misterio",
+        "cem",
+        "autor"
+      ]
+    },
+    {
+      "id": "aramburu-patria-2016",
+      "titulo": "Patria",
+      "autor": "Fernando Aramburu",
+      "anio": 2016,
+      "editorial": "Tusquets",
+      "fecha": "2016-09-06",
+      "precio": 22.9,
+      "paginas": 648,
+      "categoria": "Narrativa Contemporánea",
+      "tematica": "Memoria y Ciudad",
+      "sinopsis": "Dos familias vecinas y un crimen que lo rompe todo. La novela que permitió hablar del conflicto vasco sin consignas.",
+      "etiquetas": [
+        "Narrativa española",
+        "Euskadi",
+        "Memoria"
+      ],
+      "claves": [
+        "aramburu",
+        "patria",
+        "eta",
+        "euskadi",
+        "memoria",
+        "familia",
+        "conflicto"
+      ]
+    },
+    {
+      "id": "mola-bestia-2021",
+      "titulo": "La bestia",
+      "autor": "Carmen Mola",
+      "anio": 2021,
+      "editorial": "Planeta",
+      "fecha": "2021-11-04",
+      "precio": 21.9,
+      "paginas": 544,
+      "categoria": "Misterio & Policíaco",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "Madrid, 1834, cólera y una serie de crímenes rituales. El Premio Planeta que confirmó que la novela negra española vende y se lee.",
+      "etiquetas": [
+        "Novela negra",
+        "Premio Planeta 2021",
+        "Madrid"
+      ],
+      "claves": [
+        "mola",
+        "bestia",
+        "novela negra",
+        "madrid",
+        "crimen",
+        "siglo xix",
+        "policiaco"
+      ]
+    },
+    {
+      "id": "harari-sapiens-2011",
+      "titulo": "Sapiens: de animales a dioses",
+      "autor": "Yuval Noah Harari",
+      "anio": 2011,
+      "editorial": "Debate",
+      "fecha": "2011-01-01",
+      "precio": 24.9,
+      "paginas": 496,
+      "categoria": "Ensayo & Pensamiento IA",
+      "tematica": "Tecnología y Sociedad",
+      "sinopsis": "Cómo un primate sin garras acabó escribiendo leyes, dinero y religiones. El ensayo que explica por qué nos creemos historias.",
+      "etiquetas": [
+        "Ensayo",
+        "Historia",
+        "Divulgación"
+      ],
+      "claves": [
+        "harari",
+        "sapiens",
+        "historia",
+        "ensayo",
+        "humanidad",
+        "divulgacion",
+        "evolucion"
+      ]
+    },
+    {
+      "id": "liu-tres-cuerpos-2008",
+      "titulo": "El problema de los tres cuerpos",
+      "autor": "Cixin Liu",
+      "anio": 2008,
+      "editorial": "Nova",
+      "fecha": "2008-01-01",
+      "precio": 19.9,
+      "paginas": 400,
+      "categoria": "Narrativa Contemporánea",
+      "tematica": "Tecnología y Sociedad",
+      "sinopsis": "Una señal desde el espacio y una física que empieza a fallar en la Tierra. Ciencia ficción dura, política y profundamente incómoda.",
+      "etiquetas": [
+        "Ciencia ficción",
+        "China",
+        "Serie"
+      ],
+      "claves": [
+        "liu",
+        "tres cuerpos",
+        "ciencia ficcion",
+        "alienigenas",
+        "fisica",
+        "china",
+        "serie"
+      ]
+    },
+    {
+      "id": "palacio-wonder-2012",
+      "titulo": "Wonder. La lección de August",
+      "autor": "R. J. Palacio",
+      "anio": 2012,
+      "editorial": "Nube de Tinta",
+      "fecha": "2012-02-14",
+      "precio": 15.9,
+      "paginas": 416,
+      "categoria": "Infantil & Juvenil",
+      "tematica": "Literatura y Poesía",
+      "sinopsis": "August tiene diez años y una cara que los demás miran demasiado. Un curso en el colegio contado por varias voces. A partir de 10 años.",
+      "etiquetas": [
+        "Juvenil",
+        "Escuela",
+        "Diversidad"
+      ],
+      "claves": [
+        "wonder",
+        "palacio",
+        "juvenil",
+        "august",
+        "colegio",
+        "acoso",
+        "diversidad",
+        "niños"
+      ]
+    }
+  ]
+}

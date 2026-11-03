@@ -466,8 +466,26 @@ export default async function handler(req: any, res: any) {
       : {})
   };
 
-  // Fondo infantil: la casa no lo tiene. Se dice, no se disimula.
+  // Fondo infantil: si hay, se ofrece sin llamar al modelo; si no, se declara.
   if (wantsChildren(query)) {
+    const infantil = catalogue.filter(
+      (item) =>
+        /infantil|juvenil/i.test(item.category ?? '') ||
+        (item.tags ?? []).some((tag) => /infantil|juvenil|niños|niñas/i.test(tag))
+    );
+
+    if (infantil.length > 0) {
+      return json(res, 200, {
+        source: 'catalogo',
+        recommendations: infantil.slice(0, 3).map((item) => ({
+          id: item.id,
+          rationale:
+            'Es lo que tenemos para esa edad: nuestro fondo infantil es corto y preferimos no colarte un libro de adultos disfrazado.'
+        })),
+        meta: { ...baseMeta, motivo: 'fondo_infantil_propio' }
+      });
+    }
+
     return json(res, 200, {
       source: 'no_match',
       recommendations: [] as Recommendation[],

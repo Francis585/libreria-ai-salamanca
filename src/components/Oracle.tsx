@@ -15,7 +15,7 @@ interface Suggestion {
   glossary?: string[];
 }
 
-type Source = 'gemini' | 'local' | null;
+type Source = 'gemini' | 'local' | 'catalogo' | null;
 
 type Registro = 'llano' | 'divulgativo' | 'erudito';
 
@@ -143,6 +143,13 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
       if (data?.source === 'gemini' && resolved.length > 0) {
         setSuggestions(resolved);
         setSource('gemini');
+        setMeta(stats);
+        return;
+      }
+
+      if (data?.source === 'catalogo' && resolved.length > 0) {
+        setSuggestions(resolved);
+        setSource('catalogo');
         setMeta(stats);
         return;
       }
@@ -382,7 +389,11 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 {suggestions.length === 1 ? 'Un libro del fondo' : `${suggestions.length} libros del fondo`}
               </h3>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#a8a29e]">
-                {source === 'gemini' ? `Selección del Oráculo · ${registro}` : 'Motor semántico de la casa'}
+                {source === 'gemini'
+                  ? `Selección del Oráculo · ${registro}`
+                  : source === 'catalogo'
+                    ? 'Selección del fondo'
+                    : 'Motor semántico de la casa'}
               </span>
             </div>
 

@@ -24,7 +24,12 @@ const ORNAMENTS: Record<string, 'lineas' | 'rombos' | 'arcos' | 'cruces' | 'onda
   'Humanismo & Ciencia': 'rombos',
   Poesía: 'ondas',
   'Ensayo & Pensamiento IA': 'cruces',
-  'Narrativa Contemporánea': 'arcos'
+  'Narrativa Contemporánea': 'arcos',
+  'Novela & Aventura': 'rombos',
+  'Misterio & Policíaco': 'arcos',
+  Teatro: 'lineas',
+  Novedades: 'cruces',
+  'Infantil & Juvenil': 'ondas'
 };
 
 function hash(text: string): number {

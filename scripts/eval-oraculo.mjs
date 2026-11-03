@@ -57,7 +57,7 @@ const CASES = [
   { q: 'un manual de fontanería', expect: null, kind: 'fuera' },
 
   // --- ausencias que la casa debería reconocer (2) ---
-  { q: 'un libro para mi hija de 9 años', expect: null, kind: 'ausencia' },
+  { q: 'un libro para mi hija de 9 años', expect: '*', kind: 'no_lector' },
   { q: 'algo en inglés para un turista', expect: null, kind: 'ausencia' }
 ];
 

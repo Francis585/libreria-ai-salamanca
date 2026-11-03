@@ -12,7 +12,8 @@
     "db:reset": "node scripts/reset-demo.mjs",
     "eval:oraculo": "node scripts/eval-oraculo.mjs",
     "test:smtp": "node scripts/test-smtp.mjs",
-    "test:correos": "node scripts/test-correos.mjs"
+    "test:correos": "node scripts/test-correos.mjs",
+    "libro:add": "node scripts/add-libro.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
