@@ -72,3 +72,18 @@ Resend por HTTP no añade dependencias y es lo que quedó implementado.
 - Los correos no llevan `List-Unsubscribe` ni versión AMP.
 - El HTML está probado en Chromium y en la vista previa del admin; no en
   Outlook de escritorio (usa tablas, así que debería aguantar).
+
+## Pruebas automatizadas
+
+```bash
+npm run test:correos   # 13 comprobaciones, sin salir a internet
+npm run test:smtp      # cadena SMTP con captura de los 3 mensajes
+```
+
+`test:correos` levanta un SMTP local que captura los mensajes y comprueba:
+reserva de tertulia (201 y correo generado), que el correo diga **las plazas que
+quedan de verdad**, asunto con el título del encuentro, reserva de mesa con fecha
+y hora, honeypot que no genera correo, email mal formado rechazado con 400,
+estado `enviado` por smtp, HTML sin marcadores sin sustituir, dirección de la
+librería presente, versión en texto plano, `multipart/alternative` en el mensaje
+capturado y estado `simulado` cuando no hay proveedor. Deja la base como estaba.
