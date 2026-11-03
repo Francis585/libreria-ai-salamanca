@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpDown, BookOpen, Search, ShoppingBag, SlidersHorizontal, Star, X } from 'lucide-react';
-import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, type Book } from '../data/library';
+import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, EPOCHS, type Book } from '../data/library';
 import { searchBooks } from '../lib/semantic';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
@@ -22,6 +22,7 @@ const SORTS: { key: SortKey; label: string }[] = [
 export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('Todos');
+  const [epoch, setEpoch] = useState<string>('Todas');
   const [sort, setSort] = useState<SortKey>('relevancia');
   const inputRef = useRef<HTMLInputElement>(null);
   const stock = useStock();
@@ -43,8 +44,12 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
 
   const results = useMemo(() => {
     const matched = query.trim()
-      ? searchBooks(query, { category }).map((result) => result.book)
-      : BOOKS.filter((book) => category === 'Todos' || book.category === category);
+      ? searchBooks(query, { category, epoch: epoch === 'Todas' ? undefined : epoch }).map((result) => result.book)
+      : BOOKS.filter(
+          (book) =>
+            (category === 'Todos' || book.category === category) &&
+            (epoch === 'Todas' || book.epoch === epoch)
+        );
 
     const sorted = [...matched];
     switch (sort) {
@@ -61,10 +66,13 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         break;
     }
     return sorted;
-  }, [query, category, sort]);
+  }, [query, category, epoch, sort]);
 
   const countFor = (cat: string) =>
     cat === 'Todos' ? BOOKS.length : BOOKS.filter((book) => book.category === cat).length;
+
+  const epochCount = (value: string) =>
+    value === 'Todas' ? BOOKS.length : BOOKS.filter((book) => book.epoch === value).length;
 
   return (
     <section id="catalogo" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 lg:px-10 lg:py-24">
@@ -152,6 +160,28 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             {results.length} {results.length === 1 ? 'obra' : 'obras'}
           </span>
           <div className="relative">
+            <label htmlFor="catalogo-epoca" className="sr-only">
+              Filtrar por época
+            </label>
+            <select
+              id="catalogo-epoca"
+              value={epoch}
+              onChange={(event) => setEpoch(event.target.value)}
+              className={`appearance-none rounded-xl border px-3 py-2 text-xs font-medium outline-none transition-colors ${
+                epoch === 'Todas'
+                  ? 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                  : 'border-bark bg-bark text-paper'
+              }`}
+            >
+              {['Todas', ...EPOCHS].map((option) => (
+                <option key={option} value={option}>
+                  {option === 'Todas' ? `Todas las épocas (${BOOKS.length})` : `${option} (${epochCount(option)})`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="relative">
             <ArrowUpDown className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
             <select
               value={sort}
@@ -182,6 +212,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             onClick={() => {
               setQuery('');
               setCategory('Todos');
+              setEpoch('Todas');
             }}
             className="mt-6 rounded-lg bg-bark px-5 py-2.5 text-xs font-semibold text-paper transition-colors hover:bg-ink"
           >
