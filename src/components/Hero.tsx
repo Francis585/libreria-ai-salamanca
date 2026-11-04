@@ -50,9 +50,9 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
           </div>
 
           <h1 className="mt-6 max-w-[16ch] text-[clamp(2.55rem,6.2vw,4.5rem)] font-semibold leading-[0.97] tracking-[-0.04em] text-ink text-balance">
-            De 1492 a 2026.
+            El libro que buscas,
             <span className="accent-serif mt-1 block text-[1.04em] leading-[1.02] text-clay">
-              Todo el fondo, en una sola conversación.
+              aunque no sepas cómo se llama.
             </span>
           </h1>
 
