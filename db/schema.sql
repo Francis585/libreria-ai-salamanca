@@ -285,6 +285,13 @@ alter table novedades_feed
 
 create index if not exists novedades_feed_busqueda_idx on novedades_feed (busqueda);
 
+-- Precio de los títulos encargables. `estimado` = calculado por tramo de año y
+-- pendiente de confirmar al preparar el pedido; `manual` = precio real puesto a
+-- mano por la librería. La web los distingue para no prometer un PVP en firme.
+alter table novedades_feed add column if not exists precio numeric(10,2);
+alter table novedades_feed add column if not exists precio_origen text;
+
+
 
 -- Opiniones de lectores. `origen = 'casa'` son las reseñas que firma el equipo
 -- de la librería (no cuentan como opinión de un cliente); `'lector'` son las que

@@ -687,7 +687,7 @@ const patron = `%${normaliza(q).replace(/[%_]/g, '')}%`;
 
     const [filas, cuenta, editoriales] = await Promise.all([
       sql.query(
-        `select id, titulo, autor, anio, editorial, paginas, portada_url
+        `select id, titulo, autor, anio, editorial, paginas, portada_url, precio, precio_origen
            from novedades_feed
           where ${filtro}
           order by anio desc nulls last, titulo asc

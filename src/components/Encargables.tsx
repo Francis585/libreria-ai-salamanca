@@ -18,6 +18,8 @@ interface Encargable {
   editorial: string | null;
   paginas: number | null;
   portada_url: string | null;
+  precio: string | number | null;
+  precio_origen: 'estimado' | 'manual' | null;
 }
 
 interface Payload {
@@ -119,8 +121,13 @@ export const Encargables: React.FC = () => {
       `Quiero encargar «${libro.titulo}»${libro.autor ? `, de ${libro.autor}` : ''}${
         libro.editorial ? ` (${libro.editorial})` : ''
       }.`,
+      libro.precio !== null
+        ? `Precio que veo en la web: ${Number(libro.precio).toFixed(2).replace('.', ',')} €${
+            libro.precio_origen === 'estimado' ? ' (orientativo)' : ''
+          }.`
+        : '',
       ``,
-      `¿Me confirmáis precio y plazo?`,
+      `¿Me confirmáis precio final y plazo?`,
       ``,
       `Gracias.`
     ].join('\n');
@@ -206,7 +213,7 @@ export const Encargables: React.FC = () => {
             {resumen}
           </p>
           <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted/70">
-            · ediciones en castellano
+            · ediciones en castellano · precio orientativo: te lo confirmamos al preparar el pedido
           </span>
         </div>
 
@@ -242,6 +249,16 @@ export const Encargables: React.FC = () => {
               <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted/80">
                 {libro.editorial ?? '—'} · {libro.anio ?? 's. f.'}
               </p>
+              {libro.precio !== null && (
+                <p className="mt-1 text-[11.5px] font-semibold text-ink">
+                  {Number(libro.precio).toFixed(2).replace('.', ',')} €
+                  {libro.precio_origen === 'estimado' && (
+                    <span className="ml-1 font-mono text-[8.5px] font-normal uppercase tracking-[0.06em] text-muted">
+                      orient.
+                    </span>
+                  )}
+                </p>
+              )}
               <button
                 type="button"
                 onClick={() => encargar(libro)}
