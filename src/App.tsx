@@ -39,13 +39,12 @@ function readStoredCart(): CartLine[] {
 export default function App() {
   // Portada: la obra más reciente que tenga portada real y ejemplares. Antes era
   // siempre «Niebla», que es de 1914 y abría la tienda con un clásico.
-  const featured = useMemo(() => {
+  const destacados = useMemo(() => {
     const conPortada = BOOKS.filter((libro) => Boolean((PORTADAS as Record<string, string>)[libro.id]));
-    return (
-      conPortada.sort((a, b) => b.year - a.year)[0] ??
-      getBook(FEATURED_ID) ??
-      getBook('unamuno-sentimiento-1912')!
-    );
+    const ordenados = [...conPortada].sort((a, b) => b.year - a.year).slice(0, 3);
+    if (ordenados.length) return ordenados;
+    const respaldo = getBook(FEATURED_ID) ?? getBook('unamuno-sentimiento-1912')!;
+    return [respaldo];
   }, []);
 
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -143,7 +142,26 @@ export default function App() {
       <Header cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onSearch={focusCatalogSearch} />
 
       <main>
-        <Hero featured={featured} onOpenBook={setSelectedBook} onAdd={addToCart} />
+        <Hero destacados={destacados} onOpenBook={setSelectedBook} onAdd={addToCart} />
+
+        {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
+        <div className="border-y border-line bg-paper">
+          <ul className="mx-auto grid max-w-7xl gap-2 px-5 py-4 text-[11.5px] text-muted-warm sm:grid-cols-3 lg:px-10">
+            {[
+              ['Envío en 24–48 h', 'Gratis desde 35 €, a toda España'],
+              ['Devoluciones sin preguntas', '14 días para cambiarlo'],
+              ['Te atiende una persona', 'Correo y teléfono, lunes a viernes']
+            ].map(([titulo, detalle]) => (
+              <li key={titulo} className="flex items-start gap-2">
+                <span aria-hidden="true" className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-clay" />
+                <span>
+                  <strong className="font-semibold text-ink">{titulo}</strong>
+                  <span className="text-muted"> · {detalle}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
         <Oracle onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Catalog onOpenBook={setSelectedBook} onAdd={addToCart} />
         <Encargables />

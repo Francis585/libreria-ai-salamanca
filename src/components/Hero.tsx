@@ -6,15 +6,21 @@ import { SECCION_IA } from '../lib/brand';
 import { BookCover } from './BookCover';
 
 interface HeroProps {
-  featured: Book;
+  /** Tres destacados: el visitante elige, no hay carrusel automático. */
+  destacados: Book[];
   onOpenBook: (book: Book) => void;
   onAdd: (book: Book) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
+export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => {
+  // El primero del día rota según la fecha: la portada cambia sin animaciones.
+  const inicial = new Date().getDate() % Math.max(1, destacados.length);
+  const [indice, setIndice] = useState(inicial);
+  const featured = destacados[Math.min(indice, destacados.length - 1)] ?? destacados[0];
   // Cuántos títulos se pueden encargar, para que se vea de un vistazo que la
   // librería es más grande que la sala.
-  const [encargables, setEncargables] = useState<number | null>(null);
+  // Si la petición falla se enseña esta cifra de referencia en vez de unos puntos suspensivos.
+  const [encargables, setEncargables] = useState<number>(2600);
 
   useEffect(() => {
     let vivo = true;
@@ -90,7 +96,7 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
             <div>
               <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Para encargar</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
-                {encargables === null ? '…' : encargables.toLocaleString('es-ES')}
+                {encargables.toLocaleString('es-ES')}
                 <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">títulos</span>
               </dd>
             </div>
@@ -106,7 +112,10 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
 
         <div className="relative lg:col-span-5 lg:pl-4">
           <div className="relative mx-auto max-w-[330px]">
-            <div className="relative rounded-xl border border-line bg-paper p-3 shadow-[0_24px_60px_-34px_rgba(14,14,16,0.55)]">
+            <div
+              key={featured.id}
+              className="relative rounded-xl border border-line bg-paper p-3 shadow-[0_24px_60px_-34px_rgba(14,14,16,0.55)] animate-fade-in"
+            >
               <button
                 type="button"
                 onClick={() => onOpenBook(featured)}
@@ -132,7 +141,9 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               <Quote className="mt-0.5 h-4 w-4 shrink-0 text-clay" />
               <div>
                 <p className="text-[13px] leading-relaxed text-muted-warm">
-                  «{featured.excerpt?.original.slice(0, 116).replace(/^«/, '')}…»
+                  {featured.excerpt
+                    ? `«${featured.excerpt.original.slice(0, 116).replace(/^«/, '')}…»`
+                    : `${featured.synopsis.slice(0, 120).trimEnd()}…`}
                 </p>
                 <p className="mt-2 font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted">
                   {featured.author} · {featured.year}
@@ -148,6 +159,25 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
               <ArrowUpRight className="h-3.5 w-3.5" />
             </button>
           </div>
+
+          {destacados.length > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-2" role="group" aria-label="Elegir el libro destacado">
+              {destacados.map((libro, i) => (
+                <button
+                  key={libro.id}
+                  type="button"
+                  onClick={() => setIndice(i)}
+                  aria-pressed={i === indice}
+                  aria-label={`Ver ${libro.title}`}
+                  className={`overflow-hidden rounded-[3px] ring-1 transition-all ${
+                    i === indice ? 'ring-2 ring-clay' : 'opacity-60 ring-line hover:opacity-100'
+                  }`}
+                >
+                  <BookCover book={libro} compact className="h-[54px] w-[39px]" />
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-muted">
             <span className="flex items-center gap-1.5">

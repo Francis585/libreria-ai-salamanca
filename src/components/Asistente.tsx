@@ -41,7 +41,16 @@ export const Asistente: React.FC<AsistenteProps> = ({ onOpenBook }) => {
   const [mensajes, setMensajes] = useState<Mensaje[]>([]);
   const [texto, setTexto] = useState('');
   const [pensando, setPensando] = useState(false);
+  const [visible, setVisible] = useState(false);
   const finRef = useRef<HTMLDivElement>(null);
+
+  // El botón aparece al bajar: en la portada tapaba la mitad de la portada del libro.
+  useEffect(() => {
+    const alBajar = () => setVisible(window.scrollY > 420);
+    alBajar();
+    window.addEventListener('scroll', alBajar, { passive: true });
+    return () => window.removeEventListener('scroll', alBajar);
+  }, []);
 
   useEffect(() => {
     if (!abierto) return;
@@ -88,13 +97,15 @@ export const Asistente: React.FC<AsistenteProps> = ({ onOpenBook }) => {
 
   return (
     <>
-      {/* Botón flotante */}
+      {/* Botón flotante: invisible en la portada, aparece al bajar */}
       <button
         type="button"
         onClick={() => setAbierto((valor) => !valor)}
         aria-expanded={abierto}
         aria-controls="asistente-panel"
-        className="fixed bottom-5 right-4 z-[70] inline-flex items-center gap-2 rounded-full bg-ink px-4 py-3 text-[12.5px] font-semibold text-paper shadow-[0_14px_34px_-14px_rgba(14,14,16,0.65)] transition-transform hover:-translate-y-0.5 sm:right-6"
+        className={`fixed bottom-5 right-4 z-[70] inline-flex items-center gap-2 rounded-full bg-ink px-4 py-3 text-[12.5px] font-semibold text-paper shadow-[0_14px_34px_-14px_rgba(14,14,16,0.65)] transition-all duration-300 hover:-translate-y-0.5 sm:right-6 ${
+          visible || abierto ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
+        }`}
       >
         {abierto ? <X className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
         <span className="hidden sm:inline">{abierto ? 'Cerrar' : '¿Te ayudo?'}</span>
