@@ -170,12 +170,17 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-[#2a2a31]/60 pt-5 text-[10.5px] text-[#8b8b95] sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} Librería AI Salamanca · Todos los derechos reservados</p>
+          <p>
+            © {new Date().getFullYear()} Librería AI Salamanca · Proyecto de demostración: no se
+            realizan ventas reales
+          </p>
           <div className="flex flex-wrap items-center gap-4">
             <a href="#" className="transition-colors hover:text-paper">Aviso legal</a>
             <a href="#" className="transition-colors hover:text-paper">Privacidad</a>
             <a href="#" className="transition-colors hover:text-paper">Cookies</a>
-            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[#6f6f79]">Hecho en Salamanca</span>
+            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[#6f6f79]">
+              Hecho en Salamanca · demo
+            </span>
           </div>
         </div>
       </div>
