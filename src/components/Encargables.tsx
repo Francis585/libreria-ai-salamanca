@@ -66,7 +66,7 @@ export const Encargables: React.FC = () => {
   const [meta, setMeta] = useState<Payload | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
-  const [vista, setVista] = useState<'todo' | 'novedades'>('novedades');
+  const [vista, setVista] = useState<'novedades' | 'siglo21' | 'todo'>('siglo21');
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebounced(query.trim()), 320);
@@ -78,9 +78,17 @@ export const Encargables: React.FC = () => {
       setCargando(true);
       setError(false);
       try {
-        const desde = vista === 'novedades' ? new Date().getFullYear() - 1 : 0;
+        // Tres estanterías temporales: lo que acaba de salir, todo el siglo XXI
+        // y el fondo completo. El siglo XXI es la vista por defecto porque es
+        // donde está el 93 % del catálogo.
+        const rango =
+          vista === 'novedades'
+            ? { desde: new Date().getFullYear() - 1, hasta: 0 }
+            : vista === 'siglo21'
+              ? { desde: 2000, hasta: new Date().getFullYear() - 2 }
+              : { desde: 0, hasta: 0 };
         const res = await fetch(
-          `/api/catalogo?q=${encodeURIComponent(debounced)}&pagina=${paginaPedida}&limite=24&desde=${desde}`
+          `/api/catalogo?q=${encodeURIComponent(debounced)}&pagina=${paginaPedida}&limite=24&desde=${rango.desde}&hasta=${rango.hasta}`
         );
         if (!res.ok) throw new Error(String(res.status));
         const data = (await res.json()) as Payload;
@@ -171,8 +179,9 @@ export const Encargables: React.FC = () => {
 
         <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Qué enseñar">
           {[
-            { key: 'novedades' as const, label: 'Novedades (2025–2026)' },
-            { key: 'todo' as const, label: 'Todo el catálogo' }
+            { key: 'siglo21' as const, label: 'Siglo XXI' },
+            { key: 'novedades' as const, label: 'Últimas novedades' },
+            { key: 'todo' as const, label: 'Todo el fondo' }
           ].map((opcion) => {
             const activo = vista === opcion.key;
             return (
