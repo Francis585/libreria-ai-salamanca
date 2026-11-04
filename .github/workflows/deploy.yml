@@ -48,3 +48,7 @@ jobs:
             echo "Desplegando $proyecto"
             VERCEL_PROJECT_ID="$proyecto" npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
           done
+
+      # Avisa a Bing/Yandex de las URLs publicadas (Google va por Search Console)
+      - name: Avisar a los buscadores (IndexNow)
+        run: node scripts/indexnow.mjs
