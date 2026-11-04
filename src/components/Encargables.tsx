@@ -66,7 +66,7 @@ export const Encargables: React.FC = () => {
   const [meta, setMeta] = useState<Payload | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
-  const [vista, setVista] = useState<'todo' | 'novedades'>('todo');
+  const [vista, setVista] = useState<'todo' | 'novedades'>('novedades');
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebounced(query.trim()), 320);
@@ -171,8 +171,8 @@ export const Encargables: React.FC = () => {
 
         <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Qué enseñar">
           {[
-            { key: 'todo' as const, label: 'Todo el catálogo' },
-            { key: 'novedades' as const, label: 'Novedades' }
+            { key: 'novedades' as const, label: 'Novedades (2025–2026)' },
+            { key: 'todo' as const, label: 'Todo el catálogo' }
           ].map((opcion) => {
             const activo = vista === opcion.key;
             return (
