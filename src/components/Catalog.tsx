@@ -12,6 +12,15 @@ interface CatalogProps {
 
 type SortKey = 'relevancia' | 'titulo' | 'precio' | 'reciente' | 'valoracion';
 type RangoPrecio = 'todos' | 'menos15' | '15a25' | 'mas25';
+type Vista = 'actual' | 'clasicos' | 'antiguo' | 'todo';
+
+/** Tres estanterías: lo que se vende hoy, los clásicos vivos y el fondo antiguo. */
+const VISTAS: { key: Vista; label: string; desde: number; hasta: number }[] = [
+  { key: 'actual', label: 'Actual', desde: 1950, hasta: 9999 },
+  { key: 'clasicos', label: 'Clásicos', desde: 1800, hasta: 1949 },
+  { key: 'antiguo', label: 'Fondo antiguo', desde: 0, hasta: 1799 },
+  { key: 'todo', label: 'Todo', desde: 0, hasta: 9999 }
+];
 type Formato = 'todos' | 'tapa' | 'rustica' | 'bolsillo';
 
 const SORTS: { key: SortKey; label: string }[] = [
@@ -56,6 +65,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
   // El catálogo se enseña por tandas: 46 fichas de golpe hacían la página
   // interminable. Doce y un botón para seguir.
   const [visibles, setVisibles] = useState(12);
+  const [vista, setVista] = useState<Vista>('actual');
   const inputRef = useRef<HTMLInputElement>(null);
   const stock = useStock();
 
@@ -74,8 +84,12 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  /** Filtros finos: precio, nota mínima, formato y disponibilidad. */
+  /** Filtros finos: estantería, precio, nota mínima, formato y disponibilidad. */
   const pasaFiltros = (book: Book) => {
+    if (vista !== 'todo') {
+      const rango = VISTAS.find((v) => v.key === vista)!;
+      if (book.year < rango.desde || book.year > rango.hasta) return false;
+    }
     if (precio === 'menos15' && book.price >= 15) return false;
     if (precio === '15a25' && (book.price < 15 || book.price > 25)) return false;
     if (precio === 'mas25' && book.price <= 25) return false;
@@ -127,11 +141,20 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         break;
     }
     return sorted;
-  }, [query, category, epoch, sort, precio, notaMinima, formato, soloDisponibles, stock]);
+  }, [query, category, epoch, sort, precio, notaMinima, formato, soloDisponibles, stock, vista]);
 
   useEffect(() => {
     setVisibles(12);
-  }, [query, category, epoch, precio, notaMinima, formato, soloDisponibles]);
+  }, [query, category, epoch, precio, notaMinima, formato, soloDisponibles, vista]);
+
+  const cuentaVista = (vista: Vista) => {
+    const rango = VISTAS.find((v) => v.key === vista)!;
+    return BOOKS.filter(
+      (book) =>
+        (vista === 'todo' || (book.year >= rango.desde && book.year <= rango.hasta)) &&
+        (category === 'Todos' || book.category === category)
+    ).length;
+  };
 
   const countFor = (cat: string) =>
     cat === 'Todos' ? BOOKS.length : BOOKS.filter((book) => book.category === cat).length;
@@ -222,7 +245,30 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         </ul>
       </div>
 
-      <div className="mt-7 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      {/* Estanterías: la web no se satura porque solo se enseña una a la vez */}
+      <div className="mt-8 flex flex-wrap items-center gap-2" role="group" aria-label="Qué parte del fondo ver">
+        {VISTAS.map((opcion) => {
+          const activo = vista === opcion.key;
+          return (
+            <button
+              key={opcion.key}
+              type="button"
+              aria-pressed={activo}
+              onClick={() => setVista(opcion.key)}
+              className={`inline-flex items-center gap-2 rounded-md border px-3.5 py-2 text-[12px] font-semibold transition-colors ${
+                activo ? 'border-ink bg-ink text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40 hover:text-ink'
+              }`}
+            >
+              {opcion.label}
+              <span className={`font-mono text-[10px] tabular-nums ${activo ? 'text-paper/70' : 'text-muted'}`}>
+                {cuentaVista(opcion.key)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar sm:flex-wrap sm:overflow-visible sm:pb-0" role="group" aria-label="Filtrar por categoría">
           {['Todos', ...CATEGORIES].map((cat) => {
             const active = category === cat;

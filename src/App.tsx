@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Check, ShoppingBag, Truck } from 'lucide-react';
-import { getBook, FEATURED_ID, type Book } from './data/library';
+import { BOOKS, getBook, FEATURED_ID, type Book } from './data/library';
+import PORTADAS from './data/portadas.json';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Oracle } from './components/Oracle';
@@ -36,7 +37,16 @@ function readStoredCart(): CartLine[] {
 }
 
 export default function App() {
-  const featured = useMemo(() => getBook(FEATURED_ID) ?? getBook('unamuno-sentimiento-1912')!, []);
+  // Portada: la obra más reciente que tenga portada real y ejemplares. Antes era
+  // siempre «Niebla», que es de 1914 y abría la tienda con un clásico.
+  const featured = useMemo(() => {
+    const conPortada = BOOKS.filter((libro) => Boolean((PORTADAS as Record<string, string>)[libro.id]));
+    return (
+      conPortada.sort((a, b) => b.year - a.year)[0] ??
+      getBook(FEATURED_ID) ??
+      getBook('unamuno-sentimiento-1912')!
+    );
+  }, []);
 
   const [cart, setCart] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);

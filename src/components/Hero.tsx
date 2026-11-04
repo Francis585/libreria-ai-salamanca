@@ -57,9 +57,9 @@ export const Hero: React.FC<HeroProps> = ({ featured, onOpenBook, onAdd }) => {
           </h1>
 
           <p className="mt-6 max-w-[54ch] text-[15px] leading-[1.65] text-muted-warm sm:text-[16px]">
-            Somos una librería online desde Salamanca: fondo salmantino, clásicos, novedades e
-            infantil, y un equipo que todavía recomienda de viva voz. Escríbenos lo que buscas,
-            aunque no recuerdes el título, y te lo encontramos.
+            Librería online desde Salamanca: narrativa actual, ensayo, infantil y una
+            selección de clásicos que siguen vendiéndose. Escríbenos lo que buscas, aunque no
+            recuerdes el título, y te lo encontramos.
           </p>
 
           <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
