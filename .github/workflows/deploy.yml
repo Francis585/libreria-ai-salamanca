@@ -1,24 +1,25 @@
 name: Publicar
 
-# Flujo del LABORATORIO.
+# Dos ramas, dos sitios:
+#   main        → libreria-ai-salamanca.vercel.app  (la original)
+#   experimento → libreria-ai-lab.vercel.app        (el laboratorio)
 #
-# `libreria-ai-lab` es la copia donde se experimenta. Cada push a main compila y
-# la publica SOLO a ella: la tienda original no se toca hasta que se decida
-# promover. Para promover hay que lanzar este flujo a mano con destino
-# "original" (Actions → Publicar → Run workflow).
+# Así se puede probar en el laboratorio sin tocar la original, y cuando algo
+# está listo se fusiona `experimento` en `main` y se publica sola.
 on:
   push:
-    branches: [main]
+    branches: [main, experimento]
   workflow_dispatch:
     inputs:
       destino:
-        description: 'Proyecto a publicar'
-        required: true
-        default: laboratorio
+        description: 'Proyecto a publicar (por defecto, el de la rama)'
+        required: false
+        default: ''
         type: choice
         options:
-          - laboratorio
+          - ''
           - original
+          - laboratorio
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -50,13 +51,15 @@ jobs:
         env:
           PROYECTO_LAB: ${{ secrets.VERCEL_PROJECT_ID }}
           PROYECTO_ORIGINAL: ${{ secrets.VERCEL_PROJECT_ID_COPIA }}
-          DESTINO: ${{ github.event.inputs.destino }}
+          ELEGIDO: ${{ github.event.inputs.destino }}
         run: |
           set -e
-          # Un push normal va solo al laboratorio; la original, únicamente a mano.
-          if [ "$DESTINO" = "original" ]; then
+          destino="$ELEGIDO"
+          if [ -z "$destino" ]; then
+            if [ "$GITHUB_REF_NAME" = "main" ]; then destino="original"; else destino="laboratorio"; fi
+          fi
+          if [ "$destino" = "original" ]; then
             proyecto="$PROYECTO_ORIGINAL"
-            echo "Promoviendo a la tienda original."
           else
             proyecto="$PROYECTO_LAB"
           fi
@@ -64,9 +67,9 @@ jobs:
             echo "Proyecto sin id configurado; se omite."
             exit 0
           fi
+          echo "Publicando en $destino ($proyecto)"
           VERCEL_PROJECT_ID="$proyecto" npx vercel deploy --prod --yes --token="$VERCEL_TOKEN"
 
       # Avisa a Bing/Yandex de las URLs publicadas (Google va por Search Console)
       - name: Avisar a los buscadores (IndexNow)
-        if: ${{ github.event.inputs.destino != 'original' }}
         run: node scripts/indexnow.mjs
