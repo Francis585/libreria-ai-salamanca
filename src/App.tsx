@@ -52,6 +52,35 @@ export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
+  /**
+   * Abrir una ficha cambia la URL (/libro/<id>): así el libro se puede
+   * compartir, guardar y —lo importante— indexar. Se sincroniza también al
+   * volver atrás con el navegador.
+   */
+  const abrirLibro = useCallback((book: Book | null) => {
+    setSelectedBook(book);
+    if (book) {
+      const ruta = `/libro/${book.id}`;
+      if (window.location.pathname !== ruta) window.history.pushState({ libro: book.id }, '', ruta);
+      document.title = `${book.title} — ${book.author} · Librería AI Salamanca`;
+    } else {
+      if (window.location.pathname.startsWith('/libro/')) window.history.replaceState({}, '', '/');
+      document.title = 'Librería AI Salamanca · Libros en castellano, envío en 24-48 h';
+    }
+  }, []);
+
+  useEffect(() => {
+    const libroDeLaRuta = () => {
+      const coincide = window.location.pathname.match(/^\/libro\/([^/]+)\/?$/);
+      const libro = coincide ? getBook(decodeURIComponent(coincide[1])) : undefined;
+      if (libro) abrirLibro(libro);
+      else if (selectedBook) abrirLibro(null);
+    };
+    libroDeLaRuta();
+    window.addEventListener('popstate', libroDeLaRuta);
+    return () => window.removeEventListener('popstate', libroDeLaRuta);
+  }, [abrirLibro]);
   const [toast, setToast] = useState<{ text: string; id: number } | null>(null);
 
   // Recuperar cesta guardada
@@ -142,7 +171,7 @@ export default function App() {
       <Header cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onSearch={focusCatalogSearch} />
 
       <main>
-        <Hero destacados={destacados} onOpenBook={setSelectedBook} onAdd={addToCart} />
+        <Hero destacados={destacados} onOpenBook={abrirLibro} onAdd={addToCart} />
 
         {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
         <div className="border-y border-line bg-paper">
@@ -162,8 +191,8 @@ export default function App() {
             ))}
           </ul>
         </div>
-        <Oracle onOpenBook={setSelectedBook} onAdd={addToCart} />
-        <Catalog onOpenBook={setSelectedBook} onAdd={addToCart} />
+        <Oracle onOpenBook={abrirLibro} onAdd={addToCart} />
+        <Catalog onOpenBook={abrirLibro} onAdd={addToCart} />
         <Encargables />
         <Events />
         
@@ -171,16 +200,16 @@ export default function App() {
 
       <Footer />
 
-      <Asistente onOpenBook={setSelectedBook} />
+      <Asistente onOpenBook={abrirLibro} />
 
       <BookModal
         book={selectedBook}
-        onClose={() => setSelectedBook(null)}
+        onClose={() => abrirLibro(null)}
         onAdd={(book) => {
           addToCart(book);
-          setSelectedBook(null);
+          abrirLibro(null);
         }}
-        onOpenBook={setSelectedBook}
+        onOpenBook={abrirLibro}
       />
 
       <CartDrawer
