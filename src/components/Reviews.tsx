@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Loader2, Send, Star, ThumbsUp } from 'lucide-react';
+import { ExternalLink, Loader2, Send, Star, ThumbsUp } from 'lucide-react';
+import { distribucionReal, getRealRating, SOURCE_URL } from '../data/ratings';
 
 export interface Resena {
   id: number;
@@ -86,8 +87,10 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
   const [fallo, setFallo] = useState<string | null>(null);
   const [enviada, setEnviada] = useState(false);
 
-  const mediaMostrada = media ?? valoracionEditorial;
-  const maximo = Math.max(1, ...distribucion.map((d) => d.cuantas));
+  const real = getRealRating(libroId);
+  const reparto = real ? distribucionReal(real) : distribucion;
+  const mediaMostrada = real ? real.average : media ?? valoracionEditorial;
+  const maximo = Math.max(1, ...reparto.map((d) => d.cuantas));
 
   const enviar = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -127,31 +130,52 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Resumen */}
-      <div className="grid gap-5 rounded-xl border border-line bg-mist/40 p-4 sm:grid-cols-[150px_1fr]">
+      <div className="grid gap-5 rounded-xl border border-line bg-mist/40 p-4 sm:grid-cols-[196px_1fr]">
         <div className="flex flex-col items-center justify-center text-center">
           <span className="text-4xl font-semibold leading-none tabular-nums text-ink">
             {mediaMostrada.toFixed(1)}
           </span>
           <Estrellas valor={mediaMostrada} className="mt-1.5" />
-          <span className="mt-2 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-clay">
-            Nota de la casa
-          </span>
-          <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-            {total > 0
-              ? `${total} ${total === 1 ? 'opinión' : 'opiniones'}`
-              : 'Sin opiniones de lectores'}
-          </span>
+          {real ? (
+            <>
+              <span className="mt-2 rounded-full bg-ink px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-paper">
+                Lectores reales
+              </span>
+              <a
+                href={`${SOURCE_URL}${real.key}`}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-1.5 inline-flex items-center gap-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-2 hover:text-ink"
+                title="Ver la ficha de la obra en Open Library"
+              >
+                {real.count} {real.count === 1 ? 'voto' : 'votos'} · Open Library
+                <ExternalLink className="h-2.5 w-2.5" />
+              </a>
+              <span className="mt-2 border-t border-line pt-2 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
+                Nota de la casa {valoracionEditorial.toFixed(1)}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="mt-2 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-clay">
+                Nota de la casa
+              </span>
+              <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                Sin valoraciones de lectores
+              </span>
+            </>
+          )}
         </div>
 
         <div className="space-y-1">
-          {distribucion.length === 0 && (
+          {reparto.length === 0 && (
             <p className="py-4 text-[12px] leading-relaxed text-muted-warm">
               Esta nota no es una media de usuarios: es la que le pone el equipo de la librería al
               recomendar el título. Cuando alguien deje su opinión desde la ficha, aparecerá aquí con
               su nombre y sin pasar por filtros.
             </p>
           )}
-          {distribucion.map((fila) => (
+          {reparto.map((fila) => (
             <div key={fila.estrellas} className="flex items-center gap-2">
               <span className="w-3 font-mono text-[10px] text-muted">{fila.estrellas}</span>
               <Star className="h-2.5 w-2.5 fill-muted text-muted" />
@@ -166,6 +190,11 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
               </span>
             </div>
           ))}
+          {real && (
+            <p className="pt-2 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
+              Distribución de votos en Open Library
+            </p>
+          )}
         </div>
       </div>
 

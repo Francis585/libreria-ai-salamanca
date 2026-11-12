@@ -13,7 +13,8 @@
     "eval:oraculo": "node scripts/eval-oraculo.mjs",
     "test:smtp": "node scripts/test-smtp.mjs",
     "test:correos": "node scripts/test-correos.mjs",
-    "libro:add": "node scripts/add-libro.mjs"
+    "libro:add": "node scripts/add-libro.mjs",
+    "ratings": "node scripts/fetch-ratings.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

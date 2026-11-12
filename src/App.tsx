@@ -4,6 +4,7 @@ import { BOOKS, getBook, FEATURED_ID, type Book } from './data/library';
 import PORTADAS from './data/portadas.json';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { StatsBand } from './components/StatsBand';
 import { Ticker } from './components/Ticker';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
@@ -175,6 +176,7 @@ export default function App() {
 
       <main>
         <Hero destacados={destacados} onOpenBook={abrirLibro} onAdd={addToCart} />
+        <StatsBand />
 
         {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
         <div className="border-y border-line bg-paper">

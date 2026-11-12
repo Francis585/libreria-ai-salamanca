@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, ArrowUpRight, BookOpen, Coffee, Quote, Sparkles, Star } from 'lucide-react';
 import type { Book } from '../data/library';
 import { BOOKS } from '../data/library';
+import { getRealRating } from '../data/ratings';
 import { SECCION_IA } from '../lib/brand';
 import { BookCover } from './BookCover';
 
@@ -128,14 +129,25 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
                   Recomendado del mes
                 </span>
-                <span
-                  className="flex items-center gap-1 font-mono text-[11px] text-muted-warm"
-                  title="Nota que le pone el equipo de la librería"
-                >
-                  <Star className="h-3 w-3 fill-clay text-clay" />
-                  {featured.rating.toFixed(1)}
-                  <span className="text-[9px] uppercase tracking-[0.1em] text-muted">casa</span>
-                </span>
+                {(() => {
+                  const real = getRealRating(featured.id);
+                  return (
+                    <span
+                      className="flex items-center gap-1 font-mono text-[11px] text-muted-warm"
+                      title={
+                        real
+                          ? `Media de ${real.count} votos de lectores en Open Library`
+                          : 'Nota que le pone el equipo de la librería'
+                      }
+                    >
+                      <Star className="h-3 w-3 fill-clay text-clay" />
+                      {(real?.average ?? featured.rating).toFixed(1)}
+                      <span className="text-[9px] uppercase tracking-[0.1em] text-muted">
+                        {real ? `${real.count} votos` : 'casa'}
+                      </span>
+                    </span>
+                  );
+                })()}
               </div>
             </div>
           </div>

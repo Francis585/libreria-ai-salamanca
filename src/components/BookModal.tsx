@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { Book } from '../data/library';
 import { getBook } from '../data/library';
+import { getRealRating } from '../data/ratings';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
 import { Modal } from './Modal';
@@ -36,7 +37,8 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
   const disponibles = book ? stock[book.id] : undefined;
   const agotado = disponibles === 0;
   const opiniones = useResenas(book?.id);
-  const nota = opiniones.media ?? book?.rating ?? 0;
+  const real = getRealRating(book?.id);
+  const nota = real ? real.average : opiniones.media ?? book?.rating ?? 0;
 
   useEffect(() => {
     setTab('sinopsis');
@@ -55,7 +57,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
     { key: 'sinopsis', label: 'Sinopsis', show: true },
     { key: 'entidades', label: 'Personajes y lugares', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
     { key: 'texto', label: 'Fragmento', show: Boolean(book?.excerpt || book?.metrics) },
-    { key: 'opiniones', label: 'Opiniones del equipo', count: opiniones.total || undefined, show: true }
+    { key: 'opiniones', label: 'Valoraciones', count: real?.count || opiniones.total || undefined, show: true }
   ];
 
   const copyCitation = async () => {
@@ -113,16 +115,18 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                     onClick={() => setTab('opiniones')}
                     className="flex items-center gap-1.5 rounded-full bg-paper px-2.5 py-1 font-mono text-[11px] text-muted-warm ring-1 ring-line transition-colors hover:ring-clay/50"
                     aria-label={
-                      opiniones.total > 0
-                        ? `Ver las ${opiniones.total} opiniones`
-                        : 'Nota que le pone el equipo de la librería'
+                      real
+                        ? `Ver la valoración de ${real.count} lectores`
+                        : opiniones.total > 0
+                          ? `Ver las ${opiniones.total} opiniones`
+                          : 'Nota que le pone el equipo de la librería'
                     }
-                    title="Nota que le pone el equipo de la librería"
+                    title={real ? `Media de ${real.count} votos en Open Library` : 'Nota que le pone el equipo de la librería'}
                   >
                     <Star className="h-3 w-3 fill-clay text-clay" />
                     {nota.toFixed(1)}
                     <span className="text-[9px] uppercase tracking-[0.12em] text-muted">
-                      {opiniones.total > 0 ? `${opiniones.total} op.` : 'casa'}
+                      {real ? `${real.count} votos` : opiniones.total > 0 ? `${opiniones.total} op.` : 'casa'}
                     </span>
                   </button>
                 </div>

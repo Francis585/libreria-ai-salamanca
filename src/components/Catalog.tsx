@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpDown, BookOpen, Search, ShoppingBag, SlidersHorizontal, Star, X } from 'lucide-react';
 import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, EPOCHS, type Book } from '../data/library';
+import { getRealRating } from '../data/ratings';
 import { searchBooks } from '../lib/semantic';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
@@ -29,7 +30,7 @@ const SORTS: { key: SortKey; label: string }[] = [
   { key: 'titulo', label: 'Título (A–Z)' },
   { key: 'precio', label: 'Precio (menor a mayor)' },
   { key: 'reciente', label: 'Año (más reciente)' },
-  { key: 'valoracion', label: 'Mejor nota de la casa' }
+  { key: 'valoracion', label: 'Mejor valorados (lectores)' }
 ];
 
 const PRECIOS: { key: RangoPrecio; label: string }[] = [
@@ -136,7 +137,16 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         sorted.sort((a, b) => b.year - a.year);
         break;
       case 'valoracion':
-        sorted.sort((a, b) => b.rating - a.rating || a.title.localeCompare(b.title, 'es'));
+        sorted.sort((a, b) => {
+          const ra = getRealRating(a.id);
+          const rb = getRealRating(b.id);
+          // Primero las que tienen votos reales, de mejor a peor; el resto, por nota de la casa.
+          if (ra && !rb) return -1;
+          if (!ra && rb) return 1;
+          const va = ra?.average ?? a.rating;
+          const vb = rb?.average ?? b.rating;
+          return vb - va || a.title.localeCompare(b.title, 'es');
+        });
         break;
       default:
         break;
@@ -538,13 +548,25 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                   >
                     {book.category}
                   </span>
-                  <span
-                    className="flex items-center gap-1 font-mono text-[10px] text-muted"
-                    title="Nota que le pone el equipo de la librería"
-                  >
-                    <Star className="h-3 w-3 fill-gold text-gold" />
-                    {book.rating.toFixed(1)}
-                  </span>
+                  {(() => {
+                    const real = getRealRating(book.id);
+                    return (
+                      <span
+                        className="flex items-center gap-1 font-mono text-[10px] text-muted"
+                        title={
+                          real
+                            ? `Media de ${real.count} votos de lectores en Open Library`
+                            : 'Nota que le pone el equipo de la librería'
+                        }
+                      >
+                        <Star className="h-3 w-3 fill-gold text-gold" />
+                        {(real?.average ?? book.rating).toFixed(1)}
+                        <span className="text-[9px] uppercase tracking-[0.1em]">
+                          {real ? `${real.count}` : 'casa'}
+                        </span>
+                      </span>
+                    );
+                  })()}
                 </div>
 
                 <h3 className="mt-1.5 font-display text-[22px] font-semibold leading-[1.15] tracking-tight text-ink">

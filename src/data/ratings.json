@@ -1,0 +1,240 @@
+{
+  "celestina-rojas-1499": {
+    "average": 3.5,
+    "count": 2,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 1,
+      "5": 0
+    },
+    "key": "/works/OL938934W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "unamuno-sentimiento-1912": {
+    "average": 4.3,
+    "count": 10,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 3,
+      "4": 1,
+      "5": 6
+    },
+    "key": "/works/OL503529W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "unamuno-niebla-1914": {
+    "average": 4.2,
+    "count": 5,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 2,
+      "5": 2
+    },
+    "key": "/works/OL503589W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "martin-gaite-cuarto-1978": {
+    "average": 3.5,
+    "count": 2,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 1,
+      "5": 0
+    },
+    "key": "/works/OL77404W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "clarin-regenta-1885": {
+    "average": 3.3,
+    "count": 4,
+    "counts": {
+      "1": 0,
+      "2": 1,
+      "3": 1,
+      "4": 2,
+      "5": 0
+    },
+    "key": "/works/OL41290W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "galdos-fortunata-1887": {
+    "average": 5,
+    "count": 1,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 1
+    },
+    "key": "/works/OL815451W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "pardo-bazan-pazos-1886": {
+    "average": 4,
+    "count": 3,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 1,
+      "5": 1
+    },
+    "key": "/works/OL637777W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "stevenson-isla-1883": {
+    "average": 3.8,
+    "count": 108,
+    "counts": {
+      "1": 1,
+      "2": 4,
+      "3": 36,
+      "4": 43,
+      "5": 24
+    },
+    "key": "/works/OL24034W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "chesterton-padre-brown-1911": {
+    "average": 4.3,
+    "count": 20,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 5,
+      "4": 4,
+      "5": 11
+    },
+    "key": "/works/OL76341W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "becquer-rimas-1871": {
+    "average": 3.7,
+    "count": 3,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 2,
+      "5": 0
+    },
+    "key": "/works/OL22665933W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "uclez-peninsula-2025": {
+    "average": 4.8,
+    "count": 4,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 1,
+      "5": 3
+    },
+    "key": "/works/OL43994375W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "posteguillo-tres-mundos-2025": {
+    "average": 5,
+    "count": 1,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 1
+    },
+    "key": "/works/OL44700835W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "zafon-sombra-viento-2001": {
+    "average": 4.3,
+    "count": 55,
+    "counts": {
+      "1": 3,
+      "2": 1,
+      "3": 8,
+      "4": 6,
+      "5": 37
+    },
+    "key": "/works/OL278437W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "aramburu-patria-2016": {
+    "average": 5,
+    "count": 3,
+    "counts": {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 3
+    },
+    "key": "/works/OL26387829W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "mola-bestia-2021": {
+    "average": 3.4,
+    "count": 5,
+    "counts": {
+      "1": 0,
+      "2": 1,
+      "3": 1,
+      "4": 3,
+      "5": 0
+    },
+    "key": "/works/OL26377819W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "harari-sapiens-2011": {
+    "average": 4.2,
+    "count": 214,
+    "counts": {
+      "1": 14,
+      "2": 9,
+      "3": 19,
+      "4": 52,
+      "5": 120
+    },
+    "key": "/works/OL17075811W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  },
+  "palacio-wonder-2012": {
+    "average": 4.3,
+    "count": 246,
+    "counts": {
+      "1": 14,
+      "2": 8,
+      "3": 23,
+      "4": 47,
+      "5": 154
+    },
+    "key": "/works/OL16142094W",
+    "source": "openlibrary",
+    "fetched": "2026-11-12"
+  }
+}
