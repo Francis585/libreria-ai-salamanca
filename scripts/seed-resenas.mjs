@@ -45,14 +45,6 @@ const RESENAS = [
   },
   {
     libro: 'unamuno-niebla-1914',
-    nombre: 'Marta Nieto',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'Me lo recomendaron en el mostrador cuando dije que quería algo de Salamanca que no fuera una guía. Empecé una noche y lo terminé a las cuatro de la mañana.'
-  },
-  {
-    libro: 'unamuno-niebla-1914',
     nombre: 'Equipo de fondo antiguo',
     valoracion: 4,
     origen: 'casa',
@@ -66,14 +58,6 @@ const RESENAS = [
     origen: 'casa',
     texto:
       'Si alguien pregunta por la Salamanca de posguerra, este es el libro que pongo en sus manos. La tienda de ultramarinos del padre, los cuadernos, la nevera de la cocina: todo está a cuatro calles de aquí.'
-  },
-  {
-    libro: 'martin-gaite-cuarto-1978',
-    nombre: 'Lucía Ferrer',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'Lo compré por la recomendación del Oráculo y no me arrepiento. Voy por la mitad y ya lo he subrayado entero.'
   },
   {
     libro: 'sotomayor-algoritmos-2025',
@@ -116,28 +100,12 @@ const RESENAS = [
       'La edición de lujo justifica el precio: papel de 90 gramos, costura vista y un aparato de notas que no estorba. Para consultar, no para llevar en el bolso.'
   },
   {
-    libro: 'clarin-regenta-1885',
-    nombre: 'Marta Nieto',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'Vetusta da más miedo que cualquier novela negra actual. La compré en bolsillo y ya he regalado dos ejemplares.'
-  },
-  {
     libro: 'galdos-fortunata-1887',
     nombre: 'Bernardo Carvajal',
     valoracion: 5,
     origen: 'casa',
     texto:
       'Galdós convierte un enredo sentimental en un mapa social de Madrid. La letra de esta edición es generosa, cosa de agradecer en 900 páginas.'
-  },
-  {
-    libro: 'mola-bestia-2021',
-    nombre: 'Javier Ochoa',
-    valoracion: 4,
-    origen: 'lector',
-    texto:
-      'Se lee en dos noches, como dicen. El Madrid del cólera está muy bien construido; el final, a mi gusto, algo precipitado.'
   },
   {
     libro: 'harari-sapiens-2011',
@@ -148,36 +116,12 @@ const RESENAS = [
       'Traducción correcta y notas al pie útiles. Es el título que más se lleva el público de instituto que viene a las visitas guiadas.'
   },
   {
-    libro: 'liu-tres-cuerpos-2008',
-    nombre: 'Lucía Ferrer',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'La parte del videojuego me costó, pero cuando entiendes qué está pasando no puedes parar. Pedí el segundo al día siguiente.'
-  },
-  {
     libro: 'zafon-sombra-viento-2001',
     nombre: 'Bernardo Carvajal',
     valoracion: 5,
     origen: 'casa',
     texto:
       'El libro que devolvió Barcelona a la novela y que sigue funcionando como regalo seguro. Si dudas con alguien que lee poco, empieza por aquí.'
-  },
-  {
-    libro: 'aramburu-patria-2016',
-    nombre: 'Marta Nieto',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'Duro y necesario. Lo leí en verano, en dos semanas, y todavía pienso en Bittori.'
-  },
-  {
-    libro: 'sanjuan-cantico-1584',
-    nombre: 'Padre Ignacio Rueda',
-    valoracion: 5,
-    origen: 'lector',
-    texto:
-      'La compré para un regalo y acabé comprando otra para mí. El cotejo de variantes es un lujo para una edición de este precio.'
   },
   {
     libro: 'villanueva-sonetos-2024',
@@ -204,7 +148,7 @@ await client.connect();
 
 try {
   if (purga) {
-    await client.query(`delete from resenas where origen = 'casa'`);
+    await client.query(`delete from resenas`);
   }
   let nuevas = 0;
   for (const r of RESENAS) {

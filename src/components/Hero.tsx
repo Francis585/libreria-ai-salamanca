@@ -128,9 +128,13 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
                 <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
                   Recomendado del mes
                 </span>
-                <span className="flex items-center gap-1 font-mono text-[11px] text-muted-warm">
+                <span
+                  className="flex items-center gap-1 font-mono text-[11px] text-muted-warm"
+                  title="Nota que le pone el equipo de la librería"
+                >
                   <Star className="h-3 w-3 fill-clay text-clay" />
                   {featured.rating.toFixed(1)}
+                  <span className="text-[9px] uppercase tracking-[0.1em] text-muted">casa</span>
                 </span>
               </div>
             </div>

@@ -133,16 +133,22 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
             {mediaMostrada.toFixed(1)}
           </span>
           <Estrellas valor={mediaMostrada} className="mt-1.5" />
+          <span className="mt-2 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-clay">
+            Nota de la casa
+          </span>
           <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-            {total > 0 ? `${total} ${total === 1 ? 'opinión' : 'opiniones'}` : 'Valoración de la casa'}
+            {total > 0
+              ? `${total} ${total === 1 ? 'opinión' : 'opiniones'}`
+              : 'Sin opiniones de lectores'}
           </span>
         </div>
 
         <div className="space-y-1">
           {distribucion.length === 0 && (
             <p className="py-4 text-[12px] leading-relaxed text-muted-warm">
-              Todavía no hay opiniones de lectores. La nota que ves es la que le pone el equipo de la
-              librería al recomendar el título.
+              Esta nota no es una media de usuarios: es la que le pone el equipo de la librería al
+              recomendar el título. Cuando alguien deje su opinión desde la ficha, aparecerá aquí con
+              su nombre y sin pasar por filtros.
             </p>
           )}
           {distribucion.map((fila) => (

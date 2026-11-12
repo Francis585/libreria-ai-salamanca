@@ -55,7 +55,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
     { key: 'sinopsis', label: 'Sinopsis', show: true },
     { key: 'entidades', label: 'Personajes y lugares', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
     { key: 'texto', label: 'Fragmento', show: Boolean(book?.excerpt || book?.metrics) },
-    { key: 'opiniones', label: 'Opiniones', count: opiniones.total || undefined, show: true }
+    { key: 'opiniones', label: 'Opiniones del equipo', count: opiniones.total || undefined, show: true }
   ];
 
   const copyCitation = async () => {
@@ -111,12 +111,19 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                   <button
                     type="button"
                     onClick={() => setTab('opiniones')}
-                    className="flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 font-mono text-[11px] text-muted-warm ring-1 ring-line transition-colors hover:ring-clay/50"
-                    aria-label={`Ver las ${opiniones.total} opiniones y valorar`}
+                    className="flex items-center gap-1.5 rounded-full bg-paper px-2.5 py-1 font-mono text-[11px] text-muted-warm ring-1 ring-line transition-colors hover:ring-clay/50"
+                    aria-label={
+                      opiniones.total > 0
+                        ? `Ver las ${opiniones.total} opiniones`
+                        : 'Nota que le pone el equipo de la librería'
+                    }
+                    title="Nota que le pone el equipo de la librería"
                   >
                     <Star className="h-3 w-3 fill-clay text-clay" />
                     {nota.toFixed(1)}
-                    {opiniones.total > 0 && <span className="text-muted">({opiniones.total})</span>}
+                    <span className="text-[9px] uppercase tracking-[0.12em] text-muted">
+                      {opiniones.total > 0 ? `${opiniones.total} op.` : 'casa'}
+                    </span>
                   </button>
                 </div>
 

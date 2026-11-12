@@ -29,7 +29,7 @@ const SORTS: { key: SortKey; label: string }[] = [
   { key: 'titulo', label: 'Título (A–Z)' },
   { key: 'precio', label: 'Precio (menor a mayor)' },
   { key: 'reciente', label: 'Año (más reciente)' },
-  { key: 'valoracion', label: 'Mejor valorados' }
+  { key: 'valoracion', label: 'Mejor nota de la casa' }
 ];
 
 const PRECIOS: { key: RangoPrecio; label: string }[] = [
@@ -397,7 +397,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           </div>
 
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Valoración</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Nota de la casa</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {NOTAS.map((opcion) => {
                 const activo = notaMinima === opcion.key;
@@ -538,7 +538,10 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                   >
                     {book.category}
                   </span>
-                  <span className="flex items-center gap-1 font-mono text-[10px] text-muted">
+                  <span
+                    className="flex items-center gap-1 font-mono text-[10px] text-muted"
+                    title="Nota que le pone el equipo de la librería"
+                  >
                     <Star className="h-3 w-3 fill-gold text-gold" />
                     {book.rating.toFixed(1)}
                   </span>
