@@ -171,10 +171,10 @@ export default function App() {
 
       <Header cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onSearch={focusCatalogSearch} />
 
+      <Ticker />
+
       <main>
         <Hero destacados={destacados} onOpenBook={abrirLibro} onAdd={addToCart} />
-
-        <Ticker />
 
         {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
         <div className="border-y border-line bg-paper">
