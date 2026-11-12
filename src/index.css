@@ -119,6 +119,32 @@
 
 /* ---------- Animaciones ---------- */
 
+/* Cinta de materias bajo la portada: se mueve sola y no pide nada al lector */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee {
+  animation: marquee 42s linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+    transform: none;
+  }
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

@@ -55,8 +55,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
     { key: 'sinopsis', label: 'Sinopsis', show: true },
     { key: 'entidades', label: 'Personajes y lugares', count: book?.entities ? book.entities.characters.length + book.entities.places.length + book.entities.dates.length : undefined, show: Boolean(book?.entities) },
     { key: 'texto', label: 'Fragmento', show: Boolean(book?.excerpt || book?.metrics) },
-    { key: 'opiniones', label: 'Opiniones', count: opiniones.total || undefined, show: true },
-    { key: 'afines', label: 'También te gusta', count: related.length || undefined, show: related.length > 0 }
+    { key: 'opiniones', label: 'Opiniones', count: opiniones.total || undefined, show: true }
   ];
 
   const copyCitation = async () => {
@@ -104,7 +103,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
               <div className="mt-5 space-y-3">
                 <div className="flex items-end justify-between">
                   <div>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Precio</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Precio</span>
                     <p className="font-display text-3xl font-semibold tabular-nums text-ink">
                       {book.price.toFixed(2)} <span className="text-lg">€</span>
                     </p>
@@ -171,11 +170,11 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
             <div className="flex min-w-0 flex-col">
               <div className="px-6 pb-5 pt-8 pr-16 sm:px-8">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-clay/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-clay">
+                  <span className="rounded-full bg-clay/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-clay">
                     {book.category}
                   </span>
                   {book.badge && (
-                    <span className="rounded-full border border-line px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-warm">
+                    <span className="rounded-full border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-warm">
                       {book.badge}
                     </span>
                   )}
@@ -224,7 +223,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
 
                     {book.authorBio && (
                       <div className="rounded-xl border border-line bg-mist/40 p-4">
-                        <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-clay">Sobre el autor</p>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-clay">Sobre el autor</p>
                         <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted-warm">{book.authorBio}</p>
                       </div>
                     )}
@@ -233,12 +232,39 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                       {book.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-line px-2.5 py-1 text-[10.5px] text-muted-warm"
+                          className="rounded-full border border-line px-2.5 py-1 text-[11px] text-muted-warm"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
+
+                    {/* La sinopsis sola dejaba media columna en blanco: aquí va
+                        lo que de verdad se hace en una librería, la siguiente
+                        recomendación. */}
+                    {related.length > 0 && (
+                      <div className="border-t border-line pt-4">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                          También te gusta
+                        </p>
+                        <div className="mt-3 grid grid-cols-3 gap-2.5">
+                          {related.slice(0, 3).map((entry) => (
+                            <button
+                              key={entry.id}
+                              type="button"
+                              onClick={() => onOpenBook(entry)}
+                              className="group text-left"
+                            >
+                              <BookCover book={entry} compact className="aspect-[3/4.2] w-full rounded-[2px] ring-1 ring-line" />
+                              <p className="mt-1.5 line-clamp-2 font-display text-[12px] font-semibold leading-tight text-ink group-hover:text-clay">
+                                {entry.title}
+                              </p>
+                              <p className="mt-0.5 truncate text-[10px] text-muted">{entry.author}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -312,7 +338,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
 
                         <div className="rounded-xl border border-line p-4">
                           <div className="flex items-baseline justify-between">
-                            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
+                            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                               Riqueza léxica
                             </span>
                             <span className="font-display text-xl font-semibold tabular-nums text-ink">
@@ -325,20 +351,20 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                               style={{ width: `${book.metrics.lexicalRichness}%` }}
                             />
                           </div>
-                          <p className="mt-2 text-[10.5px] text-muted">Variabilidad de vocabulario frente a la norma de su época.</p>
+                          <p className="mt-2 text-[11px] text-muted">Variabilidad de vocabulario frente a la norma de su época.</p>
                         </div>
 
                         <dl className="grid gap-3 sm:grid-cols-2">
                           <div className="rounded-xl border border-line p-3">
-                            <dt className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">Densidad conceptual</dt>
+                            <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">Densidad conceptual</dt>
                             <dd className="mt-1 text-[12px] font-medium leading-snug text-ink">{book.metrics.densityScore}</dd>
                           </div>
                           <div className="rounded-xl border border-line p-3">
-                            <dt className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">Tono</dt>
+                            <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">Tono</dt>
                             <dd className="mt-1 text-[12px] font-medium leading-snug text-ink">{book.metrics.tone}</dd>
                           </div>
                           <div className="rounded-xl border border-line p-3 sm:col-span-2">
-                            <dt className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">Digitalización</dt>
+                            <dt className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">Digitalización</dt>
                             <dd className="mt-1 text-[12px] font-medium leading-snug text-ink">{book.metrics.digitizationLevel}</dd>
                           </div>
                         </dl>
@@ -365,7 +391,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                       >
                         <BookCover book={entry} compact className="h-[92px] w-[66px] shrink-0 rounded-[2px]" />
                         <div className="min-w-0 flex-1">
-                          <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-clay">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-clay">
                             {entry.thematic} · {entry.year}
                           </p>
                           <p className="mt-1 font-display text-base font-semibold leading-snug text-ink group-hover:text-clay">
@@ -399,7 +425,7 @@ export const BookModal: React.FC<BookModalProps> = ({ book, onClose, onAdd, onOp
                   <Download className="h-3.5 w-3.5" />
                   Descargar ficha
                 </button>
-                <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                   Librería AI · Salamanca
                 </span>
               </div>

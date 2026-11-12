@@ -82,11 +82,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <li key={book.id} className="flex gap-3 rounded-xl border border-line p-3">
                   <BookCover book={book} compact className="h-[96px] w-[70px] shrink-0 rounded-[2px]" />
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-clay">{book.category}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-clay">{book.category}</p>
                     <p className="mt-0.5 font-display text-[15px] font-semibold leading-snug text-ink">
                       {book.title}
                     </p>
-                    <p className="text-[10.5px] text-muted">{book.author}</p>
+                    <p className="text-[11px] text-muted">{book.author}</p>
 
                     <div className="mt-auto flex items-center justify-between pt-2">
                       <div className="flex items-center gap-1.5">

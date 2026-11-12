@@ -245,15 +245,15 @@ export const Encargables: React.FC = () => {
               <h3 className="mt-2.5 line-clamp-2 text-[12px] font-semibold leading-snug text-ink">
                 {libro.titulo}
               </h3>
-              <p className="mt-0.5 truncate text-[10.5px] text-muted">{libro.autor ?? 'Autoría sin datos'}</p>
-              <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted/80">
+              <p className="mt-0.5 truncate text-[11px] text-muted">{libro.autor ?? 'Autoría sin datos'}</p>
+              <p className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-muted/80">
                 {libro.editorial ?? '—'} · {libro.anio ?? 's. f.'}
               </p>
               {libro.precio !== null && (
                 <p className="mt-1 text-[11.5px] font-semibold text-ink">
                   {Number(libro.precio).toFixed(2).replace('.', ',')} €
                   {libro.precio_origen === 'estimado' && (
-                    <span className="ml-1 font-mono text-[8.5px] font-normal uppercase tracking-[0.06em] text-muted">
+                    <span className="ml-1 font-mono text-[10px] font-normal uppercase tracking-[0.06em] text-muted">
                       orient.
                     </span>
                   )}
@@ -262,7 +262,7 @@ export const Encargables: React.FC = () => {
               <button
                 type="button"
                 onClick={() => encargar(libro)}
-                className="mt-2 inline-flex items-center gap-1 self-start text-[10.5px] font-semibold text-clay opacity-0 transition-opacity hover:underline group-hover:opacity-100 focus-visible:opacity-100"
+                className="mt-2 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-clay opacity-0 transition-opacity hover:underline group-hover:opacity-100 focus-visible:opacity-100"
               >
                 Encargar <ArrowUpRight className="h-3 w-3" />
               </button>

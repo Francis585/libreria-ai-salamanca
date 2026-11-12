@@ -124,7 +124,7 @@ export const Asistente: React.FC<AsistenteProps> = ({ onOpenBook }) => {
             </span>
             <div className="min-w-0">
               <p className="text-[12.5px] font-semibold leading-none text-ink">El librero de guardia</p>
-              <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
                 Responde con el fondo y la agenda reales
               </p>
             </div>

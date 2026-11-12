@@ -174,7 +174,7 @@ export const Events: React.FC = () => {
                     <span className="font-display text-4xl font-semibold leading-none text-ink">{event.day}</span>
                     <div className="flex flex-col">
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-clay">{event.month}</span>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">{event.weekday}</span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">{event.weekday}</span>
                     </div>
                   </div>
                   <span className="flex items-center gap-1 rounded-full bg-mist px-2 py-1 font-mono text-[10px] text-muted-warm">
@@ -196,7 +196,7 @@ export const Events: React.FC = () => {
                   <div>
                     <p className="text-[11px] font-medium text-ink">{event.speaker}</p>
                     <p
-                      className={`mt-0.5 flex items-center gap-1 font-mono text-[9.5px] ${
+                      className={`mt-0.5 flex items-center gap-1 font-mono text-[10px] ${
                         completo ? 'text-clay' : 'text-muted'
                       }`}
                     >
@@ -255,7 +255,7 @@ export const Events: React.FC = () => {
             ) : (
               <form onSubmit={submit} className="space-y-4">
                 <div>
-                  <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-clay">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-clay">
                     {selected.weekday} {selected.day} {selected.month} · {selected.time}
                   </span>
                   <h3 id="reserva-titulo" className="mt-2 pr-8 font-display text-2xl font-semibold leading-tight text-ink">

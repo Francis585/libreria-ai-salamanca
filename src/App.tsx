@@ -4,6 +4,7 @@ import { BOOKS, getBook, FEATURED_ID, type Book } from './data/library';
 import PORTADAS from './data/portadas.json';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { Ticker } from './components/Ticker';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
 import { Encargables } from './components/Encargables';
@@ -152,7 +153,7 @@ export default function App() {
       </a>
 
       <div className="border-b border-line bg-mist/70">
-        <div className="mx-auto hidden max-w-7xl items-center justify-center gap-x-5 px-5 py-2 text-center font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-warm sm:flex lg:px-10">
+        <div className="mx-auto hidden max-w-7xl items-center justify-center gap-x-5 px-5 py-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-muted-warm sm:flex lg:px-10">
           <span className="flex items-center gap-1.5 whitespace-nowrap">
             <Truck className="h-3 w-3 text-clay" />
             Envío gratis desde 35 €
@@ -162,7 +163,7 @@ export default function App() {
           <span className="h-2.5 w-px bg-line" />
           <span className="whitespace-nowrap">Atención al lector por correo y teléfono</span>
         </div>
-        <p className="flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-1.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-muted-warm sm:hidden">
+        <p className="flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-warm sm:hidden">
           <Truck className="h-2.5 w-2.5 text-clay" />
           Envío gratis desde 35 € · Entrega en 24–48 h
         </p>
@@ -172,6 +173,8 @@ export default function App() {
 
       <main>
         <Hero destacados={destacados} onOpenBook={abrirLibro} onAdd={addToCart} />
+
+        <Ticker />
 
         {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
         <div className="border-y border-line bg-paper">
@@ -248,7 +251,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => setCartOpen(true)}
-            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-bark px-2.5 py-1.5 text-[10.5px] font-semibold text-paper hover:bg-ink"
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-bark px-2.5 py-1.5 text-[11px] font-semibold text-paper hover:bg-ink"
           >
             <ShoppingBag className="h-3 w-3" />
             Ver

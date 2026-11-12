@@ -95,7 +95,7 @@ export const FeedNovedades: React.FC = () => {
                 {item.titulo}
               </p>
               <p className="mt-0.5 truncate text-[11px] text-muted">{item.autor ?? 'Autor sin datos'}</p>
-              <p className="truncate font-mono text-[9px] uppercase tracking-[0.1em] text-muted/80">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.1em] text-muted/80">
                 {item.editorial ?? 'editorial sin datos'}
               </p>
             </li>

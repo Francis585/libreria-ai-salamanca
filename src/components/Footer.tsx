@@ -162,14 +162,14 @@ export const Footer: React.FC = () => {
               >
                 <Instagram className="h-3.5 w-3.5" />
               </a>
-              <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#6f6f79]">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#6f6f79]">
                 @libreriaaisalamanca
               </span>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-[#2a2a31]/60 pt-5 text-[10.5px] text-[#8b8b95] sm:flex-row sm:items-center">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-[#2a2a31]/60 pt-5 text-[11px] text-[#8b8b95] sm:flex-row sm:items-center">
           <p>
             © {new Date().getFullYear()} Librería AI Salamanca · Proyecto de demostración: no se
             realizan ventas reales
@@ -178,7 +178,7 @@ export const Footer: React.FC = () => {
             <a href="#" className="transition-colors hover:text-paper">Aviso legal</a>
             <a href="#" className="transition-colors hover:text-paper">Privacidad</a>
             <a href="#" className="transition-colors hover:text-paper">Cookies</a>
-            <span className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-[#6f6f79]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6f6f79]">
               Hecho en Salamanca · demo
             </span>
           </div>

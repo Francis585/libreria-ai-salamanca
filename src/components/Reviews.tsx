@@ -133,7 +133,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
             {mediaMostrada.toFixed(1)}
           </span>
           <Estrellas valor={mediaMostrada} className="mt-1.5" />
-          <span className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
+          <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
             {total > 0 ? `${total} ${total === 1 ? 'opinión' : 'opiniones'}` : 'Valoración de la casa'}
           </span>
         </div>
@@ -189,11 +189,11 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
               <p className="text-[12.5px] font-semibold text-ink">{resena.nombre}</p>
               <Estrellas valor={resena.valoracion} />
               {resena.origen === 'casa' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-clay">
+                <span className="inline-flex items-center gap-1 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-clay">
                   <ThumbsUp className="h-2.5 w-2.5" /> Reseña de la casa
                 </span>
               )}
-              <time className="ml-auto font-mono text-[9.5px] uppercase tracking-[0.08em] text-muted">
+              <time className="ml-auto font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
                 {new Date(resena.creado_en).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
               </time>
             </div>
@@ -254,7 +254,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
             {enviando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             {enviando ? 'Enviando…' : 'Publicar opinión'}
           </button>
-          <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
             {texto.length}/600
           </span>
           {enviada && <span className="text-[11px] font-medium text-emerald-700">Publicada. Gracias.</span>}

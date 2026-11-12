@@ -77,7 +77,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
             </span>
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Índice activo</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Índice activo</p>
               <p className="font-mono text-xs font-semibold tabular-nums text-ink">{BOOKS.length} obras · 5 materias</p>
             </div>
           </div>
@@ -141,7 +141,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
           <div className="mt-5 flex flex-col gap-3 border-t border-line-soft pt-4 sm:flex-row sm:items-center">
             <div className="flex flex-1 flex-col gap-3 sm:flex-row">
               <label className="flex-1">
-                <span className="mb-1 block font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Época</span>
+                <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Época</span>
                 <select
                   value={epoch}
                   onChange={(event) => setEpoch(event.target.value)}
@@ -155,7 +155,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                 </select>
               </label>
               <label className="flex-1">
-                <span className="mb-1 block font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Materia</span>
+                <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Materia</span>
                 <select
                   value={thematic}
                   onChange={(event) => setThematic(event.target.value)}
@@ -232,7 +232,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-clay">
+                            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-clay">
                               {result.book.thematic} · {result.book.year}
                             </p>
                             <h3 className="mt-0.5 font-display text-lg font-semibold leading-snug text-ink">
@@ -263,7 +263,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                           {result.matchedConcepts.map((concept) => (
                             <span
                               key={concept}
-                              className="rounded border border-line bg-mist/60 px-1.5 py-0.5 font-mono text-[9.5px] text-muted-warm"
+                              className="rounded border border-line bg-mist/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-warm"
                             >
                               {concept}
                             </span>
@@ -271,7 +271,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                           <button
                             type="button"
                             onClick={() => onOpenBook(result.book)}
-                            className="ml-auto inline-flex items-center gap-1 text-[10.5px] font-semibold text-clay hover:underline"
+                            className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-clay hover:underline"
                           >
                             Ficha completa
                             <ArrowRight className="h-3 w-3" />
@@ -295,10 +295,10 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                     className="absolute right-0 top-0 h-32 w-32 rounded-full bg-gold/10 blur-2xl"
                   />
                   <div className="relative flex items-center justify-between gap-2">
-                    <span className="rounded border border-gold/30 bg-gold/10 px-2 py-0.5 font-mono text-[9.5px] text-gold">
+                    <span className="rounded border border-gold/30 bg-gold/10 px-2 py-0.5 font-mono text-[10px] text-gold">
                       {selected.accessionCode ?? selected.id.toUpperCase()}
                     </span>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#8b8b95]">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#8b8b95]">
                       Inspector
                     </span>
                   </div>
@@ -309,7 +309,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                     {selected.author} ({selected.year})
                   </p>
                   {activeResult && (
-                    <p className="relative mt-3 border-t border-[#2a2a31]/60 pt-2 text-[10.5px] leading-relaxed text-[#c9c9d0]">
+                    <p className="relative mt-3 border-t border-[#2a2a31]/60 pt-2 text-[11px] leading-relaxed text-[#c9c9d0]">
                       {activeResult.reason}
                     </p>
                   )}
@@ -353,7 +353,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                           <div key={key}>
                             <div className="flex items-center gap-1.5 border-b border-line-soft pb-1.5">
                               <Icon className="h-3 w-3 text-clay" />
-                              <h4 className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink">{title}</h4>
+                              <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink">{title}</h4>
                             </div>
                             <ul className="mt-1 divide-y divide-line-soft">
                               {rows.map((row) => {
@@ -363,7 +363,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                                 return (
                                   <li key={`${key}-${heading}`} className="py-2">
                                     <p className="text-[11.5px] font-semibold text-ink">{heading}</p>
-                                    <p className="text-[10.5px] leading-relaxed text-muted-warm">{body}</p>
+                                    <p className="text-[11px] leading-relaxed text-muted-warm">{body}</p>
                                   </li>
                                 );
                               })}
@@ -380,7 +380,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                         <div>
                           <div className="flex items-center gap-1.5 border-b border-line-soft pb-1.5">
                             <Quote className="h-3 w-3 text-clay" />
-                            <h4 className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink">
+                            <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
                               Extracto cotejado
                             </h4>
                           </div>
@@ -397,10 +397,10 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                         <div>
                           <div className="flex items-center gap-1.5 border-b border-line-soft pb-1.5">
                             <BarChart3 className="h-3 w-3 text-clay" />
-                            <h4 className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink">Métricas</h4>
+                            <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink">Métricas</h4>
                           </div>
                           <div className="mt-2 flex items-baseline justify-between">
-                            <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
                               Riqueza léxica
                             </span>
                             <span className="font-display text-lg font-semibold tabular-nums text-ink">
@@ -413,7 +413,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                               style={{ width: `${selected.metrics.lexicalRichness}%` }}
                             />
                           </div>
-                          <dl className="mt-3 space-y-2 text-[10.5px]">
+                          <dl className="mt-3 space-y-2 text-[11px]">
                             <div>
                               <dt className="text-muted">Densidad</dt>
                               <dd className="text-ink">{selected.metrics.densityScore}</dd>
@@ -444,7 +444,7 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                           }}
                           className="w-full rounded-lg border border-line p-2.5 text-left transition-colors hover:border-clay/40 hover:bg-mist/50"
                         >
-                          <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-clay">
+                          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-clay">
                             {entry.year} · {entry.thematic}
                           </p>
                           <p className="mt-0.5 font-display text-[13.5px] font-semibold leading-snug text-ink">
@@ -460,13 +460,13 @@ export const Lab: React.FC<LabProps> = ({ onOpenBook }) => {
                 </div>
 
                 <div className="flex items-center justify-between border-t border-line bg-mist/40 px-5 py-3">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
                     {selected.price.toFixed(2)} €
                   </span>
                   <button
                     type="button"
                     onClick={() => onOpenBook(selected)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-clay px-3 py-1.5 text-[10.5px] font-semibold text-white hover:bg-clay-deep"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-clay px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-clay-deep"
                   >
                     Abrir ficha
                     <ArrowRight className="h-3 w-3" />

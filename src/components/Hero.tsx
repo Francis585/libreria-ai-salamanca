@@ -50,7 +50,7 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-clay opacity-70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-clay" />
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-warm sm:text-[10px] sm:tracking-[0.18em]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-warm sm:text-[10px] sm:tracking-[0.18em]">
               Librería online desde Salamanca
             </span>
           </div>
@@ -87,21 +87,21 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
 
           <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-line pt-5">
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">En catálogo</dt>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">En catálogo</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
                 {BOOKS.length}
                 <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">títulos</span>
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Para encargar</dt>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">Para encargar</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
                 {encargables.toLocaleString('es-ES')}
                 <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">títulos</span>
               </dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Entrega</dt>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">Entrega</dt>
               <dd className="mt-1 text-[26px] font-semibold leading-none tabular-nums tracking-[-0.04em] text-ink">
                 24–48
                 <span className="ml-1 text-[11px] font-medium tracking-normal text-muted">h</span>
@@ -125,7 +125,7 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
                 <BookCover book={featured} className="aspect-[3/4.1] w-full" />
               </button>
               <div className="flex items-center justify-between px-1 pb-1 pt-3">
-                <span className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
+                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
                   Recomendado del mes
                 </span>
                 <span className="flex items-center gap-1 font-mono text-[11px] text-muted-warm">
@@ -145,7 +145,7 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
                     ? `«${featured.excerpt.original.slice(0, 116).replace(/^«/, '')}…»`
                     : `${featured.synopsis.slice(0, 120).trimEnd()}…`}
                 </p>
-                <p className="mt-2 font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted">
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
                   {featured.author} · {featured.year}
                 </p>
               </div>

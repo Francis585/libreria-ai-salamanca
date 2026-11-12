@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Book } from '../data/library';
+import { CATEGORY_ACCENTS, type Book } from '../data/library';
 import PORTADAS from '../data/portadas.json';
 
 interface BookCoverProps {
@@ -46,16 +46,65 @@ function hash(text: string): number {
   return value;
 }
 
-/** Lleva un color hacia un gris tinta: quita el caramelo de cuero viejo sin perder la materia. */
-function towardNeutral(hex: string, amount: number): string {
+const PAPEL = '#f6f4ee';
+
+/**
+ * Rota el tono de un color y fija su luminosidad. Se usa para que dos libros de
+ * la misma materia no salgan con la misma portada: el tono base es el de la
+ * materia y cada obra lo gira unos grados según su id.
+ */
+function hsl(hex: string, dh: number, ds: number, luz: number): string {
   const clean = hex.replace('#', '');
   const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
   const num = parseInt(full, 16);
-  const target = { r: 0x14, g: 0x15, b: 0x1b };
-  const r = Math.round(((num >> 16) & 255) * (1 - amount) + target.r * amount);
-  const g = Math.round(((num >> 8) & 255) * (1 - amount) + target.g * amount);
-  const b = Math.round((num & 255) * (1 - amount) + target.b * amount);
-  return `rgb(${r} ${g} ${b})`;
+  const r = ((num >> 16) & 255) / 255;
+  const g = ((num >> 8) & 255) / 255;
+  const b = (num & 255) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  const l = (max + min) / 2;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (max === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  h = (h + dh + 360) % 360;
+  s = Math.min(1, Math.max(0, s * ds));
+
+  const c = (1 - Math.abs(2 * luz - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = luz - c / 2;
+  let rr = 0;
+  let gg = 0;
+  let bb = 0;
+  if (h < 60) { rr = c; gg = x; }
+  else if (h < 120) { rr = x; gg = c; }
+  else if (h < 180) { gg = c; bb = x; }
+  else if (h < 240) { gg = x; bb = c; }
+  else if (h < 300) { rr = x; bb = c; }
+  else { rr = c; bb = x; }
+  const a255 = (v: number) => Math.round((v + m) * 255);
+  return `rgb(${a255(rr)} ${a255(gg)} ${a255(bb)})`;
+}
+
+/** Mezcla dos colores: t = 0 devuelve `a`, t = 1 devuelve `b`. */
+function mix(a: string, b: string, t: number): string {
+  const parse = (hex: string) => {
+    const clean = hex.replace('#', '');
+    const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+    const num = parseInt(full, 16);
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+  };
+  const A = parse(a);
+  const B = parse(b);
+  const r = Math.round(A.r * (1 - t) + B.r * t);
+  const g = Math.round(A.g * (1 - t) + B.g * t);
+  const bl = Math.round(A.b * (1 - t) + B.b * t);
+  return `rgb(${r} ${g} ${bl})`;
 }
 
 const Pattern: React.FC<{ kind: string; id: string; accent: string }> = ({ kind, id, accent }) => {
@@ -142,79 +191,72 @@ const Pattern: React.FC<{ kind: string; id: string; accent: string }> = ({ kind,
   );
 };
 
-/** Oscurece un color hacia la tinta de la casa. */
-function oscurece(hex: string, amount: number): string {
-  const clean = hex.replace('#', '');
-  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
-  const num = parseInt(full, 16);
-  const target = { r: 0x0e, g: 0x0e, b: 0x10 };
-  const r = Math.round(((num >> 16) & 255) * (1 - amount) + target.r * amount);
-  const g = Math.round(((num >> 8) & 255) * (1 - amount) + target.g * amount);
-  const b = Math.round((num & 255) * (1 - amount) + target.b * amount);
-  return `rgb(${r} ${g} ${b})`;
-}
-
 /**
- * Portada tipográfica para las obras sin edición española con portada
- * localizable (y para los títulos inventados del catálogo). Nada de ornamento
- * de colección antigua: bloque de color, título grande y pie de la casa, al
- * estilo de las colecciones actuales.
+ * Portada de colección para las obras sin imagen localizable (y para los
+ * títulos inventados del catálogo).
+ *
+ * Antes era un bloque casi negro: en el estante leía como hueco, no como
+ * portada. Ahora es un bloque de color de verdad —tinte de la materia con el
+ * título en serif oscuro, franja sólida arriba y pie de autor— así que la
+ * portada generada se reconoce como portada y no como un hueco en el grid.
  */
 const GeneratedCover: React.FC<{ book: Book; compact: boolean }> = ({ book, compact }) => {
-  const { to, accent } = book.cover;
-  const fondo = oscurece(to, 0.28);
-  const franja = accent;
+  // El color del bloque sale de la materia, no del palmo de la obra: los palmos
+  // guardados son marrones muy oscuros y, subidos a tono medio, se vuelven
+  // grises indistinguibles. La materia sí da diez colores de verdad, y el giro
+  // de tono por obra evita que tres libros de la misma materia salgan iguales.
+  const base = CATEGORY_ACCENTS[book.category] ?? '#3b3bf5';
+  const giro = (hash(book.id) % 90) - 45;
+  const campo = hsl(base, giro, 0.66, compact ? 0.52 : 0.45);
+  const franja = hsl(base, giro, 0.95, 0.27);
+  const ornamento = hsl(base, giro, 1, 0.86);
 
   return (
-    <div className="absolute inset-0" style={{ backgroundColor: fondo }} aria-hidden="true">
-      {/* franja de materia */}
-      <div className="absolute inset-x-0 top-0" style={{ height: compact ? '4px' : '7px', backgroundColor: franja }} />
+    <div className="absolute inset-0" style={{ backgroundColor: campo }} aria-hidden="true">
+      <Pattern kind={ORNAMENTS[book.category] ?? 'lineas'} id={book.id} accent={ornamento} />
 
-      <div
-        className={`relative flex h-full flex-col ${
-          compact ? 'px-[9%] pb-[8%] pt-[10%]' : 'px-[9%] pb-[8%] pt-[11%]'
-        }`}
-      >
+      {/* Franja de materia: el único borde duro de la portada */}
+      <div className="absolute inset-x-0 top-0" style={{ height: compact ? '3px' : '5px', backgroundColor: franja }} />
+
+      <div className={`relative flex h-full flex-col text-paper ${compact ? 'px-[9%] pb-[9%] pt-[14%]' : 'px-[9%] pb-[7%] pt-[10%]'}`}>
         <div className="flex items-baseline justify-between gap-2">
           <span
-            className={`font-mono uppercase ${compact ? 'text-[6.5px]' : 'text-[8.5px]'} tracking-[0.18em]`}
-            style={{ color: franja }}
+            className={`font-mono uppercase text-paper/80 ${compact ? 'text-[6px]' : 'text-[7.5px]'} tracking-[0.18em]`}
           >
             {book.year}
           </span>
           {!compact && (
-            <span className="shrink-0 font-mono text-[6.5px] uppercase tracking-[0.14em] text-paper/40">
+            <span className="shrink-0 font-mono text-[6.5px] uppercase tracking-[0.14em] text-paper/70">
               {book.epoch}
             </span>
           )}
         </div>
 
         <h4
-          className={`mt-[12%] font-display font-semibold text-paper ${
+          className={`mt-[11%] text-left font-serif font-normal text-paper ${
             compact
-              ? 'line-clamp-4 text-[9.5px] leading-[1.15] tracking-[-0.02em]'
-              : 'line-clamp-4 text-[1.12rem] leading-[1.12] tracking-[-0.025em] sm:text-[1.3rem]'
+              ? 'line-clamp-4 text-[9.5px] leading-[1.12]'
+              : 'line-clamp-4 text-[1.45rem] leading-[1.02] tracking-[-0.015em] sm:text-[1.7rem]'
           }`}
         >
           {book.title}
         </h4>
 
-        <div className="mt-auto">
-          <div className="mb-[6%] h-px w-full bg-paper/25" />
-          <p
-            className={`uppercase text-paper/75 ${
-              compact ? 'line-clamp-2 text-[6px] tracking-[0.1em]' : 'truncate text-[8.5px] tracking-[0.12em]'
-            }`}
-          >
+        <div className="mt-auto pt-[9%]">
+          <div className="h-px w-full bg-paper/40" />
+          <p className="mt-2 truncate font-mono text-[8px] uppercase tracking-[0.12em] text-paper/80">
             {book.author}
           </p>
           {!compact && (
-            <p className="mt-1.5 font-mono text-[6px] uppercase tracking-[0.16em] text-paper/35">
-              Librería AI · Salamanca
+            <p className="mt-1 truncate font-mono text-[6.5px] uppercase tracking-[0.16em] text-paper/55">
+              {book.collection ?? 'Librería AI · Salamanca'}
             </p>
           )}
         </div>
       </div>
+
+      {/* Lomo: una sombra vertical en el canto izquierdo */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-[7%] bg-gradient-to-r from-black/20 via-black/[0.03] to-transparent" />
     </div>
   );
 };

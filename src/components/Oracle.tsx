@@ -405,7 +405,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                       <BookCover book={book} compact className="aspect-[3/4.2] w-full" />
                     </button>
                     <div className="min-w-0">
-                      <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-gold/90">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gold/90">
                         {book.category}
                       </p>
                       <h4 className="mt-1 font-display text-lg font-semibold leading-tight text-ink">

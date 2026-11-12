@@ -232,7 +232,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                 onClick={() => onOpenBook(libro)}
                 className="w-full rounded-lg border border-line/70 bg-paper px-3 py-2.5 text-left transition-colors hover:border-clay/50"
               >
-                <span className="block font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                <span className="block font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                   {libro.year} · {libro.category}
                 </span>
                 <span className="mt-0.5 block truncate font-display text-[13px] font-semibold text-ink">
@@ -319,7 +319,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             <SlidersHorizontal className="h-3 w-3" />
             Filtros
             {activos > 0 && (
-              <span className="grid h-4 min-w-4 place-items-center rounded-full bg-clay px-1 text-[9px] font-semibold text-white">
+              <span className="grid h-4 min-w-4 place-items-center rounded-full bg-clay px-1 text-[10px] font-semibold text-white">
                 {activos}
               </span>
             )}
@@ -374,7 +374,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           className="mt-4 grid gap-5 rounded-xl border border-line bg-mist/30 p-4 animate-fade-in sm:grid-cols-2 lg:grid-cols-4"
         >
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Precio</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Precio</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {PRECIOS.map((opcion) => {
                 const activo = precio === opcion.key;
@@ -396,7 +396,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           </div>
 
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Valoración</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Valoración</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {NOTAS.map((opcion) => {
                 const activo = notaMinima === opcion.key;
@@ -419,7 +419,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           </div>
 
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Formato</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Formato</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {FORMATOS.map((opcion) => {
                 const activo = formato === opcion.key;
@@ -441,7 +441,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           </div>
 
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Disponibilidad</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Disponibilidad</p>
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
@@ -509,7 +509,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                   <BookCover book={book} className="aspect-[3/4.15] w-full" />
                 </button>
                 {book.badge && (
-                  <span className="absolute left-3 top-3 rounded-full bg-paper/92 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-bark shadow-sm backdrop-blur">
+                  <span className="absolute left-3 top-3 rounded-full bg-paper/92 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-bark shadow-sm backdrop-blur">
                     {book.badge}
                   </span>
                 )}
@@ -523,7 +523,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                   <ShoppingBag className="h-4 w-4" />
                 </button>
                 {disponibles !== undefined && disponibles <= 3 && (
-                  <span className="absolute right-3 top-3 rounded-full bg-paper/92 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.08em] text-clay shadow-sm backdrop-blur">
+                  <span className="absolute right-3 top-3 rounded-full bg-paper/92 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-clay shadow-sm backdrop-blur">
                     {agotado ? 'Agotado' : `Quedan ${disponibles}`}
                   </span>
                 )}
@@ -532,7 +532,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
               <div className="mt-4 flex flex-1 flex-col">
                 <div className="flex items-center justify-between gap-2">
                   <span
-                    className="font-mono text-[9px] uppercase tracking-[0.14em]"
+                    className="font-mono text-[10px] uppercase tracking-[0.14em]"
                     style={{ color: CATEGORY_ACCENTS[book.category] ?? '#3b3bf5' }}
                   >
                     {book.category}
@@ -561,7 +561,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                     <span className="block font-display text-xl font-semibold tabular-nums text-ink">
                       {book.price.toFixed(2)} €
                     </span>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-muted">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
                       {book.format}
                     </span>
                   </div>

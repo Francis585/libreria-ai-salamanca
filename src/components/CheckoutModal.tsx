@@ -136,7 +136,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ open, cart, onClos
               entrega y el pago. Total: <strong>{done.total.toFixed(2)} €</strong>.
             </p>
             <div className="mx-auto mt-5 w-fit rounded-lg border border-line bg-mist/60 px-4 py-2">
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">Referencia</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Referencia</p>
               <p className="font-mono text-sm font-semibold tracking-wide text-ink">{done.referencia}</p>
             </div>
             <button
@@ -164,7 +164,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ open, cart, onClos
                 <Truck className="h-4 w-4 text-clay" />
                 Envío a casa
               </p>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-muted">
+              <p className="mt-1 text-[11px] leading-relaxed text-muted">
                 Entrega en 24–48 h en península. {subtotal >= ENVIO_GRATIS_DESDE ? 'Gratis en este pedido.' : '4,50 € · gratis desde 35 €.'}
               </p>
             </div>
