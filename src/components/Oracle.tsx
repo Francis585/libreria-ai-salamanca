@@ -4,6 +4,7 @@ import { BOOKS, type Book, getBook } from '../data/library';
 import { SECCION_IA } from '../lib/brand';
 import { ORACLE_MOOD_LABELS, localRecommendations, obrasPorTema, temasDelCatalogo } from '../lib/semantic';
 import { BookCover } from './BookCover';
+import { SectionLabel } from './SectionLabel';
 
 interface OracleProps {
   onOpenBook: (book: Book) => void;
@@ -205,7 +206,8 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
 
       <div className="relative mx-auto max-w-6xl px-5 py-20 lg:px-10 lg:py-24">
         <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+          <SectionLabel n="01">El librero</SectionLabel>
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
             <Sparkles className="h-3 w-3" />
             Recomendación de la casa
           </span>

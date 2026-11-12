@@ -6,17 +6,18 @@
   --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* Superficies: blanco hueso neutro, sin papel ni crema */
-  --color-paper: #f7f7f5;
-  --color-mist: #efefec;
-  --color-parchment: #e9e9e6;
-  --color-line: #e2e2dd;
-  --color-line-soft: #ededea;
+  /* Superficies: papel cálido, no blanco de panel. La librería se lee como
+     impreso; el blanco puro la dejaba con cara de admin. */
+  --color-paper: #f3eee3;
+  --color-mist: #eae3d5;
+  --color-parchment: #e0d7c5;
+  --color-line: #d8cfbc;
+  --color-line-soft: #e6dfd2;
 
-  /* Tinta neutra */
-  --color-ink: #0e0e10;
-  --color-bark: #0e0e10;
-  --color-bark-soft: #1c1c22;
+  /* Tinta cálida */
+  --color-ink: #14120e;
+  --color-bark: #14120e;
+  --color-bark-soft: #211d17;
 
   /* Acento único: cobalto */
   --color-clay: #3b3bf5;
@@ -24,8 +25,8 @@
   --color-gold: #3b3bf5;
   --color-gold-deep: #2b2bd6;
 
-  --color-muted: #73737c;
-  --color-muted-warm: #4b4b54;
+  --color-muted: #6f6a62;
+  --color-muted-warm: #4a453d;
 
   /* Radios secos, sin pastilla de libro antiguo */
   --radius-xs: 2px;

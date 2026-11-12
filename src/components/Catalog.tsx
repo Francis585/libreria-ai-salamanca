@@ -4,6 +4,7 @@ import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, EPOCHS, type Book } from '../data/
 import { searchBooks } from '../lib/semantic';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
+import { SectionLabel } from './SectionLabel';
 
 interface CatalogProps {
   onOpenBook: (book: Book) => void;
@@ -166,7 +167,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     <section id="catalogo" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 lg:px-10 lg:py-24">
       <div className="flex flex-col gap-8 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl">
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-clay">Catálogo</span>
+          <SectionLabel n="02">Catálogo</SectionLabel>
           <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
             Los libros que recomendamos
           </h2>
