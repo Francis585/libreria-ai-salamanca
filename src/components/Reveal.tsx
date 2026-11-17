@@ -16,6 +16,11 @@ type Props = {
   as?: 'div' | 'section' | 'li' | 'article' | 'header' | 'figure';
   /** id opcional para anclas (#seccion) */
   id?: string;
+  /** Atributos ARIA que se reenvían al nodo raíz. */
+  role?: string;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
+  'aria-describedby'?: string;
 };
 
 export const Reveal: React.FC<Props> = ({
@@ -24,7 +29,11 @@ export const Reveal: React.FC<Props> = ({
   y = 18,
   className = '',
   as: Tag = 'div',
-  id
+  id,
+  role,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
+  'aria-describedby': ariaDescribedby
 }) => {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -68,6 +77,10 @@ export const Reveal: React.FC<Props> = ({
       // @ts-expect-error ref polimórfico: el nodo siempre es un HTMLElement
       ref={ref}
       id={id}
+      role={role}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledby}
+      aria-describedby={ariaDescribedby}
       className={`reveal ${visible ? 'is-visible' : ''} ${className}`}
       style={
         {

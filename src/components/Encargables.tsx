@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, Loader2, Search, Truck, X } from 'lucide-react';
 import { SectionLabel } from './SectionLabel';
+import { Reveal } from './Reveal';
 
 /**
  * Fondo encargable.
@@ -142,15 +143,16 @@ export const Encargables: React.FC = () => {
   }, [meta, total, debounced]);
 
   return (
-    <section id="encargos" className="scroll-mt-24 border-y border-line bg-mist/40">
-      <div className="mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-24">
-        <div className="flex flex-col gap-6 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
+    <section id="encargos" className="relative scroll-mt-24 overflow-hidden border-y border-paper/10 bg-ink text-paper">
+      <div aria-hidden="true" className="hero-ink pointer-events-none absolute inset-0" />
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-24">
+        <Reveal className="flex flex-col gap-6 border-b border-paper/15 pb-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <SectionLabel n="04">Encargos</SectionLabel>
-            <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
+            <SectionLabel n="04" tono="oscuro">Encargos</SectionLabel>
+            <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-paper">
               Todo lo que se publica en España
             </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-warm">
+            <p className="mt-4 text-sm leading-relaxed text-paper/60">
               Arriba está el fondo de la sala, con su ficha y su ejemplar. Aquí va el resto del
               catálogo español: lo que escriben autores de aquí y lo que se traduce, siempre en
               edición castellana. Te lo conseguimos y llega en dos o cuatro días.
@@ -158,34 +160,34 @@ export const Encargables: React.FC = () => {
           </div>
 
           <div className="w-full md:w-[360px]">
-            <label htmlFor="encargos-busqueda" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+            <label htmlFor="encargos-busqueda" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-paper/45">
               Buscar en los encargos
             </label>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-paper/40" />
               <input
                 id="encargos-busqueda"
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Título, autor o editorial"
-                className="w-full rounded-lg border border-line bg-paper py-3 pl-10 pr-10 text-sm text-ink placeholder-muted/80 outline-none transition-colors focus:border-clay/60"
+                className="w-full rounded-lg border border-paper/20 bg-paper/[0.06] py-3 pl-10 pr-10 text-sm text-paper placeholder-paper/35 outline-none transition-colors focus:border-clay/70 focus:bg-paper/10"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery('')}
                   aria-label="Borrar búsqueda"
-                  className="absolute right-2.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded text-muted hover:bg-line/60 hover:text-ink"
+                  className="absolute right-2.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded text-paper/50 hover:bg-paper/10 hover:text-paper"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Qué enseñar">
+        <Reveal delay={120} className="mt-5 flex flex-wrap items-center gap-2" role="group" aria-label="Qué enseñar">
           {[
             { key: 'siglo21' as const, label: 'Siglo XXI' },
             { key: 'novedades' as const, label: 'Últimas novedades' },
@@ -199,62 +201,70 @@ export const Encargables: React.FC = () => {
                 aria-pressed={activo}
                 onClick={() => setVista(opcion.key)}
                 className={`rounded-md border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
-                  activo ? 'border-bark bg-bark text-paper' : 'border-line bg-paper text-muted-warm hover:border-muted/40'
+                  activo
+                    ? 'border-paper bg-paper text-ink'
+                    : 'border-paper/20 bg-transparent text-paper/55 hover:border-paper/45 hover:text-paper'
                 }`}
               >
                 {opcion.label}
               </button>
             );
           })}
-        </div>
+        </Reveal>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+          <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-paper/45">
             <Truck className="h-3 w-3 text-clay" />
             {resumen}
           </p>
-          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted/70">
+          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-paper/30">
             · ediciones en castellano · precio orientativo: te lo confirmamos al preparar el pedido
           </span>
         </div>
 
         {error && (
-          <p className="mt-8 rounded-lg border border-line bg-paper p-4 text-[12.5px] text-muted-warm">
+          <p className="mt-8 rounded-lg border border-paper/20 bg-paper/[0.06] p-4 text-[12.5px] text-paper/70">
             No hemos podido cargar los encargos ahora mismo. Escríbenos a {CORREO} y lo buscamos a mano.
           </p>
         )}
 
         {!error && libros.length === 0 && cargando && (
-          <p className="mt-10 flex items-center gap-2 text-[13px] text-muted">
+          <p className="mt-10 flex items-center gap-2 text-[13px] text-paper/50">
             <Loader2 className="h-4 w-4 animate-spin" /> Consultando el catálogo…
           </p>
         )}
 
         {!error && libros.length === 0 && !cargando && (
-          <div className="mt-10 rounded-lg border border-dashed border-line px-6 py-12 text-center">
-            <p className="font-display text-xl font-semibold text-ink">No hay nada con ese nombre</p>
-            <p className="mx-auto mt-2 max-w-md text-[12.5px] leading-relaxed text-muted-warm">
+          <div className="mt-10 rounded-lg border border-dashed border-paper/20 px-6 py-12 text-center">
+            <p className="font-display text-xl font-semibold text-paper">No hay nada con ese nombre</p>
+            <p className="mx-auto mt-2 max-w-md text-[12.5px] leading-relaxed text-paper/55">
               Lo encargamos igual: si existe en España, lo conseguimos. Escríbenos y lo buscamos.
             </p>
           </div>
         )}
 
         <ul className="mt-8 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-6">
-          {libros.map((libro) => (
-            <li key={libro.id} className="group flex flex-col">
+          {libros.map((libro, i) => (
+            <Reveal
+              as="li"
+              key={libro.id}
+              delay={(i % 12) * 40}
+              y={14}
+              className="group flex flex-col"
+            >
               <MINIATURA libro={libro} />
-              <h3 className="mt-2.5 line-clamp-2 text-[12px] font-semibold leading-snug text-ink">
+              <h3 className="mt-2.5 line-clamp-2 text-[12px] font-semibold leading-snug text-paper">
                 {libro.titulo}
               </h3>
-              <p className="mt-0.5 truncate text-[11px] text-muted">{libro.autor ?? 'Autoría sin datos'}</p>
-              <p className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-muted/80">
+              <p className="mt-0.5 truncate text-[11px] text-paper/50">{libro.autor ?? 'Autoría sin datos'}</p>
+              <p className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.08em] text-paper/35">
                 {libro.editorial ?? '—'} · {libro.anio ?? 's. f.'}
               </p>
               {libro.precio !== null && (
-                <p className="mt-1 text-[11.5px] font-semibold text-ink">
+                <p className="mt-1 text-[11.5px] font-semibold text-paper">
                   {Number(libro.precio).toFixed(2).replace('.', ',')} €
                   {libro.precio_origen === 'estimado' && (
-                    <span className="ml-1 font-mono text-[10px] font-normal uppercase tracking-[0.06em] text-muted">
+                    <span className="ml-1 font-mono text-[10px] font-normal uppercase tracking-[0.06em] text-paper/40">
                       orient.
                     </span>
                   )}
@@ -267,7 +277,7 @@ export const Encargables: React.FC = () => {
               >
                 Encargar <ArrowUpRight className="h-3 w-3" />
               </button>
-            </li>
+            </Reveal>
           ))}
         </ul>
 
@@ -277,7 +287,7 @@ export const Encargables: React.FC = () => {
               type="button"
               onClick={() => void cargar(pagina + 1, false)}
               disabled={cargando}
-              className="inline-flex items-center gap-2 rounded-lg border border-line bg-paper px-5 py-2.5 text-xs font-semibold text-ink transition-colors hover:border-ink/25 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg border border-paper/25 px-5 py-2.5 text-xs font-semibold text-paper transition-colors hover:border-paper/60 hover:bg-paper/5 disabled:opacity-60"
             >
               {cargando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
               Cargar más encargos

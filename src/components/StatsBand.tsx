@@ -26,18 +26,18 @@ const CIFRAS: Cifra[] = [
 ];
 
 export const StatsBand: React.FC = () => (
-  <section aria-label="La librería en cifras" className="border-y border-line bg-mist/60">
+  <section aria-label="La librería en cifras" className="border-y border-paper/10 bg-ink">
     <div className="mx-auto grid max-w-6xl grid-cols-2 gap-y-6 px-5 py-6 sm:grid-cols-3 lg:grid-cols-5">
       {CIFRAS.map((c, i) => (
         <Reveal key={c.etiqueta} delay={i * 70} y={12} className="px-1">
-          <p className="font-display text-2xl font-semibold leading-none tabular-nums text-ink sm:text-3xl">
+          <p className="font-display text-2xl font-semibold leading-none tabular-nums text-paper sm:text-3xl">
             {c.texto ?? <CountUp valor={c.valor} />}
           </p>
-          <p className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted">
+          <p className="mt-1.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-paper/45">
             {c.etiqueta}
           </p>
           {c.nota && (
-            <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted/70">{c.nota}</p>
+            <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-paper/30">{c.nota}</p>
           )}
         </Reveal>
       ))}

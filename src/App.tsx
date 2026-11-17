@@ -5,11 +5,13 @@ import PORTADAS from './data/portadas.json';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { StatsBand } from './components/StatsBand';
+import { ShelfMarquee } from './components/ShelfMarquee';
 import { TopRatings } from './components/TopRatings';
 import { Ticker } from './components/Ticker';
 import { ReadProgress } from './components/ReadProgress';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
+import { Manifesto } from './components/Manifesto';
 import { Encargables } from './components/Encargables';
 import { Asistente } from './components/Asistente';
 import { Events } from './components/Events';
@@ -156,18 +158,18 @@ export default function App() {
         Saltar al catálogo
       </a>
 
-      <div className="border-b border-line bg-mist/70">
-        <div className="mx-auto hidden max-w-7xl items-center justify-center gap-x-5 px-5 py-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-muted-warm sm:flex lg:px-10">
+      <div className="border-b border-paper/10 bg-ink">
+        <div className="mx-auto hidden max-w-7xl items-center justify-center gap-x-5 px-5 py-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-paper/45 sm:flex lg:px-10">
           <span className="flex items-center gap-1.5 whitespace-nowrap">
             <Truck className="h-3 w-3 text-clay" />
             Envío gratis desde 35 €
           </span>
-          <span className="h-2.5 w-px bg-line" />
+          <span className="h-2.5 w-px bg-paper/15" />
           <span className="whitespace-nowrap">Entrega en 24–48 h en toda España</span>
-          <span className="h-2.5 w-px bg-line" />
+          <span className="h-2.5 w-px bg-paper/15" />
           <span className="whitespace-nowrap">Atención al lector por correo y teléfono</span>
         </div>
-        <p className="flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-warm sm:hidden">
+        <p className="flex items-center justify-center gap-1.5 whitespace-nowrap px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-paper/45 sm:hidden">
           <Truck className="h-2.5 w-2.5 text-clay" />
           Envío gratis desde 35 € · Entrega en 24–48 h
         </p>
@@ -180,6 +182,7 @@ export default function App() {
       <main>
         <Hero destacados={destacados} onOpenBook={abrirLibro} onAdd={addToCart} />
         <StatsBand />
+        <ShelfMarquee onOpenBook={abrirLibro} />
 
         {/* Tres garantías: en una tienda online sustituyen a la confianza del mostrador */}
         <div className="border-y border-line bg-paper">
@@ -202,6 +205,7 @@ export default function App() {
         <TopRatings onOpenBook={abrirLibro} />
         <Oracle onOpenBook={abrirLibro} onAdd={addToCart} />
         <Catalog onOpenBook={abrirLibro} onAdd={addToCart} />
+        <Manifesto />
         <Encargables />
         <Events />
         
