@@ -57,7 +57,7 @@ const MINIATURA: React.FC<{ libro: Encargable }> = ({ libro }) => {
     <div className="flex aspect-[3/4.1] w-full flex-col justify-between overflow-hidden rounded-[3px] bg-bark p-3 ring-1 ring-line">
       <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-paper/40">{libro.anio ?? 's. f.'}</span>
       <span className="line-clamp-3 font-display text-[12px] font-semibold leading-tight text-paper">{libro.titulo}</span>
-      <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-clay">{inicial}</span>
+      <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-mustard">{inicial}</span>
     </div>
   );
 };
@@ -143,7 +143,8 @@ export const Encargables: React.FC = () => {
   }, [meta, total, debounced]);
 
   return (
-    <section id="encargos" className="relative scroll-mt-24 overflow-hidden border-y border-paper/10 bg-ink text-paper">
+    <section id="encargos" className="relative scroll-mt-24 overflow-hidden border-y border-paper/10 bg-terra-deep text-paper">
+      <div aria-hidden="true" className="stripes" />
       <div aria-hidden="true" className="hero-ink pointer-events-none absolute inset-0" />
       <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-24">
         <Reveal className="flex flex-col gap-6 border-b border-paper/15 pb-8 md:flex-row md:items-end md:justify-between">
@@ -171,7 +172,7 @@ export const Encargables: React.FC = () => {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Título, autor o editorial"
-                className="w-full rounded-lg border border-paper/20 bg-paper/[0.06] py-3 pl-10 pr-10 text-sm text-paper placeholder-paper/35 outline-none transition-colors focus:border-clay/70 focus:bg-paper/10"
+                className="w-full rounded-lg border border-paper/20 bg-paper/[0.06] py-3 pl-10 pr-10 text-sm text-paper placeholder-paper/35 outline-none transition-colors focus:border-mustard/70 focus:bg-paper/10"
               />
               {query && (
                 <button
@@ -214,7 +215,7 @@ export const Encargables: React.FC = () => {
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-paper/45">
-            <Truck className="h-3 w-3 text-clay" />
+            <Truck className="h-3 w-3 text-mustard" />
             {resumen}
           </p>
           <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-paper/30">
@@ -273,7 +274,7 @@ export const Encargables: React.FC = () => {
               <button
                 type="button"
                 onClick={() => encargar(libro)}
-                className="mt-2 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-clay opacity-0 transition-opacity hover:underline group-hover:opacity-100 focus-visible:opacity-100"
+                className="mt-2 inline-flex items-center gap-1 self-start text-[11px] font-semibold text-mustard opacity-0 transition-opacity hover:underline group-hover:opacity-100 focus-visible:opacity-100"
               >
                 Encargar <ArrowUpRight className="h-3 w-3" />
               </button>

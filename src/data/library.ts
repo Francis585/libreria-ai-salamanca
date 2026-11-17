@@ -513,14 +513,14 @@ export function booksByIds(ids: string[]): Book[] {
 
 /** Un color por materia: tiñe el punto de los filtros y la etiqueta de cada ficha. */
 export const CATEGORY_ACCENTS: Record<Category, string> = {
-  'Clásicos Salmantinos': '#3b3bf5',
-  'Humanismo & Ciencia': '#0f766e',
-  'Narrativa Contemporánea': '#4f46e5',
-  'Ensayo & Pensamiento IA': '#1d4ed8',
-  Poesía: '#a21caf',
-  'Novela & Aventura': '#0e7490',
-  'Misterio & Policíaco': '#3730a3',
-  Teatro: '#c2410c',
-  Novedades: '#3b3bf5',
-  'Infantil & Juvenil': '#15803d',
+  'Clásicos Salmantinos': '#2f36d6',
+  'Humanismo & Ciencia': '#2b6863',
+  'Narrativa Contemporánea': '#6a3d5c',
+  'Ensayo & Pensamiento IA': '#2f36d6',
+  Poesía: '#b0523a',
+  'Novela & Aventura': '#2b6863',
+  'Misterio & Policíaco': '#3b2233',
+  Teatro: '#b0523a',
+  Novedades: '#b3822c',
+  'Infantil & Juvenil': '#5c6a3b',
 };

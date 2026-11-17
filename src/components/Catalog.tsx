@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpDown, BookOpen, Search, ShoppingBag, SlidersHorizontal, Star, X } from 'lucide-react';
 import { BOOKS, CATEGORIES, CATEGORY_ACCENTS, EPOCHS, type Book } from '../data/library';
-import { getRealRating } from '../data/ratings';
+import { getValoracion, NOMBRE_FUENTE } from '../data/valoraciones';
 import { searchBooks } from '../lib/semantic';
 import { useStock } from '../lib/useStock';
 import { BookCover } from './BookCover';
@@ -95,7 +95,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     if (precio === 'menos15' && book.price >= 15) return false;
     if (precio === '15a25' && (book.price < 15 || book.price > 25)) return false;
     if (precio === 'mas25' && book.price <= 25) return false;
-    if (notaMinima > 0 && book.rating < notaMinima) return false;
+    if (notaMinima > 0 && (getValoracion(book.id)?.average ?? 0) < notaMinima) return false;
     if (formato !== 'todos' && !book.format.toLowerCase().includes(formato === 'tapa' ? 'tapa dura' : formato === 'rustica' ? 'rústica' : 'bolsillo')) return false;
     if (soloDisponibles && stock[book.id] === 0) return false;
     return true;
@@ -138,13 +138,13 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
         break;
       case 'valoracion':
         sorted.sort((a, b) => {
-          const ra = getRealRating(a.id);
-          const rb = getRealRating(b.id);
-          // Primero las que tienen votos reales, de mejor a peor; el resto, por nota de la casa.
+          const ra = getValoracion(a.id);
+          const rb = getValoracion(b.id);
+          // Primero las que tienen votos reales, de mejor a peor; el resto, al final.
           if (ra && !rb) return -1;
           if (!ra && rb) return 1;
-          const va = ra?.average ?? a.rating;
-          const vb = rb?.average ?? b.rating;
+          const va = ra?.average ?? 0;
+          const vb = rb?.average ?? 0;
           return vb - va || a.title.localeCompare(b.title, 'es');
         });
         break;
@@ -177,7 +177,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     <section id="catalogo" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 lg:px-10 lg:py-24">
       <div className="flex flex-col gap-8 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl">
-          <SectionLabel n="03">Catálogo</SectionLabel>
+          <SectionLabel n="03" tono="plum">Catálogo</SectionLabel>
           <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
             Los libros que recomendamos
           </h2>
@@ -507,7 +507,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             return (
             <article
               key={book.id}
-              className="card-lift group flex flex-col animate-fade-up"
+              className="card-lift tilt-card tilt-card group flex flex-col animate-fade-up"
               style={{ animationDelay: `${Math.min(index, 6) * 45}ms` }}
             >
               <div className="relative">
@@ -549,20 +549,20 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                     {book.category}
                   </span>
                   {(() => {
-                    const real = getRealRating(book.id);
+                    const real = getValoracion(book.id);
                     return (
                       <span
                         className="flex items-center gap-1 font-mono text-[10px] text-muted"
                         title={
                           real
-                            ? `Media de ${real.count} votos de lectores en Open Library`
-                            : 'Nota que le pone el equipo de la librería'
+                            ? `${real.count} votos de lectores en ${NOMBRE_FUENTE[real.source]}`
+                            : 'Este libro todavía no tiene valoraciones de lectores'
                         }
                       >
-                        <Star className="h-3 w-3 fill-gold text-gold" />
-                        {(real?.average ?? book.rating).toFixed(1)}
+                        <Star className={`h-3 w-3 ${real ? 'fill-gold text-gold' : 'text-line'}`} />
+                        {real ? real.average.toFixed(1) : '—'}
                         <span className="text-[9px] uppercase tracking-[0.1em]">
-                          {real ? `${real.count}` : 'casa'}
+                          {real ? real.count.toLocaleString('es-ES') : 'sin votos'}
                         </span>
                       </span>
                     );

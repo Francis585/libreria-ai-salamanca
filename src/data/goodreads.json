@@ -1,0 +1,86 @@
+{
+  "nebrija-gramatica-1492": {
+    "average": 4.1,
+    "count": 15,
+    "url": "https://www.goodreads.com/book/show/242937701-gram-tica-de-la-lengua-castellana?from_search=true&from_srp=true&qid=AbeTAEojbW&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "celestina-rojas-1499": {
+    "average": 3.4,
+    "count": 27006,
+    "url": "https://www.goodreads.com/book/show/84307827-comedia-de-calisto-y-melibea?from_search=true&from_srp=true&qid=AxFIJtN2Tn&rank=2",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "vitoria-relectio-1539": {
+    "average": 4.1,
+    "count": 13,
+    "url": "https://www.goodreads.com/book/show/23346501-de-indis-et-de-iure-belli-relectiones?from_search=true&from_srp=true&qid=3QoB1g0C00&rank=3",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "luis-leon-nombres-1583": {
+    "average": 4,
+    "count": 42,
+    "url": "https://www.goodreads.com/book/show/61800769-colecci-n-fray-luis-de-le-n-de-los-nombres-de-cristo?from_search=true&from_srp=true&qid=oEvOeO5F8p&rank=3",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "lazarillo-tormes-1554": {
+    "average": 3.5,
+    "count": 37965,
+    "url": "https://www.goodreads.com/book/show/62600524-el-lazarillo-de-tormes-original?from_search=true&from_srp=true&qid=tHeeLt0xss&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "huarte-examen-1575": {
+    "average": 3.9,
+    "count": 11,
+    "url": "https://www.goodreads.com/book/show/4235381-examen-de-ingenios-para-las-ciencias-pensamiento?from_search=true&from_srp=true&qid=QTwqGHaTyf&rank=3",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "suarez-tractatus-1612": {
+    "average": 4.8,
+    "count": 1,
+    "url": "https://www.goodreads.com/book/show/15132917-tractatus-de-legibus-ac-deo-legislatore-liber-v-de-varietate-legum-hum?from_search=true&from_srp=true&qid=nRyz33MCSZ&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "unamuno-sentimiento-1912": {
+    "average": 4,
+    "count": 2589,
+    "url": "https://www.goodreads.com/book/show/145204915-del-sentimiento-tragico-de-la-vida-en-los-hombres-y-en-los-pueblos-y-tra?from_search=true&from_srp=true&qid=cDLiUshDiU&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "unamuno-niebla-1914": {
+    "average": 4.1,
+    "count": 26262,
+    "url": "https://www.goodreads.com/book/show/30122015-niebla---miguel-de-unamuno-con-notas-biograf-a?from_search=true&from_srp=true&qid=BlQ8eEuXpD&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "martin-gaite-cuarto-1978": {
+    "average": 3.6,
+    "count": 4839,
+    "url": "https://www.goodreads.com/book/show/420260.El_cuarto_de_atr_s?from_search=true&from_srp=true&qid=LYFsn1ibot&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "clarin-regenta-1885": {
+    "average": 4,
+    "count": 6392,
+    "url": "https://www.goodreads.com/book/show/49255373-la-regenta?from_search=true&from_srp=true&qid=8BB9TWZH1E&rank=1",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  },
+  "galdos-fortunata-1887": {
+    "average": 4.3,
+    "count": 3192,
+    "url": "https://www.goodreads.com/book/show/75651086-fortunata-y-jacinta?from_search=true&from_srp=true&qid=C54h1b6mCv&rank=2",
+    "source": "goodreads",
+    "fetched": "2026-11-17"
+  }
+}

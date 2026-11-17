@@ -189,7 +189,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
   };
 
   return (
-    <section id={SECCION_IA.ancla} className="relative overflow-hidden border-y border-paper/10 bg-ink text-paper">
+    <section id={SECCION_IA.ancla} className="relative overflow-hidden border-y border-paper/10 bg-olive-deep text-paper">
       <div
         aria-hidden="true"
         className="absolute inset-0 opacity-[0.045]"
@@ -201,18 +201,18 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
       />
       <div
         aria-hidden="true"
-        className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-clay/15 blur-3xl"
+        className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-mustard/15 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-6xl px-5 py-20 lg:px-10 lg:py-24">
         <div className="max-w-2xl">
-          <SectionLabel n="01">El librero</SectionLabel>
-          <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-clay/25 bg-clay/15 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-gold">
+          <SectionLabel n="01" tono="mustard">El librero</SectionLabel>
+          <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-mustard/25 bg-mustard/15 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-mustard">
             <Sparkles className="h-3 w-3" />
             Recomendación de la casa
           </span>
           <h2 className="mt-5 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-paper">
-            Dinos qué te pasa. <span className="italic text-gold">Te damos un libro.</span>
+            Dinos qué te pasa. <span className="italic text-mustard">Te damos un libro.</span>
           </h2>
           <p className="mt-5 max-w-xl text-sm leading-relaxed text-paper/65 sm:text-[15px]">
             El librero no inventa títulos: elige entre las {BOOKS.length} obras de
@@ -236,7 +236,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Ej. una novela corta para el tren, o algo sobre la Escuela de Salamanca"
-              className="w-full rounded-lg border border-paper/15 bg-paper/10 px-4 py-3.5 text-[15px] text-paper placeholder-muted/80 outline-none transition-colors focus:border-clay/60"
+              className="w-full rounded-lg border border-paper/15 bg-paper/10 px-4 py-3.5 text-[15px] text-paper placeholder-muted/80 outline-none transition-colors focus:border-mustard/60"
             />
           </div>
 
@@ -249,7 +249,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                 id="oraculo-materia"
                 value={materia}
                 onChange={(event) => setMateria(event.target.value)}
-                className="w-full appearance-none rounded-lg border border-paper/15 bg-paper/10 px-3 py-3 text-[13px] text-paper outline-none transition-colors focus:border-clay/60"
+                className="w-full appearance-none rounded-lg border border-paper/15 bg-paper/10 px-3 py-3 text-[13px] text-paper outline-none transition-colors focus:border-mustard/60"
               >
                 <option value="">Todas las materias</option>
                 {materias.map((opcion) => (
@@ -272,7 +272,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                       aria-pressed={activo}
                       onClick={() => setMood(activo ? '' : opcion)}
                       className={`rounded-full border px-3 py-1.5 text-[11px] transition-colors ${
-                        activo ? 'border-clay bg-clay/[0.08] text-clay' : 'border-paper/15 text-paper/65 hover:border-muted/40 hover:text-paper'
+                        activo ? 'border-mustard bg-mustard/[0.08] text-mustard' : 'border-paper/15 text-paper/65 hover:border-muted/40 hover:text-paper'
                       }`}
                     >
                       {opcion}
@@ -290,7 +290,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-clay px-5 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-clay-deep disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-mustard px-5 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-mustard-deep disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -329,7 +329,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           <div ref={resultsRef} className="mt-10 scroll-mt-28 animate-fade-up">
             <div className="rounded-xl border border-gold/30 bg-paper/10 p-5 sm:p-6">
               <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-paper">
-                <Sparkles className="h-4 w-4 text-gold" />
+                <Sparkles className="h-4 w-4 text-mustard" />
                 Preferimos decírtelo
               </h3>
               <p className="mt-3 max-w-2xl text-[13px] leading-relaxed text-paper/65">
@@ -349,7 +349,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                           <button
                             type="button"
                             onClick={() => book && onOpenBook(book)}
-                            className="text-left text-[13px] text-paper underline decoration-gold/40 underline-offset-4 transition-colors hover:text-gold"
+                            className="text-left text-[13px] text-paper underline decoration-gold/40 underline-offset-4 transition-colors hover:text-mustard"
                           >
                             {item.title}
                             <span className="ml-2 text-[11px] no-underline text-paper/45">
@@ -374,7 +374,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
           <div ref={resultsRef} className="mt-10 scroll-mt-28 animate-fade-up">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-paper/15 pb-4">
               <h3 className="flex items-center gap-2 font-display text-2xl font-semibold text-paper">
-                <Sparkles className="h-4 w-4 text-gold" />
+                <Sparkles className="h-4 w-4 text-mustard" />
                 {suggestions.length === 1 ? 'Un libro del fondo' : `${suggestions.length} libros del fondo`}
               </h3>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-paper/45">
@@ -394,7 +394,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
               {suggestions.map(({ book, rationale, glossary }, index) => (
                 <article
                   key={book.id}
-                  className="group flex flex-col rounded-xl border border-paper/15 bg-paper/10 p-4 transition-colors hover:border-clay/50"
+                  className="group flex flex-col rounded-xl border border-paper/15 bg-paper/10 p-4 transition-colors hover:border-mustard/50"
                   style={{ animationDelay: `${index * 70}ms` }}
                 >
                   <div className="flex gap-3">
@@ -407,11 +407,11 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                       <BookCover book={book} compact className="aspect-[3/4.2] w-full" />
                     </button>
                     <div className="min-w-0">
-                      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gold/90">
+                      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-mustard/90">
                         {book.category}
                       </p>
                       <h4 className="mt-1 font-display text-lg font-semibold leading-tight text-paper">
-                        <button type="button" onClick={() => onOpenBook(book)} className="text-left hover:text-gold">
+                        <button type="button" onClick={() => onOpenBook(book)} className="text-left hover:text-mustard">
                           {book.title}
                         </button>
                       </h4>
@@ -430,7 +430,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     <ul className="mt-3 space-y-1">
                       {glossary.map((entry) => (
                         <li key={entry} className="text-[11px] leading-snug text-paper/45">
-                          <span className="text-gold/80">·</span> {entry}
+                          <span className="text-mustard/80">·</span> {entry}
                         </li>
                       ))}
                     </ul>
@@ -440,7 +440,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     <button
                       type="button"
                       onClick={() => onAdd(book)}
-                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-[11px] font-bold text-paper transition-colors hover:bg-gold-deep"
+                      className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-mustard px-3 py-2 text-[11px] font-bold text-paper transition-colors hover:bg-mustard-deep"
                     >
                       <ShoppingBag className="h-3.5 w-3.5" />
                       Añadir
@@ -448,7 +448,7 @@ export const Oracle: React.FC<OracleProps> = ({ onOpenBook, onAdd }) => {
                     <button
                       type="button"
                       onClick={() => onOpenBook(book)}
-                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-paper/15 px-3 py-2 text-[11px] font-semibold text-paper transition-colors hover:border-clay/50"
+                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-paper/15 px-3 py-2 text-[11px] font-semibold text-paper transition-colors hover:border-mustard/50"
                     >
                       Ficha
                       <ArrowRight className="h-3 w-3" />

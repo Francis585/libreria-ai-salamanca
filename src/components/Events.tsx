@@ -168,7 +168,7 @@ export const Events: React.FC = () => {
             return (
               <article
                 key={event.id}
-                className="group flex flex-col rounded-xl border border-line bg-paper p-5 transition-all hover:-translate-y-0.5 hover:border-clay/35 hover:shadow-[0_18px_36px_-28px_rgba(45,40,34,0.6)]"
+                className="group flex flex-col rounded-xl border border-line bg-paper p-5 tilt-card transition-all hover:border-clay/35 hover:shadow-[0_18px_36px_-28px_rgba(45,40,34,0.6)]"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-baseline gap-2">

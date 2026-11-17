@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUpRight, Star } from 'lucide-react';
 import { BOOKS, CATEGORY_ACCENTS, type Book } from '../data/library';
 import { Reveal } from './Reveal';
-import { getRealRating } from '../data/ratings';
+import { getValoracion } from '../data/valoraciones';
 import { SectionLabel } from './SectionLabel';
 
 interface TopRatingsProps {
@@ -22,8 +22,8 @@ export const TopRatings: React.FC<TopRatingsProps> = ({ onOpenBook }) => {
   const MEDIA_CATALOGO = 4;
   const ponderada = (average: number, count: number) => (average * count + MEDIA_CATALOGO * PESO) / (count + PESO);
 
-  const filas = BOOKS.map((libro) => ({ libro, real: getRealRating(libro.id) }))
-    .filter((fila): fila is { libro: Book; real: NonNullable<ReturnType<typeof getRealRating>> } => Boolean(fila.real) && fila.real!.count >= 3)
+  const filas = BOOKS.map((libro) => ({ libro, real: getValoracion(libro.id) }))
+    .filter((fila): fila is { libro: Book; real: NonNullable<ReturnType<typeof getValoracion>> } => Boolean(fila.real) && fila.real!.count >= 3)
     .sort((a, b) => ponderada(b.real.average, b.real.count) - ponderada(a.real.average, a.real.count))
     .slice(0, 8);
 
@@ -35,7 +35,7 @@ export const TopRatings: React.FC<TopRatingsProps> = ({ onOpenBook }) => {
       <div className="mx-auto max-w-7xl px-5 py-14 lg:px-10 lg:py-20">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <SectionLabel n="02">Clasificación de lectores</SectionLabel>
+            <SectionLabel n="02" tono="terra">Clasificación de lectores</SectionLabel>
             <h2 className="mt-4 max-w-[24ch] font-display text-[clamp(1.9rem,3.6vw,2.9rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-ink">
               Lo que de verdad puntúan los lectores.
             </h2>

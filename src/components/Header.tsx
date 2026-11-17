@@ -38,8 +38,8 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch 
     <header
       className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         scrolled
-          ? 'border-paper/10 bg-ink/95 backdrop-blur-md shadow-[0_1px_0_rgba(243,238,227,0.06)]'
-          : 'border-transparent bg-ink'
+          ? 'border-paper/10 bg-forest/95 backdrop-blur-md shadow-[0_1px_0_rgba(243,238,227,0.06)]'
+          : 'border-transparent bg-forest'
       }`}
     >
       <div className="mx-auto flex h-[70px] max-w-7xl items-center justify-between gap-4 px-5 lg:px-10">
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount, onOpenCart, onSearch 
       </div>
 
       {mobileOpen && (
-        <div id="menu-movil" className="border-t border-paper/10 bg-ink px-5 pb-5 pt-2 lg:hidden animate-fade-in">
+        <div id="menu-movil" className="border-t border-paper/10 bg-forest px-5 pb-5 pt-2 lg:hidden animate-fade-in">
           <nav className="flex flex-col divide-y divide-paper/10 text-sm">
             {LINKS.map((link) => (
               <a

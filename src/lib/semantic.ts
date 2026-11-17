@@ -1,3 +1,4 @@
+import { getValoracion } from '../data/valoraciones';
 import { BOOKS, type Book } from '../data/library';
 
 export interface SearchResult {
@@ -260,7 +261,7 @@ export function localRecommendations(query = '', mood = '', count = 3, temas: st
     .sort((a, b) => b.score - a.score);
 
   if (results.length === 0) {
-    return BOOKS.filter((b) => b.badge === 'Recomendado' || b.rating >= 4.9)
+    return BOOKS.filter((b) => b.badge === 'Recomendado' || (getValoracion(b.id)?.average ?? 0) >= 4.3)
       .slice(0, count)
       .map((book) => ({
         book,

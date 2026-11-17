@@ -132,6 +132,16 @@ async function portadaEspanola(titulo, autor) {
     const url = `https://covers.openlibrary.org/b/id/${obra.cover_i}-L.jpg`;
     if (await imagenValida(url)) return url;
   }
+  // 4. Sin edición española localizada: se acepta la portada de la obra en
+  //    cualquier idioma solo si el título coincide casi palabra por palabra.
+  for (const obra of obras) {
+    if (!obra.cover_i) continue;
+    const a = normaliza(titulo).split(' ').filter((w) => w.length > 3);
+    const b = normaliza(obra.title ?? '');
+    if (a.length && a.filter((w) => b.includes(w)).length / a.length < 0.8) continue;
+    const url = `https://covers.openlibrary.org/b/id/${obra.cover_i}-L.jpg`;
+    if (await imagenValida(url)) return url;
+  }
   return null;
 }
 

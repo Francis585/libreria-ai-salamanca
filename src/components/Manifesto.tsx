@@ -37,14 +37,15 @@ export const Manifesto: React.FC = () => {
     <section
       id="manifiesto"
       aria-label="Cómo trabaja la librería"
-      className="relative overflow-hidden border-y border-paper/10 bg-ink text-paper"
+      className="relative overflow-hidden border-y border-paper/10 bg-plum-deep text-paper"
     >
-      <div aria-hidden="true" className="hero-ink pointer-events-none absolute inset-0" />
+      <div aria-hidden="true" className="band-plum pointer-events-none absolute inset-0" />
+      <div aria-hidden="true" className="stripes" />
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-5 py-20 lg:grid-cols-12 lg:gap-14 lg:px-10 lg:py-28">
         <div className="lg:col-span-7">
           <Reveal className="flex items-center gap-3" y={10}>
-            <span aria-hidden="true" className="h-1.5 w-1.5 bg-clay" />
+            <span aria-hidden="true" className="h-1.5 w-1.5 bg-mustard" />
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-paper/55">
               Manifiesto de la casa
             </span>
@@ -78,7 +79,7 @@ export const Manifesto: React.FC = () => {
           <Reveal delay={300} className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#encargos"
-              className="group inline-flex items-center gap-2 rounded-lg bg-clay px-5 py-3 text-[13px] font-semibold text-white transition-all hover:bg-clay-deep hover:shadow-[0_12px_28px_-14px_rgba(59,59,245,0.85)]"
+              className="group inline-flex items-center gap-2 rounded-lg bg-mustard px-5 py-3 text-[13px] font-semibold text-white transition-all hover:bg-mustard-deep hover:shadow-[0_12px_28px_-14px_rgba(59,59,245,0.85)]"
             >
               Ver el fondo por encargo
               <ArrowDownRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:translate-y-0.5" />
@@ -120,7 +121,7 @@ export const Manifesto: React.FC = () => {
             </svg>
 
             <figcaption className="mt-6 flex items-start gap-2.5 border-t border-paper/15 pt-5">
-              <Quote className="mt-0.5 h-4 w-4 shrink-0 text-clay" />
+              <Quote className="mt-0.5 h-4 w-4 shrink-0 text-mustard" />
               <p className="font-serif text-[17px] italic leading-snug text-paper/80">
                 «Una librería no vende libros: encuentra el que te hace falta.»
               </p>
@@ -130,7 +131,7 @@ export const Manifesto: React.FC = () => {
           <ul className="mt-8 space-y-3">
             {REGLAS.map(([n, titulo, detalle], i) => (
               <Reveal as="li" key={n} delay={140 + i * 90} y={14} className="flex gap-3 border-t border-paper/10 pt-3">
-                <span className="mt-0.5 font-mono text-[10px] tracking-[0.16em] text-clay">{n}</span>
+                <span className="mt-0.5 font-mono text-[10px] tracking-[0.16em] text-mustard">{n}</span>
                 <span>
                   <strong className="block text-[12.5px] font-semibold text-paper">{titulo}</strong>
                   <span className="mt-0.5 block text-[11.5px] leading-relaxed text-paper/50">{detalle}</span>
@@ -151,7 +152,7 @@ export const Manifesto: React.FC = () => {
                   <span className="display-outline font-display text-[22px] font-semibold uppercase tracking-[0.02em] opacity-60">
                     {materia}
                   </span>
-                  <span aria-hidden="true" className="h-1 w-1 bg-clay/70" />
+                  <span aria-hidden="true" className="h-1 w-1 bg-mustard/70" />
                 </span>
               ))}
             </React.Fragment>

@@ -158,7 +158,7 @@ export default function App() {
         Saltar al catálogo
       </a>
 
-      <div className="border-b border-paper/10 bg-ink">
+      <div className="border-b border-paper/10 bg-forest">
         <div className="mx-auto hidden max-w-7xl items-center justify-center gap-x-5 px-5 py-2 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-paper/45 sm:flex lg:px-10">
           <span className="flex items-center gap-1.5 whitespace-nowrap">
             <Truck className="h-3 w-3 text-clay" />

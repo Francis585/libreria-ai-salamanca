@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ExternalLink, Loader2, Send, Star, ThumbsUp } from 'lucide-react';
-import { distribucionReal, getRealRating, SOURCE_URL } from '../data/ratings';
+import { ExternalLink, Loader2, Send, Star } from 'lucide-react';
+import { etiquetaVotos, getOpiniones, getValoracion, NOMBRE_FUENTE, reparto } from '../data/valoraciones';
 
 export interface Resena {
   id: number;
@@ -20,7 +20,7 @@ interface ResenasPayload {
 
 const VACIO: ResenasPayload = { resenas: [], total: 0, media: null, distribucion: [] };
 
-/** Opiniones de una obra. Si el endpoint no responde, la ficha sigue funcionando sin ellas. */
+/** Opiniones dejadas desde la propia web. Si el endpoint no responde, la ficha sigue igual. */
 export function useResenas(libroId: string | undefined) {
   const [data, setData] = useState<ResenasPayload>(VACIO);
   const [cargando, setCargando] = useState(false);
@@ -38,7 +38,7 @@ export function useResenas(libroId: string | undefined) {
       if (!res.ok) throw new Error(String(res.status));
       const json = (await res.json()) as ResenasPayload;
       setData({
-        resenas: json.resenas ?? [],
+        resenas: (json.resenas ?? []).filter((r) => r.origen === 'lector'),
         total: json.total ?? 0,
         media: json.media ?? null,
         distribucion: json.distribucion ?? []
@@ -71,15 +71,14 @@ const Estrellas: React.FC<{ valor: number; className?: string }> = ({ valor, cla
 
 interface ReviewsProps {
   libroId: string;
-  valoracionEditorial: number;
   /** Si la ficha ya pidió las opiniones, se reutilizan en vez de pedirlas otra vez. */
   datos?: ReturnType<typeof useResenas>;
 }
 
-export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, datos }) => {
+export const Reviews: React.FC<ReviewsProps> = ({ libroId, datos }) => {
   const propio = useResenas(datos ? undefined : libroId);
   const fuente = datos ?? propio;
-  const { resenas, total, media, distribucion, cargando, error, recargar } = fuente;
+  const { resenas, cargando, error, recargar } = fuente;
   const [nombre, setNombre] = useState('');
   const [puntos, setPuntos] = useState(5);
   const [texto, setTexto] = useState('');
@@ -87,10 +86,14 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
   const [fallo, setFallo] = useState<string | null>(null);
   const [enviada, setEnviada] = useState(false);
 
-  const real = getRealRating(libroId);
-  const reparto = real ? distribucionReal(real) : distribucion;
-  const mediaMostrada = real ? real.average : media ?? valoracionEditorial;
-  const maximo = Math.max(1, ...reparto.map((d) => d.cuantas));
+  const valoracion = getValoracion(libroId);
+  const opiniones = getOpiniones(libroId);
+  const barras = reparto(valoracion);
+  const maximo = Math.max(1, ...(barras?.map((d) => d.cuantas) ?? [0]));
+
+  // La media que se enseña es la de la fuente con más votos. Si no hay datos,
+  // no hay: no se rellena con una nota inventada.
+  const mediaMostrada = valoracion?.average ?? null;
 
   const enviar = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -132,50 +135,48 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
       {/* Resumen */}
       <div className="grid gap-5 rounded-xl border border-line bg-mist/40 p-4 sm:grid-cols-[196px_1fr]">
         <div className="flex flex-col items-center justify-center text-center">
-          <span className="text-4xl font-semibold leading-none tabular-nums text-ink">
-            {mediaMostrada.toFixed(1)}
-          </span>
-          <Estrellas valor={mediaMostrada} className="mt-1.5" />
-          {real ? (
+          {mediaMostrada === null ? (
             <>
-              <span className="mt-2 rounded-full bg-ink px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-paper">
-                Lectores reales
+              <span className="font-display text-3xl leading-none text-ink/25">—</span>
+              <span className="mt-2 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-clay">
+                Sin valoraciones
               </span>
-              <a
-                href={`${SOURCE_URL}${real.key}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="mt-1.5 inline-flex items-center gap-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-2 hover:text-ink"
-                title="Ver la ficha de la obra en Open Library"
-              >
-                {real.count} {real.count === 1 ? 'voto' : 'votos'} · Open Library
-                <ExternalLink className="h-2.5 w-2.5" />
-              </a>
-              <span className="mt-2 border-t border-line pt-2 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
-                Nota de la casa {valoracionEditorial.toFixed(1)}
+              <span className="mt-1.5 max-w-[150px] font-mono text-[10px] uppercase leading-relaxed tracking-[0.1em] text-muted">
+                Este título aún no tiene votos de lectores
               </span>
             </>
           ) : (
             <>
-              <span className="mt-2 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-clay">
-                Nota de la casa
+              <span className="font-display text-4xl font-semibold leading-none tnum text-ink">
+                {mediaMostrada.toFixed(1)}
               </span>
-              <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-                Sin valoraciones de lectores
+              <Estrellas valor={mediaMostrada} className="mt-1.5" />
+              <span className="mt-2 rounded-full bg-forest px-2 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.12em] text-paper">
+                Lectores reales
               </span>
+              <a
+                href={valoracion!.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="mt-1.5 inline-flex items-center gap-1 whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-2 hover:text-ink"
+                title={`Ver la ficha de la obra en ${NOMBRE_FUENTE[valoracion!.source]}`}
+              >
+                {etiquetaVotos(valoracion!)}
+                <ExternalLink className="h-2.5 w-2.5" />
+              </a>
             </>
           )}
         </div>
 
         <div className="space-y-1">
-          {reparto.length === 0 && (
+          {!barras && (
             <p className="py-4 text-[12px] leading-relaxed text-muted-warm">
-              Esta nota no es una media de usuarios: es la que le pone el equipo de la librería al
-              recomendar el título. Cuando alguien deje su opinión desde la ficha, aparecerá aquí con
-              su nombre y sin pasar por filtros.
+              {mediaMostrada === null
+                ? 'No hay una media de lectores que podamos enseñar sin inventarla. Cuando alguien vote, aparecerá aquí con su nombre.'
+                : `La media viene de ${NOMBRE_FUENTE[valoracion!.source]}, que no publica el reparto por estrellas. Los votos son de lectores, no de la librería.`}
             </p>
           )}
-          {reparto.map((fila) => (
+          {barras?.map((fila) => (
             <div key={fila.estrellas} className="flex items-center gap-2">
               <span className="w-3 font-mono text-[10px] text-muted">{fila.estrellas}</span>
               <Star className="h-2.5 w-2.5 fill-muted text-muted" />
@@ -185,14 +186,12 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
                   style={{ width: `${(fila.cuantas / maximo) * 100}%` }}
                 />
               </div>
-              <span className="w-4 text-right font-mono text-[10px] tabular-nums text-muted">
-                {fila.cuantas}
-              </span>
+              <span className="w-5 text-right font-mono text-[10px] tnum text-muted">{fila.cuantas}</span>
             </div>
           ))}
-          {real && (
+          {barras && (
             <p className="pt-2 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted">
-              Distribución de votos en Open Library
+              Reparto de votos en {NOMBRE_FUENTE[valoracion!.source]}
             </p>
           )}
         </div>
@@ -200,34 +199,61 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
 
       {error && (
         <p className="rounded-lg border border-line bg-mist/50 p-3 text-[11.5px] text-muted-warm">
-          No hemos podido cargar las opiniones ahora mismo. La ficha y la compra funcionan igual.
+          No hemos podido cargar las opiniones dejadas en la web. Las de lectores externos sí se ven.
         </p>
       )}
 
-      {/* Lista */}
+      {/* Opiniones escritas por lectores reales (Goodreads) */}
+      {opiniones.length > 0 && (
+        <section aria-label="Opiniones de lectores">
+          <h4 className="flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
+            Opiniones de lectores
+            <span className="text-muted">
+              {opiniones.length} · {NOMBRE_FUENTE.goodreads}
+            </span>
+          </h4>
+          <div className="mt-3 space-y-4">
+            {opiniones.slice(0, 8).map((opinion, indice) => (
+              <article key={`${opinion.nombre}-${indice}`} className="border-b border-line-soft pb-4 last:border-0 last:pb-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-bark font-mono text-[10px] font-semibold text-paper" aria-hidden="true">
+                    {opinion.nombre.trim().charAt(0).toUpperCase()}
+                  </span>
+                  <p className="text-[12.5px] font-semibold text-ink">{opinion.nombre}</p>
+                  {opinion.estrellas ? <Estrellas valor={opinion.estrellas} /> : null}
+                  {opinion.enlace && (
+                    <a
+                      href={opinion.enlace}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="ml-auto inline-flex items-center gap-1 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted hover:text-clay"
+                    >
+                      Ver en Goodreads <ExternalLink className="h-2.5 w-2.5" />
+                    </a>
+                  )}
+                </div>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted-warm">{opinion.texto}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Opiniones dejadas desde la web */}
       <div className="space-y-4">
         {cargando && (
           <p className="flex items-center gap-2 text-[12px] text-muted">
-            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Cargando opiniones…
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Cargando opiniones de la web…
           </p>
         )}
-
         {resenas.map((resena) => (
           <article key={resena.id} className="border-b border-line-soft pb-4 last:border-0 last:pb-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span
-                className="grid h-7 w-7 place-items-center rounded-full bg-bark font-mono text-[10px] font-semibold text-paper"
-                aria-hidden="true"
-              >
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-clay font-mono text-[10px] font-semibold text-paper" aria-hidden="true">
                 {resena.nombre.trim().charAt(0).toUpperCase()}
               </span>
               <p className="text-[12.5px] font-semibold text-ink">{resena.nombre}</p>
               <Estrellas valor={resena.valoracion} />
-              {resena.origen === 'casa' && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-clay/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-clay">
-                  <ThumbsUp className="h-2.5 w-2.5" /> Reseña de la casa
-                </span>
-              )}
               <time className="ml-auto font-mono text-[10px] uppercase tracking-[0.08em] text-muted">
                 {new Date(resena.creado_en).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
               </time>
@@ -241,7 +267,8 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
       <form onSubmit={enviar} className="rounded-xl border border-line p-4">
         <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink">Deja tu opinión</h4>
         <p className="mt-1 text-[11px] leading-relaxed text-muted">
-          Se publica con tu nombre. No pedimos correo ni registro.
+          Se publica con tu nombre, sin registro. Tu voto queda como opinión de esta web y no se suma a
+          la media de Goodreads.
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -289,9 +316,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, valoracionEditorial, 
             {enviando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             {enviando ? 'Enviando…' : 'Publicar opinión'}
           </button>
-          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">
-            {texto.length}/600
-          </span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">{texto.length}/600</span>
           {enviada && <span className="text-[11px] font-medium text-emerald-700">Publicada. Gracias.</span>}
           {fallo && <span className="text-[11px] font-medium text-clay">{fallo}</span>}
         </div>

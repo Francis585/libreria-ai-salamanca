@@ -2,31 +2,55 @@
 
 @theme {
   --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-serif: "Newsreader", ui-serif, Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   /* Superficies: papel cálido, no blanco de panel. La librería se lee como
      impreso; el blanco puro la dejaba con cara de admin. */
-  --color-paper: #f3eee3;
-  --color-mist: #eae3d5;
-  --color-parchment: #e0d7c5;
-  --color-line: #d8cfbc;
-  --color-line-soft: #e6dfd2;
+  --color-paper: #f8f3e9;
+  --color-mist: #efe7d6;
+  --color-parchment: #e4dac5;
+  --color-line: #d7cbb2;
+  --color-line-soft: #e8dfcc;
 
   /* Tinta cálida */
-  --color-ink: #14120e;
-  --color-bark: #14120e;
-  --color-bark-soft: #211d17;
+  --color-ink: #191309;
+  --color-bark: #191309;
+  --color-bark-soft: #262019;
 
-  /* Acento único: cobalto */
-  --color-clay: #3b3bf5;
-  --color-clay-deep: #2b2bd6;
-  --color-gold: #3b3bf5;
-  --color-gold-deep: #2b2bd6;
+  /* Cobalto de la casa */
+  --color-clay: #2f36d6;
+  --color-clay-deep: #242ab4;
+  --color-gold: #2f36d6;
+  --color-gold-deep: #242ab4;
 
-  --color-muted: #6f6a62;
-  --color-muted-warm: #4a453d;
+  /* Banda oscura: verde botella de tela de libro, no negro de pantalla */
+  --color-forest: #14211b;
+  --color-forest-soft: #1d2f27;
+
+  /* Los otros colores de la casa: cada capítulo tiene el suyo, como los
+     tejidos de las encuadernaciones. Se usan en etiquetas, filetes y
+     subrayados, nunca en bloques grandes de texto. */
+  --color-terra: #b0523a;
+  --color-olive: #5c6a3b;
+  --color-mustard: #b3822c;
+  --color-plum: #6a3d5c;
+  --color-teal: #2b6863;
+  --color-terra-deep: #7a3020;
+  --color-plum-deep: #3b2233;
+  --color-olive-deep: #3c4526;
+  --color-mustard-deep: #7a5618;
+
+  /* Versiones aclaradas para leer sobre las bandas oscuras. */
+  --color-terra-light: #e08a6b;
+  --color-olive-light: #a3b573;
+  --color-mustard-light: #e0b25c;
+  --color-plum-light: #c99ab8;
+  --color-teal-light: #7fc4bd;
+
+  --color-muted: #6e675b;
+  --color-muted-warm: #453e32;
 
   /* Radios secos, sin pastilla de libro antiguo */
   --radius-xs: 2px;
@@ -51,14 +75,32 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Titulares en serif editorial; el texto de interfaz sigue en sans. */
   h1,
-  h2,
+  h2 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 30, "WONK" 1;
+    letter-spacing: -0.032em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-variation-settings: "SOFT" 18, "WONK" 1;
+    letter-spacing: -0.042em;
+  }
+
   h3 {
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
-    background-color: rgb(59 59 245 / 0.18);
+    background-color: rgb(47 54 214 / 0.16);
   }
 
   :focus-visible {
@@ -101,15 +143,22 @@
 }
 
 /* Cobalto legible sobre negro: el acento puro no alcanza contraste */
+.bg-plum-deep .text-clay,
+.bg-terra-deep .text-clay,
 .bg-bark .text-clay,
 .bg-bark-soft .text-clay,
 .bg-bark .text-gold,
+.bg-forest .text-clay,
+.bg-forest .text-gold,
 .bg-ink .text-clay,
 .bg-ink .text-gold {
   color: #a9a9ff;
 }
 
+.bg-plum-deep .border-clay,
+.bg-terra-deep .border-clay,
 .bg-bark .border-clay,
+.bg-forest .border-clay,
 .bg-ink .border-clay {
   border-color: rgb(169 169 255 / 0.45);
 }
@@ -136,10 +185,54 @@
   background-size: 3px 3px;
 }
 
+/* Portada en papel: el mismo dossier, pero con la tinta al revés. */
+.hero-paper {
+  background:
+    radial-gradient(760px 360px at 86% -8%, rgb(47 54 214 / 0.10), transparent 68%),
+    radial-gradient(560px 260px at 2% 108%, rgb(176 82 58 / 0.09), transparent 72%);
+}
+
+/* Bandas de color: tejido de encuadernación, con su grano. */
+.band-plum {
+  background:
+    radial-gradient(820px 380px at 84% -12%, rgb(169 169 255 / 0.16), transparent 70%),
+    radial-gradient(520px 260px at 0% 108%, rgb(211 155 120 / 0.12), transparent 72%);
+}
+.band-terra {
+  background:
+    radial-gradient(780px 360px at 88% -10%, rgb(255 214 190 / 0.18), transparent 70%),
+    radial-gradient(520px 240px at 0% 110%, rgb(255 255 255 / 0.08), transparent 72%);
+}
+
+/* Filete de cuatro tintas: separa bandas sin subrayar nada. */
+.stripes {
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-terra) 0 25%, var(--color-olive) 25% 50%, var(--color-mustard) 50% 75%, var(--color-plum) 75% 100%);
+}
+
+/* Etiqueta de sección y cita editorial */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.pull-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
 /* Segunda línea del titular en contorno: firma del dossier, sin cambiar la tipografía */
 .display-outline {
   color: transparent;
   -webkit-text-stroke: 1.4px rgb(243 238 227 / 0.85);
+}
+.display-outline-ink {
+  color: transparent;
+  -webkit-text-stroke: 1.4px rgb(25 19 9 / 0.72);
 }
 @media (min-width: 1024px) {
   .display-outline {
@@ -153,6 +246,72 @@
 }
 
 /* ---------- Animaciones ---------- */
+
+/* Filete que se dibuja al entrar: sólo una línea, pero da el pulso. */
+.rule-draw {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible .rule-draw,
+.rule-draw.is-visible {
+  transform: scaleX(1);
+}
+
+/* Enlace con subrayado que barre de izquierda a derecha. */
+.link-sweep {
+  position: relative;
+}
+.link-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: currentColor;
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-sweep:hover::after,
+.link-sweep:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Tarjeta con inclinación muy leve: se mueve con el puntero, no con el scroll. */
+.tilt-card {
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 420ms ease;
+}
+.tilt-card:hover {
+  transform: translateY(-3px) rotate(-0.35deg);
+  box-shadow: 0 22px 44px -30px rgb(25 19 9 / 0.55);
+}
+
+/* Anillo orbital: un trazo discontinuo que gira muy despacio tras la portada. */
+.orbit-ring {
+  position: absolute;
+  inset: -18px;
+  border-radius: 9999px;
+  border: 1px dashed rgb(47 54 214 / 0.35);
+  animation: spinSlow 46s linear infinite;
+}
+@keyframes spinSlow {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring { animation: none; }
+}
+
+/* Entradas escalonadas: el retardo lo pone cada hijo. */
+.stagger > * {
+  animation: mgFade 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger > *:nth-child(2) { animation-delay: 70ms; }
+.stagger > *:nth-child(3) { animation-delay: 140ms; }
+.stagger > *:nth-child(4) { animation-delay: 210ms; }
+.stagger > *:nth-child(5) { animation-delay: 280ms; }
+.stagger > *:nth-child(6) { animation-delay: 350ms; }
 
 /* Cinta de materias bajo la portada: se mueve sola y no pide nada al lector */
 @keyframes marquee {
@@ -576,5 +735,180 @@
     animation: none;
     flex-wrap: wrap;
     width: auto;
+  }
+}
+
+
+/* ---------- Tipografía editorial ---------- */
+
+/* Titulares en Fraunces: serif de contraste alto y eje óptico variable.
+   Se afina el trazo en cuerpos grandes, como en un libro impreso. */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.032em;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.display-hero {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 40, "WONK" 1;
+  font-weight: 500;
+  letter-spacing: -0.038em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+/* Entradilla: serif de lectura, cuerpo mayor, medida corta */
+.lede {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.55;
+  letter-spacing: 0.002em;
+  text-wrap: pretty;
+  max-width: 34ch;
+}
+
+/* Capitular para el primer párrafo de las bandas editoriales */
+.dropcap::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3.4em;
+  line-height: 0.76;
+  padding: 0.06em 0.09em 0 0;
+  color: var(--color-clay);
+}
+
+/* Etiqueta pequeña de dossier */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cifras alineadas en las tablas */
+.tnum {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Enlace con subrayado que se dibuja al pasar */
+.link-draw {
+  position: relative;
+  text-decoration: none;
+}
+.link-draw::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.link-draw:hover::after,
+.link-draw:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ---------- Más movimiento ---------- */
+
+/* Velo de papel: grano sutil que respira sobre las bandas oscuras */
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image:
+    radial-gradient(rgb(248 243 233 / 0.5) 0.5px, transparent 0.6px),
+    radial-gradient(rgb(248 243 233 / 0.3) 0.5px, transparent 0.6px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
+  animation: grainShift 9s steps(6) infinite;
+  mix-blend-mode: overlay;
+}
+@keyframes grainShift {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-2%, 1%, 0); }
+  40% { transform: translate3d(1%, -2%, 0); }
+  60% { transform: translate3d(-1%, -1%, 0); }
+  80% { transform: translate3d(2%, 1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* Portada que se descubre con un barrido vertical */
+.clip-reveal {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--cr, 0ms);
+}
+.clip-reveal.is-visible {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Floritura de la portada del hero al cargar */
+@keyframes floatSlow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -7px, 0); }
+}
+.float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+/* Subrayado de materia que crece desde el centro */
+.materia-pill {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+}
+.materia-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  transform: translateY(101%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  z-index: -1;
+}
+.materia-pill:hover::before {
+  transform: translateY(0);
+  opacity: 0.08;
+}
+
+/* Aparición con desenfoque, para los bloques que no usan Reveal */
+@keyframes blurIn {
+  from { opacity: 0; filter: blur(10px); transform: translate3d(0, 16px, 0); }
+  to { opacity: 1; filter: blur(0); transform: translate3d(0, 0, 0); }
+}
+.blur-in {
+  animation: blurIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paper-grain::before,
+  .float-slow,
+  .blur-in {
+    animation: none !important;
+  }
+  .clip-reveal {
+    clip-path: none !important;
+    transition: none !important;
+  }
+  .link-draw::after,
+  .materia-pill::before {
+    transition: none !important;
   }
 }
