@@ -304,7 +304,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ libroId, datos }) => {
           rows={3}
           placeholder="Qué te ha parecido, a quién se lo recomendarías…"
           aria-label="Tu opinión"
-          className="mt-3 w-full resize-y rounded-lg border border-line bg-paper px-3 py-2 text-[12.5px] leading-relaxed text-ink placeholder-muted outline-none focus:border-clay/60"
+          className="mt-3 w-full resize-y rounded-lg border border-line bg-paper px-3 py-2 pull-quote text-[14px] leading-snug text-ink placeholder-muted outline-none focus:border-clay/60"
         />
 
         <div className="mt-3 flex flex-wrap items-center gap-3">

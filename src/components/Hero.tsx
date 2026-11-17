@@ -189,7 +189,7 @@ export const Hero: React.FC<HeroProps> = ({ destacados, onOpenBook, onAdd }) => 
             <div className="flex items-start gap-3">
               <Quote className="mt-0.5 h-4 w-4 shrink-0 text-clay" />
               <div>
-                <p className="text-[13px] leading-relaxed text-ink/70">
+                <p className="pull-quote text-[15px] leading-snug text-ink/75">
                   {featured.excerpt
                     ? `«${featured.excerpt.original.slice(0, 116).replace(/^«/, '')}…»`
                     : `${featured.synopsis.slice(0, 120).trimEnd()}…`}
