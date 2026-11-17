@@ -177,7 +177,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
     <section id="catalogo" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-20 lg:px-10 lg:py-24">
       <div className="flex flex-col gap-8 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl">
-          <SectionLabel n="02">Catálogo</SectionLabel>
+          <SectionLabel n="03">Catálogo</SectionLabel>
           <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
             Los libros que recomendamos
           </h2>
@@ -507,7 +507,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             return (
             <article
               key={book.id}
-              className="group flex flex-col animate-fade-up"
+              className="card-lift group flex flex-col animate-fade-up"
               style={{ animationDelay: `${Math.min(index, 6) * 45}ms` }}
             >
               <div className="relative">
@@ -517,7 +517,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
                   className="block w-full overflow-hidden rounded-[3px] shadow-[0_12px_28px_-16px_rgba(45,40,34,0.55)] ring-1 ring-line transition-transform duration-300 group-hover:-translate-y-1"
                   aria-label={`Ver la ficha de ${book.title}`}
                 >
-                  <BookCover book={book} className="aspect-[3/4.15] w-full" />
+                  <BookCover book={book} className="card-cover aspect-[3/4.15] w-full" />
                 </button>
                 {book.badge && (
                   <span className="absolute left-3 top-3 rounded-full bg-paper/92 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-bark shadow-sm backdrop-blur">

@@ -5,7 +5,9 @@ import PORTADAS from './data/portadas.json';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { StatsBand } from './components/StatsBand';
+import { TopRatings } from './components/TopRatings';
 import { Ticker } from './components/Ticker';
+import { ReadProgress } from './components/ReadProgress';
 import { Oracle } from './components/Oracle';
 import { Catalog } from './components/Catalog';
 import { Encargables } from './components/Encargables';
@@ -146,6 +148,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-paper text-ink">
+      <ReadProgress />
       <a
         href="#catalogo"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-bark focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:text-paper"
@@ -196,6 +199,7 @@ export default function App() {
             ))}
           </ul>
         </div>
+        <TopRatings onOpenBook={abrirLibro} />
         <Oracle onOpenBook={abrirLibro} onAdd={addToCart} />
         <Catalog onOpenBook={abrirLibro} onAdd={addToCart} />
         <Encargables />

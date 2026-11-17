@@ -146,7 +146,7 @@ export const Encargables: React.FC = () => {
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-24">
         <div className="flex flex-col gap-6 border-b border-line pb-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <SectionLabel n="03">Encargos</SectionLabel>
+            <SectionLabel n="04">Encargos</SectionLabel>
             <h2 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] font-semibold leading-[1.02] tracking-tight text-ink">
               Todo lo que se publica en España
             </h2>

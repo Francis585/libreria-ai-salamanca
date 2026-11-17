@@ -1,0 +1,49 @@
+name: Sincronizar datos
+
+# Una vez por semana busca portadas nuevas y valoraciones reales en Open Library.
+# Si hay cambios, hace commit en main: el despliegue de producción sale solo.
+on:
+  schedule:
+    - cron: '15 4 * * 1' # lunes, 04:15 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: sync-datos
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Traer portadas y valoraciones
+        run: npm run sync
+
+      - name: Comprobar que compila
+        run: npx tsc --noEmit
+
+      - name: Commit solo si cambian los datos
+        run: |
+          set -e
+          git config user.name "libreria-datos[bot]"
+          git config user.email "datos@libreria-ai.local"
+          git add src/data/portadas.json src/data/ratings.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios esta semana."
+          else
+            git commit -m "chore(datos): portadas y valoraciones reales actualizadas"
+            git push origin main
+          fi
