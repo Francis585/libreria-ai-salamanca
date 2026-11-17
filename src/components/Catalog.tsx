@@ -507,7 +507,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
             return (
             <article
               key={book.id}
-              className="card-lift tilt-card tilt-card group flex flex-col animate-fade-up"
+              className="card-lift tilt-card group flex flex-col animate-fade-up"
               style={{ animationDelay: `${Math.min(index, 6) * 45}ms` }}
             >
               <div className="relative">
