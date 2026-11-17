@@ -407,7 +407,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onOpenBook, onAdd }) => {
           </div>
 
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Nota de la casa</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Valoración de lectores</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {NOTAS.map((opcion) => {
                 const activo = notaMinima === opcion.key;

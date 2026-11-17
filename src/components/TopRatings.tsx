@@ -42,7 +42,7 @@ export const TopRatings: React.FC<TopRatingsProps> = ({ onOpenBook }) => {
           </div>
           <p className="max-w-[34ch] text-[12.5px] leading-relaxed text-muted-warm">
             Medias y votos traídos de Open Library, actualizados solos. Las obras sin votos
-            suficientes no entran aquí: se quedan con la nota de la casa en su ficha.
+            suficientes no entran aquí; su ficha lo dice sin inventar una media.
           </p>
         </div>
 
