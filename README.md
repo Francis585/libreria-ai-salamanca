@@ -8,7 +8,7 @@ recomienda con modelo de lenguaje, un asistente que responde con datos reales de
 > base y el pago no está conectado. Está pensado como pieza de portfolio y como ejercicio
 > de curso.
 
-- **Web:** https://libreria-ai-lab.vercel.app
+- **Web:** https://libreria-ai-salamanca.vercel.app
 - **Código:** este repositorio · rama `main`
 
 ---
